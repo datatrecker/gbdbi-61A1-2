@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GBDBI · Projeto Final — SoundByte Series B</title>
+<style>
+:root {
+  --bg:     #fdf8f6;
+  --s1:     #f5ecea;
+  --s2:     #ecdeda;
+  --border: #dfc9c0;
+  --c1:     #7a1a1a;
+  --c2:     #b83030;
+  --text:   #1a0d0d;
+  --muted:  #8a6060;
+  --green:  #2d6a2d;
+  --green-bg: #e8f5e8;
+  --blue:   #1a3a7a;
+  --blue-bg: #e8eef8;
+  --amber:  #8a6a20;
+  --amber-bg: #fdf5e0;
+  --teal:   #1a6a6a;
+  --teal-bg: #e0f4f4;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+.page { display: none; min-height: 100vh; flex-direction: column; }
+.page.active { display: flex; animation: fadeUp .3s ease both; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+/* NAV */
+.t-nav { display:flex; align-items:center; gap:14px; padding:18px 40px; border-bottom:1px solid var(--border); position:sticky; top:0; background:rgba(253,248,246,.92); backdrop-filter:blur(12px); z-index:10; }
+.back { display:inline-flex; align-items:center; gap:7px; font-size:12.5px; color:var(--muted); cursor:pointer; padding:7px 14px; border:1px solid var(--border); border-radius:8px; background:none; transition:all .2s; text-decoration:none; font-family:inherit; }
+.back:hover { color:var(--c1); border-color:var(--c1); }
+.t-label { font-size:10.5px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); }
+
+/* BODY */
+.t-body { flex:1; display:flex; flex-direction:column; align-items:center; padding:56px 40px 64px; max-width:900px; margin:0 auto; width:100%; }
+.t-title { font-size:38px; font-weight:800; text-align:center; margin-bottom:52px; line-height:1.18; }
+.t-title em { font-style:normal; color:var(--c1); }
+
+/* MENU */
+.m-header { padding:72px 56px 48px; background:linear-gradient(160deg,#1a0d0d,#3a1010,#7a1a1a); }
+.m-eyebrow { font-size:10.5px; letter-spacing:4px; text-transform:uppercase; color:rgba(255,200,150,.7); font-weight:600; margin-bottom:18px; }
+.m-title { font-size:50px; font-weight:900; line-height:1.05; color:#fff; }
+.m-title span { color:#f0a050; }
+.m-sub { margin-top:14px; font-size:15px; color:rgba(255,255,255,.6); }
+.m-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(265px,1fr)); gap:14px; padding:32px 56px 72px; }
+.mcard { background:var(--s1); border:1px solid var(--border); border-radius:14px; padding:28px 26px 32px; cursor:pointer; transition:border-color .2s,transform .2s,box-shadow .2s; position:relative; overflow:hidden; appearance:none; -webkit-appearance:none; width:100%; text-align:left; font-family:inherit; font-size:inherit; color:inherit; }
+.mcard:hover { border-color:var(--c1); transform:translateY(-3px); box-shadow:0 16px 48px rgba(122,26,26,.10); }
+.mcard::after { content:''; position:absolute; inset:0 0 auto 0; height:2px; background:linear-gradient(90deg,var(--c1),var(--c2)); opacity:0; transition:opacity .2s; }
+.mcard:hover::after { opacity:1; }
+.mc-num { font-size:10px; letter-spacing:3px; font-weight:700; color:var(--c1); margin-bottom:14px; text-transform:uppercase; }
+.mc-h { font-size:16px; font-weight:700; line-height:1.35; margin-bottom:8px; }
+.mc-p { font-size:12.5px; color:var(--muted); line-height:1.6; }
+.mc-arrow { position:absolute; bottom:22px; right:22px; color:var(--muted); font-size:18px; transition:color .2s,transform .2s; }
+.mcard:hover .mc-arrow { color:var(--c1); transform:translate(2px,-2px); }
+
+/* CALLOUT */
+.callout { width:100%; max-width:760px; padding:18px 20px; background:var(--s1); border-left:3px solid var(--c1); border-radius:2px 8px 8px 2px; font-size:13.5px; line-height:1.65; color:var(--text); margin-bottom:28px; }
+.callout-tag { font-size:9px; letter-spacing:2.5px; text-transform:uppercase; font-weight:700; color:var(--c1); margin-bottom:8px; }
+.callout-green { border-left-color:var(--green); background:var(--green-bg); }
+.callout-green .callout-tag { color:var(--green); }
+.callout-blue { border-left-color:var(--blue); background:var(--blue-bg); }
+.callout-blue .callout-tag { color:var(--blue); }
+.callout-amber { border-left-color:var(--amber); background:var(--amber-bg); }
+.callout-amber .callout-tag { color:var(--amber); }
+.callout-teal { border-left-color:var(--teal); background:var(--teal-bg); }
+.callout-teal .callout-tag { color:var(--teal); }
+.callout-dark { border-left-color:#1a0d0d; background:#1a0d0d; color:#f0e4e0; }
+.callout-dark .callout-tag { color:rgba(255,200,150,.8); }
+
+/* SECTION TAG */
+.section-tag { font-size:9.5px; letter-spacing:2.5px; text-transform:uppercase; font-weight:700; color:var(--muted); margin-bottom:12px; width:100%; max-width:760px; }
+
+/* RUBRIC */
+.rub-wrap { width:100%; max-width:760px; margin-bottom:28px; }
+.rub-header { display:grid; grid-template-columns:2fr 1fr 4fr; background:var(--s1); border:1px solid var(--border); border-radius:8px 8px 0 0; }
+.rub-header div { padding:9px 14px; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; font-weight:700; color:var(--muted); border-right:1px solid var(--border); }
+.rub-header div:last-child { border-right:none; }
+.rub-row { display:grid; grid-template-columns:2fr 1fr 4fr; border:1px solid var(--border); border-top:none; }
+.rub-row:last-child { border-radius:0 0 8px 8px; }
+.rub-cell { padding:12px 14px; font-size:12.5px; line-height:1.5; border-right:1px solid var(--border); }
+.rub-cell:last-child { border-right:none; }
+.rub-cell.label { font-weight:700; background:var(--s1); }
+.rub-cell.pts { font-weight:800; color:var(--c1); text-align:center; display:flex; align-items:center; justify-content:center; font-size:15px; background:var(--s2); }
+.rub-cell.crit { color:var(--muted); font-size:12px; }
+
+/* CHECKLIST */
+.checklist { width:100%; max-width:760px; display:flex; flex-direction:column; gap:8px; margin-bottom:28px; }
+.check-item { display:flex; gap:12px; align-items:flex-start; background:#fff; border:1px solid var(--border); border-radius:8px; padding:12px 16px; }
+.check-box { width:22px; height:22px; border-radius:5px; border:2px solid var(--border); flex-shrink:0; margin-top:1px; }
+.check-text { font-size:13px; line-height:1.55; }
+.check-text strong { color:var(--text); }
+.check-text span { color:var(--muted); font-size:12px; }
+
+/* PROMPT BLOCK */
+.prompt-block { width:100%; max-width:760px; margin-bottom:24px; }
+.prompt-label { font-size:9px; letter-spacing:2.5px; text-transform:uppercase; font-weight:700; color:var(--muted); display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.prompt-label::after { content:''; flex:1; height:1px; background:var(--border); }
+.prompt-box { background:#120828; border-radius:10px; padding:18px 22px; }
+.prompt-box p { font-family:'SF Mono','Fira Code','Consolas',monospace; font-size:12.5px; line-height:1.85; color:rgba(255,255,255,.82); white-space:pre-wrap; }
+
+/* TABLE */
+.info-table { width:100%; max-width:760px; border-collapse:collapse; margin-bottom:28px; font-size:13px; }
+.info-table th { padding:10px 14px; text-align:left; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; font-weight:700; background:var(--s1); border-bottom:1px solid var(--border); color:var(--muted); }
+.info-table td { padding:10px 14px; border-bottom:1px solid var(--border); line-height:1.5; vertical-align:top; }
+.info-table tr:last-child td { border-bottom:none; }
+.info-table tr:hover td { background:var(--s2); }
+
+/* PREV/NEXT */
+.pg-nav { display:flex; justify-content:space-between; align-items:center; width:100%; max-width:760px; margin-top:40px; padding-top:24px; border-top:1px solid var(--border); gap:12px; }
+.pn-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:8px; border:1.5px solid var(--border); background:none; color:var(--muted); font-size:13px; font-weight:500; cursor:pointer; transition:all .2s; font-family:inherit; }
+.pn-btn:hover { border-color:var(--c1); color:var(--c1); background:rgba(122,26,26,.04); }
+.pn-fwd { margin-left:auto; }
+
+/* COMP HEADER */
+.comp-header { width:100%; max-width:760px; border-radius:12px; padding:20px 24px; margin-bottom:20px; display:flex; align-items:center; gap:16px; }
+.comp-header.c-model { background:var(--blue-bg); border:1.5px solid var(--blue); }
+.comp-header.c-arch  { background:var(--amber-bg); border:1.5px solid var(--amber); }
+.comp-header.c-gov   { background:#fdeaea; border:1.5px solid var(--c1); }
+.comp-header.c-narr  { background:var(--teal-bg); border:1.5px solid var(--teal); }
+.ch-icon { font-size:30px; flex-shrink:0; }
+.ch-label { font-size:9.5px; letter-spacing:2px; text-transform:uppercase; font-weight:800; margin-bottom:4px; }
+.c-model .ch-label { color:var(--blue); }
+.c-arch  .ch-label { color:var(--amber); }
+.c-gov   .ch-label { color:var(--c1); }
+.c-narr  .ch-label { color:var(--teal); }
+.ch-title { font-size:18px; font-weight:800; }
+.ch-weight { font-size:14px; font-weight:800; opacity:.7; margin-left:auto; flex-shrink:0; }
+
+@media (max-width:640px) {
+  .m-header { padding:48px 24px 36px; }
+  .m-title { font-size:38px; }
+  .m-grid { padding:24px 24px 48px; grid-template-columns:1fr; }
+  .t-body { padding:40px 20px 52px; }
+  .t-title { font-size:28px; margin-bottom:36px; }
+  .rub-header, .rub-row { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     MENU
+══════════════════════════════════════ -->
+<div id="menu" class="page active">
+  <nav class="t-nav">
+    <a class="back" href="aula8.html">← Voltar à Aula 8</a>
+    <span class="t-label">ESPM · Gestão BD &amp; BI · Projeto Final</span>
+  </nav>
+  <div class="m-header">
+    <div class="m-eyebrow">GBDBI · Projeto Final Integrador · 2026</div>
+    <div class="m-title">SoundByte<br><span>Series B</span></div>
+    <div class="m-sub">Modelo de Dados · Arquitetura · Governança · Narrativa Estratégica</div>
+  </div>
+  <div class="m-grid">
+    <button class="mcard" onclick="show('p1')">
+      <div class="mc-num">01</div>
+      <div class="mc-h">Brief e Contexto</div>
+      <p class="mc-p">O cenário completo da due diligence, o que o investidor quer avaliar e como o projeto está estruturado.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p2')">
+      <div class="mc-num">02</div>
+      <div class="mc-h">🗂️ Modelo de Dados (30%)</div>
+      <p class="mc-p">ERD OLTP + Star Schema com avaliação crítica das decisões de modelagem e consistência lógica.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p3')">
+      <div class="mc-num">03</div>
+      <div class="mc-h">🏗️ Arquitetura (25%)</div>
+      <p class="mc-p">Justificativa SQL vs. NoSQL para cada camada, ancorada nas decisões do modelo de dados.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p4')">
+      <div class="mc-num">04</div>
+      <div class="mc-h">🛡️ Governança (25%)</div>
+      <p class="mc-p">Política de acesso RBAC + mapa de riscos LGPD conectados aos dados identificados no ERD.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p5')">
+      <div class="mc-num">05</div>
+      <div class="mc-h">🎤 Narrativa (20%)</div>
+      <p class="mc-p">Estrutura da apresentação e critérios de coerência estratégica entre os três componentes.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p6')">
+      <div class="mc-num">06</div>
+      <div class="mc-h">Rubrica e Entrega</div>
+      <p class="mc-p">Pontuação detalhada por componente, formato de entrega e prompts de IA para revisão final.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P1 — BRIEF E CONTEXTO
+══════════════════════════════════════ -->
+<div id="p1" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">01 · Brief e Contexto</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">O fundo quer<br><em>ver os dados.</em></div>
+
+    <div class="callout callout-dark" style="font-size:14px;line-height:1.8;">
+      <div class="callout-tag">O Cenário</div>
+      O Fundo <strong style="color:#f0c060;">Vega Capital</strong> enviou um term sheet para a SoundByte: <strong style="color:#f0c060;">R$ 50 milhões</strong> por 18% da empresa, valuation de R$ 278 milhões. Antes de assinar, o fundo exige uma <em>due diligence de dados</em>. O parceiro responsável não quer apenas ver números — quer entender se a empresa <strong style="color:#f0c060;">sabe o que está fazendo com seus dados</strong>. Seu grupo é a equipe de dados da SoundByte. Vocês precisam demonstrar maturidade analítica.
+    </div>
+
+    <div class="section-tag">O que o Vega Capital quer avaliar</div>
+    <table class="info-table">
+      <thead><tr><th>#</th><th>Pergunta do Investidor</th><th>Componente</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>"O banco de dados está bem estruturado? As entidades refletem o negócio real? Há inconsistências que escondem problemas?"</td><td>🗂️ Modelo de Dados</td></tr>
+        <tr><td>2</td><td>"As escolhas de tecnologia fazem sentido? A arquitetura é coerente com o modelo de dados e suporta crescimento?"</td><td>🏗️ Arquitetura</td></tr>
+        <tr><td>3</td><td>"A empresa está em conformidade com a LGPD? A política de acesso cobre os dados que o modelo identifica como sensíveis?"</td><td>🛡️ Governança</td></tr>
+        <tr><td>4</td><td>"A equipe consegue articular suas decisões de dados? Modelo, arquitetura e governança contam a mesma história?"</td><td>🎤 Narrativa</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-blue">
+      <div class="callout-tag">O Foco deste Projeto</div>
+      Não é sobre gerar métricas ou visualizações. É sobre avaliar se há <strong>consistência conceitual e lógica</strong> na forma como a SoundByte trabalha com seus dados. O modelo reflete o negócio real? A arquitetura suporta o modelo? A governança cobre o que o modelo expõe? Se os três respondem "sim" de forma coerente, a empresa tem maturidade de dados.
+    </div>
+
+    <div class="section-tag">Os Dados Fornecidos</div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 20px;width:100%;max-width:760px;margin-bottom:28px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <span style="font-size:24px;">🗄️</span>
+        <div>
+          <div style="font-size:13px;font-weight:800;font-family:'SF Mono','Fira Code',monospace;">soundbyte_projeto_final.sql</div>
+          <span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;background:#e8f5e8;color:#2a6a2a;padding:2px 8px;border-radius:12px;">PostgreSQL</span>
+        </div>
+      </div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.65;">Script que cria e popula o banco com dados sintéticos da SoundByte: 200 usuários, 50 artistas, 300 músicas, 5.000 reproduções e 250 assinaturas dos últimos 18 meses. O foco é o <strong style="color:var(--text);">schema</strong> — as tabelas, colunas, tipos, chaves e relacionamentos — não os valores numéricos.</p>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn pn-fwd" onclick="show('p2')">Modelo de Dados →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P2 — MODELO DE DADOS
+══════════════════════════════════════ -->
+<div id="p2" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">02 · Modelo de Dados — 30%</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">O blueprint<br><em>do sistema.</em></div>
+
+    <div class="comp-header c-model">
+      <div class="ch-icon">🗂️</div>
+      <div>
+        <div class="ch-label">Componente 1</div>
+        <div class="ch-title">Modelo de Dados</div>
+      </div>
+      <div class="ch-weight">30%</div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-tag">O que Este Componente Avalia</div>
+      Não basta apresentar os diagramas — é preciso <strong>avaliar criticamente</strong> o modelo. O investidor quer saber se a equipe entende as decisões por trás da estrutura e consegue identificar onde o modelo está sólido e onde existem fragilidades. Um diagrama sem análise crítica não serve para due diligence.
+    </div>
+
+    <div class="section-tag">O que entregar</div>
+    <div class="checklist">
+      <div class="check-item">
+        <div class="check-box"></div>
+        <div class="check-text"><strong>ERD OLTP</strong> — Diagrama Entidade-Relacionamento do banco transacional da SoundByte (dbdiagram.io, draw.io ou equivalente). <span>Deve mostrar todas as 8 tabelas com atributos, PKs, FKs e cardinalidades.</span></div>
+      </div>
+      <div class="check-item">
+        <div class="check-box"></div>
+        <div class="check-text"><strong>Star Schema</strong> — Diagrama do modelo dimensional para análise. <span>1 tabela fato + pelo menos 3 dimensões. Indique granularidade e métricas da tabela fato.</span></div>
+      </div>
+      <div class="check-item">
+        <div class="check-box"></div>
+        <div class="check-text"><strong>Análise de Consistência</strong> — Texto de 1–2 páginas avaliando: <span>As entidades refletem o negócio real? Há normalização adequada? A granularidade da fato responde as perguntas estratégicas? Quais são as fragilidades do modelo atual? O Star Schema é coerente com o ERD?</span></div>
+      </div>
+    </div>
+
+    <div class="section-tag">Perguntas que a análise deve responder</div>
+    <div style="width:100%;max-width:760px;display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
+      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;gap:12px;">
+        <div style="font-size:18px;flex-shrink:0;">🔍</div>
+        <div style="font-size:13px;line-height:1.6;"><strong>As entidades fazem sentido?</strong> <span style="color:var(--muted);">As tabelas representam corretamente as entidades do negócio de streaming? Há entidades ausentes que deveriam existir (ex.: playlists, dispositivos, eventos de sessão)?</span></div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;gap:12px;">
+        <div style="font-size:18px;flex-shrink:0;">⚠️</div>
+        <div style="font-size:13px;line-height:1.6;"><strong>Há redundância ou inconsistência lógica?</strong> <span style="color:var(--muted);">O modelo está normalizado de forma adequada? Existem dados duplicados ou desnormalização não justificada? Algum campo pode gerar leituras ambíguas?</span></div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;gap:12px;">
+        <div style="font-size:18px;flex-shrink:0;">📐</div>
+        <div style="font-size:13px;line-height:1.6;"><strong>A granularidade da fato é correta?</strong> <span style="color:var(--muted);">A tabela fato captura o evento certo (reprodução individual, sessão, dia)? Essa granularidade permite responder as perguntas estratégicas de um investidor?</span></div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;gap:12px;">
+        <div style="font-size:18px;flex-shrink:0;">🔗</div>
+        <div style="font-size:13px;line-height:1.6;"><strong>O OLTP e o Star Schema são coerentes entre si?</strong> <span style="color:var(--muted);">As dimensões do Star Schema derivam naturalmente das tabelas do ERD? As métricas da fato existem no OLTP ou precisariam ser calculadas? Há decisões do Star Schema que contradizem o OLTP?</span></div>
+      </div>
+    </div>
+
+    <div class="section-tag">Star Schema — Estrutura de Referência</div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px 22px;width:100%;max-width:760px;margin-bottom:24px;">
+      <div style="font-size:9.5px;letter-spacing:2px;font-weight:700;color:var(--muted);margin-bottom:14px;">TABELA FATO</div>
+      <p style="font-size:13px;line-height:1.7;margin-bottom:16px;"><strong>fato_reproducao</strong>: reproducao_key, usuario_key, musica_key, data_key, dispositivo, duracao_seg, completou_musica (booleano), plano_usuario, receita_atribuida</p>
+      <div style="font-size:9.5px;letter-spacing:2px;font-weight:700;color:var(--muted);margin-bottom:12px;">DIMENSÕES MÍNIMAS</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12.5px;line-height:1.65;">
+        <div style="background:var(--s1);border-radius:8px;padding:12px 14px;"><strong>dim_usuario</strong><br><span style="color:var(--muted)">usuario_key, nome, plano, cidade, estado, faixa_etaria</span></div>
+        <div style="background:var(--s1);border-radius:8px;padding:12px 14px;"><strong>dim_musica</strong><br><span style="color:var(--muted)">musica_key, titulo, artista, genero, album, pais_artista</span></div>
+        <div style="background:var(--s1);border-radius:8px;padding:12px 14px;"><strong>dim_data</strong><br><span style="color:var(--muted)">data_key, data, dia, mes, trimestre, ano, dia_semana, hora</span></div>
+        <div style="background:var(--s1);border-radius:8px;padding:12px 14px;"><strong>dim_dispositivo</strong> (se aplicável)<br><span style="color:var(--muted)">dispositivo_key, tipo, sistema_operacional</span></div>
+      </div>
+    </div>
+
+    <div class="section-tag">Rubrica — Modelo de Dados</div>
+    <div class="rub-wrap">
+      <div class="rub-header"><div>Critério</div><div>Pts</div><div>O que é esperado</div></div>
+      <div class="rub-row"><div class="rub-cell label">ERD OLTP completo</div><div class="rub-cell pts">7</div><div class="rub-cell crit">Todas as 8 tabelas com atributos, PKs marcados, FKs com seta, cardinalidades indicadas (1:N, N:M quando aplicável)</div></div>
+      <div class="rub-row"><div class="rub-cell label">Star Schema correto</div><div class="rub-cell pts">8</div><div class="rub-cell crit">Tabela fato com métricas identificadas, granularidade declarada, ≥ 3 dimensões derivadas do OLTP, chaves surrogate indicadas</div></div>
+      <div class="rub-row"><div class="rub-cell label">Análise de consistência</div><div class="rub-cell pts">15</div><div class="rub-cell crit">Identifica pelo menos 2 pontos fortes e 2 fragilidades no modelo. Justifica as decisões de granularidade. Avalia a coerência entre OLTP e Star Schema. Conecta as escolhas de modelagem ao negócio da SoundByte.</div></div>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-label">Prompt IA — Análise de Consistência do Modelo</div>
+      <div class="prompt-box">
+        <p>Você é um arquiteto de dados sênior revisando um modelo de dados para due diligence de investimento.
+
+Contexto: SoundByte é um serviço de streaming musical brasileiro com 200 mil usuários, 3 planos (gratuito/estudante/premium), dados de reprodução e assinaturas.
+
+O ERD OLTP proposto é:
+[COLE AQUI A DESCRIÇÃO OU IMAGEM DO SEU ERD]
+
+O Star Schema proposto é:
+[COLE AQUI A DESCRIÇÃO DO STAR SCHEMA]
+
+Por favor, avalie:
+1. As entidades do ERD representam adequadamente o negócio de streaming? Falta alguma entidade importante?
+2. Há problemas de normalização, redundância ou inconsistência lógica no modelo?
+3. A granularidade da tabela fato é adequada para perguntas estratégicas de um investidor?
+4. O Star Schema é coerente com o ERD, ou há dimensões que contradizem o modelo transacional?
+5. Dê uma avaliação geral (1–5) sobre a maturidade do modelo de dados</p>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p1')">← Brief</button>
+      <button class="pn-btn pn-fwd" onclick="show('p3')">Arquitetura →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P3 — ARQUITETURA
+══════════════════════════════════════ -->
+<div id="p3" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">03 · Arquitetura — 25%</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Por que SQL aqui<br><em>e NoSQL ali?</em></div>
+
+    <div class="comp-header c-arch">
+      <div class="ch-icon">🏗️</div>
+      <div>
+        <div class="ch-label">Componente 2</div>
+        <div class="ch-title">Arquitetura de Dados</div>
+      </div>
+      <div class="ch-weight">25%</div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-tag">A Conexão com o Modelo</div>
+      Cada decisão de arquitetura deve ser ancorada no modelo de dados do Componente 1. Não argumente "NoSQL é escalável" em abstrato — argumente "usamos MongoDB para perfis de usuário <em>porque</em> o ERD mostra que os dados de escuta são semi-estruturados e variam por usuário, o que torna um schema fixo inadequado". Arquitetura sem ancoragem no modelo é genérica e não convence um investidor.
+    </div>
+
+    <div class="section-tag">A Arquitetura Proposta para a SoundByte</div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px 22px;width:100%;max-width:760px;margin-bottom:24px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;font-size:12.5px;">
+        <div style="background:var(--blue-bg);border-radius:8px;padding:14px;border:1px solid #b0c8ec;">
+          <div style="font-size:9.5px;letter-spacing:2px;font-weight:700;color:var(--blue);margin-bottom:6px;">CAMADA OLTP</div>
+          <p style="color:var(--muted);line-height:1.55;"><strong>PostgreSQL</strong><br>Usuários, assinaturas, pagamentos, transações — dados com integridade referencial forte</p>
+        </div>
+        <div style="background:#f0eafa;border-radius:8px;padding:14px;border:1px solid #c0a8e8;">
+          <div style="font-size:9.5px;letter-spacing:2px;font-weight:700;color:#4a2a7a;margin-bottom:6px;">CAMADA NoSQL</div>
+          <p style="color:var(--muted);line-height:1.55;"><strong>MongoDB Atlas</strong><br>Perfis de usuário, histórico de escuta, recomendações — dados semi-estruturados e variáveis</p>
+        </div>
+        <div style="background:var(--green-bg);border-radius:8px;padding:14px;border:1px solid #a0d0a0;">
+          <div style="font-size:9.5px;letter-spacing:2px;font-weight:700;color:var(--green);margin-bottom:6px;">CAMADA ANALÍTICA</div>
+          <p style="color:var(--muted);line-height:1.55;"><strong>Star Schema</strong><br>Relatórios, KPIs, due diligence — modelo dimensional derivado das camadas anteriores</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-tag">O que justificar</div>
+    <div class="checklist">
+      <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Por que PostgreSQL para a camada OLTP?</strong> <span>Conecte com as entidades do ERD: quais tabelas exigem integridade referencial forte (ACID)? Onde as transações precisam ser atômicas (ex.: assinatura + pagamento)?</span></div></div>
+      <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Por que MongoDB para perfis e histórico?</strong> <span>Mostre como o ERD evidencia dados semi-estruturados: o perfil de escuta varia por usuário, playlists têm estrutura variável, recomendações são documentos JSON. Conecte com a Aula 6.</span></div></div>
+      <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Como a camada analítica se conecta ao Star Schema?</strong> <span>O Star Schema do Componente 1 deve alimentar essa camada. Explique o fluxo: como os dados migram do PostgreSQL e MongoDB para o modelo dimensional?</span></div></div>
+      <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Escalabilidade:</strong> o que quebra primeiro a 10× o volume atual? <span>Identifique o gargalo mais provável (PostgreSQL de reproduções? MongoDB de histórico?) e proponha uma solução (sharding, particionamento, cache, separação de leitura/escrita).</span></div></div>
+      <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Diagrama da arquitetura:</strong> crie no <strong>Lucidchart</strong> (lucid.app — gratuito) mostrando os 3 sistemas, o fluxo de dados entre eles e quem consome cada camada. <span>Inclua no PDF um print do diagrama e o link de compartilhamento do Lucid.</span></div></div>
+    </div>
+
+    <div class="section-tag">Rubrica — Arquitetura</div>
+    <div class="rub-wrap">
+      <div class="rub-header"><div>Critério</div><div>Pts</div><div>O que é esperado</div></div>
+      <div class="rub-row"><div class="rub-cell label">Diagrama da arquitetura (Lucid)</div><div class="rub-cell pts">5</div><div class="rub-cell crit">Diagrama com 3 camadas identificadas, fluxo de dados indicado e consumidores mapeados. Print + link incluídos no PDF.</div></div>
+      <div class="rub-row"><div class="rub-cell label">Justificativa SQL vs. NoSQL</div><div class="rub-cell pts">12</div><div class="rub-cell crit">Argumentos específicos para SoundByte, ancorados no modelo de dados do Componente 1. Menciona entidades ou atributos do ERD para justificar cada escolha. Justificativas genéricas não pontuam.</div></div>
+      <div class="rub-row"><div class="rub-cell label">Análise de escalabilidade</div><div class="rub-cell pts">8</div><div class="rub-cell crit">Identifica o componente de maior risco de gargalo a 10× o volume atual, conecta ao modelo de dados e propõe solução concreta (índices, sharding, cache, etc.)</div></div>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-label">Prompt IA — Revisão de Arquitetura</div>
+      <div class="prompt-box">
+        <p>Você é um arquiteto de dados sênior avaliando uma proposta de arquitetura para due diligence de investimento.
+
+Contexto: SoundByte é um serviço de streaming musical. O ERD proposto pelo grupo é:
+[COLE A DESCRIÇÃO DO ERD]
+
+A arquitetura proposta é:
+- PostgreSQL para: [descreva quais dados]
+- MongoDB para: [descreva quais dados]
+- Star Schema para: [descreva quais dados]
+
+As justificativas do grupo são:
+[COLE AS JUSTIFICATIVAS]
+
+Por favor:
+1. As justificativas estão ancoradas no modelo de dados, ou são genéricas?
+2. Há dados no ERD que foram alocados na tecnologia errada?
+3. Qual é o ponto mais frágil da arquitetura a 10× o volume atual?
+4. A camada analítica (Star Schema) é acessível a partir das camadas propostas?</p>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p2')">← Modelo</button>
+      <button class="pn-btn pn-fwd" onclick="show('p4')">Governança →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P4 — GOVERNANÇA
+══════════════════════════════════════ -->
+<div id="p4" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">04 · Governança — 25%</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Quem acessa o quê.<br><em>Com qual base legal.</em></div>
+
+    <div class="comp-header c-gov">
+      <div class="ch-icon">🛡️</div>
+      <div>
+        <div class="ch-label">Componente 3</div>
+        <div class="ch-title">Governança e LGPD</div>
+      </div>
+      <div class="ch-weight">25%</div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-tag">A Conexão com o ERD</div>
+      A política de governança deve ser construída a partir dos dados reais identificados no ERD do Componente 1. Cada campo sensível que aparece no modelo — e-mail, localização, histórico de escuta, dados de pagamento — deve aparecer nominalmente no mapa de riscos LGPD e na matriz RBAC. Governança desconectada do modelo é burocracia sem valor.
+    </div>
+
+    <div class="section-tag">Entregável 1 — Mapa de Riscos LGPD</div>
+    <table class="info-table">
+      <thead><tr><th>Dado no ERD</th><th>Classificação</th><th>Base Legal</th><th>Retenção</th><th>Risco · Mitigação</th></tr></thead>
+      <tbody>
+        <tr style="background:var(--s2)"><td colspan="5" style="font-size:11px;color:var(--muted);font-style:italic;">→ Preencha para cada campo sensível identificado no seu ERD (e-mail, localização, pagamentos, histórico de streaming, etc.)</td></tr>
+        <tr><td>E-mail e nome<br><span style="font-size:10px;color:var(--muted);">tabela: usuarios</span></td><td>Dado Pessoal</td><td>Execução de contrato (Art. 7º, V)</td><td>Enquanto conta ativa + 5 anos</td><td>Baixo — padrão de mercado</td></tr>
+        <tr><td>Localização / cidade<br><span style="font-size:10px;color:var(--muted);">tabela: usuarios</span></td><td>Dado Pessoal</td><td>Consentimento (Art. 7º, I)</td><td>Enquanto conta ativa</td><td>Médio — GPS preciso é sensível em contexto</td></tr>
+        <tr><td>Histórico de streaming<br><span style="font-size:10px;color:var(--muted);">tabela: reproducoes</span></td><td>Dado Comportamental</td><td>Legítimo interesse (Art. 7º, IX)</td><td>36 meses após último acesso</td><td>Alto — pode revelar preferências religiosas, políticas</td></tr>
+        <tr><td>Dados de pagamento<br><span style="font-size:10px;color:var(--muted);">tabela: assinaturas</span></td><td>Dado Financeiro</td><td>Execução de contrato (Art. 7º, V)</td><td>10 anos (obrigação fiscal)</td><td>Alto — acesso restrito ao financeiro</td></tr>
+        <tr style="background:var(--s1)"><td colspan="5" style="font-size:11px;color:var(--muted);font-style:italic;">→ Continue para todos os campos sensíveis do seu ERD...</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-tag">Entregável 2 — Matriz RBAC</div>
+    <div class="callout callout-amber" style="margin-bottom:16px;">
+      <div class="callout-tag">Situação Especial — Due Diligence</div>
+      Durante a due diligence, o Vega Capital terá acesso <em>limitado e temporário</em> a certos dados. Sua matriz RBAC deve incluir o perfil <strong>"Auditor Externo (Due Diligence)"</strong> — com acesso de leitura apenas aos dados necessários para validar a estrutura do modelo e métricas agregadas, sem acesso a dados pessoais individuais de usuários. Justifique cada restrição.
+    </div>
+
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 20px;width:100%;max-width:760px;margin-bottom:24px;overflow-x:auto;">
+      <table style="border-collapse:collapse;font-size:12px;min-width:600px;width:100%;">
+        <thead>
+          <tr style="background:var(--s1);">
+            <th style="padding:8px 12px;border:1px solid var(--border);text-align:left;">Dado (tabela no ERD)</th>
+            <th style="padding:8px 12px;border:1px solid var(--border);text-align:center;">Estagiário<br>Mktg</th>
+            <th style="padding:8px 12px;border:1px solid var(--border);text-align:center;">Analista<br>BI</th>
+            <th style="padding:8px 12px;border:1px solid var(--border);text-align:center;">Eng.<br>Dados</th>
+            <th style="padding:8px 12px;border:1px solid var(--border);text-align:center;">DPO</th>
+            <th style="padding:8px 12px;border:1px solid var(--border);text-align:center;">Auditor<br>Externo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:8px 12px;border:1px solid var(--border);font-weight:600;">Dados pessoais (email, nome)</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;font-style:italic;color:var(--muted);">preencher</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;font-style:italic;color:var(--muted);">preencher</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;font-style:italic;color:var(--muted);">preencher</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;font-style:italic;color:var(--muted);">preencher</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;">—</td></tr>
+          <tr><td style="padding:8px 12px;border:1px solid var(--border);font-weight:600;">Dados financeiros (assinaturas)</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;">—</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;font-style:italic;color:var(--muted);">preencher</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;font-style:italic;color:var(--muted);">preencher</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;font-style:italic;color:var(--muted);">preencher</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;">L (anonimizado)</td></tr>
+          <tr><td style="padding:8px 12px;border:1px solid var(--border);font-weight:600;">Histórico de streaming</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;font-style:italic;color:var(--muted);">preencher</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;font-style:italic;color:var(--muted);">preencher</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;font-style:italic;color:var(--muted);">preencher</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;font-style:italic;color:var(--muted);">preencher</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;">L (agregado)</td></tr>
+          <tr><td style="padding:8px 12px;border:1px solid var(--border);font-weight:600;">Schema do banco (ERD)</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;">—</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;font-style:italic;color:var(--muted);">preencher</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;font-style:italic;color:var(--muted);">preencher</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;font-style:italic;color:var(--muted);">preencher</td><td style="padding:8px 12px;border:1px solid var(--border);text-align:center;">L (estrutura)</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:11px;color:var(--muted);margin-top:10px;">L = Leitura · E = Edição · X = Exclusão · — = Sem acesso · Continue para todos os dados do seu ERD</p>
+    </div>
+
+    <div class="section-tag">Rubrica — Governança</div>
+    <div class="rub-wrap">
+      <div class="rub-header"><div>Critério</div><div>Pts</div><div>O que é esperado</div></div>
+      <div class="rub-row"><div class="rub-cell label">Mapa de riscos LGPD</div><div class="rub-cell pts">10</div><div class="rub-cell crit">Cobre todos os campos sensíveis do ERD (com nome da tabela). Base legal com artigo citado. Período de retenção por tipo. Pelo menos 3 riscos com mitigação específica para a SoundByte.</div></div>
+      <div class="rub-row"><div class="rub-cell label">Matriz RBAC completa</div><div class="rub-cell pts">8</div><div class="rub-cell crit">Todos os dados × todos os perfis (incluindo Auditor Externo). Perfil de due diligence com acesso mínimo necessário e justificativa do que foi restringido e por quê.</div></div>
+      <div class="rub-row"><div class="rub-cell label">Plano de resposta a incidentes</div><div class="rub-cell pts">7</div><div class="rub-cell crit">Processo de 4–5 etapas: detecção → escalonamento → notificação ANPD (prazo 72h) → comunicação ao Vega Capital durante a due diligence. Inclui quem notifica quem.</div></div>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-label">Prompt IA — Revisão da Política de Governança</div>
+      <div class="prompt-box">
+        <p>Você é um DPO (Data Protection Officer) sênior revisando a política de governança de uma empresa de streaming para due diligence de investimento.
+
+O ERD da SoundByte contém os seguintes dados sensíveis identificados pelo grupo:
+[LISTE OS CAMPOS SENSÍVEIS COM SUAS TABELAS]
+
+O mapa de riscos LGPD proposto é:
+[COLE O MAPA DE RISCOS]
+
+A matriz RBAC proposta é:
+[COLE A MATRIZ RBAC]
+
+Por favor, avalie:
+1. Algum campo sensível do ERD foi esquecido no mapa de riscos?
+2. As bases legais estão corretas para cada tipo de dado?
+3. O perfil "Auditor Externo (Due Diligence)" tem acesso mínimo necessário ou está muito permissivo/restritivo?
+4. O plano de resposta a incidentes cobre o cenário de uma violação durante a due diligence?</p>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p3')">← Arquitetura</button>
+      <button class="pn-btn pn-fwd" onclick="show('p5')">Narrativa →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P5 — NARRATIVA
+══════════════════════════════════════ -->
+<div id="p5" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">05 · Narrativa — 20%</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">A análise é evidência.<br><em>A decisão é sua.</em></div>
+
+    <div class="comp-header c-narr">
+      <div class="ch-icon">🎤</div>
+      <div>
+        <div class="ch-label">Componente 4</div>
+        <div class="ch-title">Narrativa e Apresentação</div>
+      </div>
+      <div class="ch-weight">20%</div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-tag">O que Será Avaliado</div>
+      A apresentação dura 10 minutos por grupo. Use o próprio documento PDF de entrega como suporte — não é necessário preparar slides separados. Os outros grupos atuam como o time do Vega Capital e podem fazer perguntas. O professor avalia a clareza da argumentação, a coerência entre os três componentes e a capacidade de conectar modelo, arquitetura e governança a uma avaliação estratégica.
+    </div>
+
+    <div class="section-tag">Roteiro da Apresentação (10 min · usando o PDF de entrega)</div>
+    <table class="info-table">
+      <thead><tr><th>Seção do PDF</th><th>O que apresentar</th><th>Tempo</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Abertura</strong></td><td>O que é a SoundByte — contexto em 1 frase e o desafio central da due diligence</td><td>30s</td></tr>
+        <tr><td><strong>Modelo de Dados</strong></td><td>Mostrar o ERD e o Star Schema — "veja onde o modelo é sólido e onde identificamos fragilidades"</td><td>2.5 min</td></tr>
+        <tr><td><strong>Arquitetura</strong></td><td>Explicar por que cada tecnologia foi escolhida — conectando às entidades do ERD apresentado</td><td>2.5 min</td></tr>
+        <tr><td><strong>Governança</strong></td><td>Mostrar o mapa LGPD e a matriz RBAC — "os dados sensíveis que identificamos no modelo estão cobertos assim"</td><td>2 min</td></tr>
+        <tr><td><strong>Avaliação Final</strong></td><td>A SoundByte tem maturidade de dados para receber R$ 50 milhões? Quais são os pontos fortes e os riscos reais?</td><td>1.5 min</td></tr>
+        <tr><td><strong>Perguntas</strong></td><td>Responder as objeções do time do Vega Capital</td><td>1 min</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-teal">
+      <div class="callout-tag">A Regra da Coerência</div>
+      Os três componentes devem se reforçar mutuamente na apresentação. <strong>Exemplo de coerência:</strong> "O ERD mostra que o histórico de streaming contém dados comportamentais sensíveis [Modelo]. Por isso, alocamos esse dado no MongoDB com acesso controlado [Arquitetura]. E na matriz RBAC, apenas o Eng. de Dados e o DPO têm acesso de leitura a esses documentos [Governança]." Essa cadeia é o que o investidor quer ver.
+    </div>
+
+    <div class="callout">
+      <div class="callout-tag">A Pergunta Final que Você Precisa Responder</div>
+      Com base na análise dos três componentes, sua equipe deve emitir um parecer: <em>"A SoundByte demonstra maturidade de dados suficiente para uma rodada Series B de R$ 50 milhões?"</em> Sustente sua resposta com evidências concretas do modelo, da arquitetura e da governança — e seja honesto sobre os riscos encontrados. Investidores valorizam times que conhecem suas próprias fragilidades.
+    </div>
+
+    <div class="section-tag">Rubrica — Narrativa</div>
+    <div class="rub-wrap">
+      <div class="rub-header"><div>Critério</div><div>Pts</div><div>O que é esperado</div></div>
+      <div class="rub-row"><div class="rub-cell label">Clareza e estrutura</div><div class="rub-cell pts">6</div><div class="rub-cell crit">Apresentação com início (contexto), meio (análise dos 3 componentes) e fim (parecer estratégico). Tempo respeitado. Navegação fluida pelo documento PDF.</div></div>
+      <div class="rub-row"><div class="rub-cell label">Coerência entre componentes</div><div class="rub-cell pts">8</div><div class="rub-cell crit">Pelo menos 3 momentos em que uma decisão de um componente é conectada explicitamente a outro. O ERD justifica a arquitetura. A arquitetura justifica escolhas de governança. Os três convergem para o parecer final.</div></div>
+      <div class="rub-row"><div class="rub-cell label">Parecer estratégico fundamentado</div><div class="rub-cell pts">6</div><div class="rub-cell crit">A avaliação final ("maturidade suficiente ou não") é sustentada por evidências específicas do modelo, da arquitetura e da governança — não por opinião geral.</div></div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p4')">← Governança</button>
+      <button class="pn-btn pn-fwd" onclick="show('p6')">Rubrica e Entrega →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P6 — RUBRICA E ENTREGA
+══════════════════════════════════════ -->
+<div id="p6" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">06 · Rubrica e Entrega</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">O que entregar<br><em>e como pontua.</em></div>
+
+    <div class="section-tag">Pontuação Total</div>
+    <table class="info-table" style="margin-bottom:28px;">
+      <thead><tr><th>Componente</th><th>Peso</th><th>Pontos Máx.</th></tr></thead>
+      <tbody>
+        <tr><td>🗂️ Modelo de Dados (ERD + Star Schema + Análise de Consistência)</td><td>30%</td><td><strong>30</strong></td></tr>
+        <tr><td>🏗️ Arquitetura (diagrama + justificativa + escalabilidade)</td><td>25%</td><td><strong>25</strong></td></tr>
+        <tr><td>🛡️ Governança (LGPD + RBAC + plano de incidentes)</td><td>25%</td><td><strong>25</strong></td></tr>
+        <tr><td>🎤 Narrativa (apresentação + coerência + parecer)</td><td>20%</td><td><strong>20</strong></td></tr>
+        <tr style="background:var(--s2);"><td colspan="2"><strong>Total</strong></td><td><strong>100</strong></td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-tag">Formato de Entrega</div>
+    <div class="callout" style="margin-bottom:16px;">
+      <div class="callout-tag">Documento Principal (PDF)</div>
+      Um único PDF organizado em 4 seções numeradas (uma por componente). Cada seção deve conter: (1) o entregável (diagrama, tabela ou texto) e (2) a análise/justificativa crítica. Imagens devem ser de alta resolução e legíveis.<br><br>
+      <strong>Limite:</strong> 15 páginas (sem contar capa e índice). Objetividade é avaliada — não há bônus por extensão.
+    </div>
+
+    <div class="callout callout-blue" style="margin-bottom:28px;">
+      <div class="callout-tag">Diagrama de Arquitetura — Lucidchart</div>
+      Inclua no PDF: <strong>1 print do diagrama de arquitetura</strong> criado no Lucidchart (lucid.app — conta gratuita) + <strong>o link de compartilhamento</strong>. O diagrama deve mostrar os 3 sistemas (PostgreSQL, MongoDB, Star Schema), os fluxos de dados entre eles e os consumidores de cada camada.
+    </div>
+
+    <div class="section-tag">Prompt IA — Revisão Final do Projeto</div>
+    <div class="prompt-block">
+      <div class="prompt-label">Prompt — IA como Analista do Vega Capital</div>
+      <div class="prompt-box">
+        <p>Você é um analista sênior do Fundo Vega Capital, responsável pela due diligence de dados da SoundByte antes de uma rodada Series B de R$ 50 milhões.
+
+Vou submeter o pacote de due diligence preparado pela equipe de dados. Avalie cada componente:
+
+1. MODELO DE DADOS: [cole o ERD e Star Schema + análise de consistência do grupo]
+2. ARQUITETURA: [cole a justificativa SQL vs. NoSQL + diagrama]
+3. GOVERNANÇA: [cole o mapa de riscos LGPD + matriz RBAC + plano de incidentes]
+
+Por favor:
+1. Os três componentes são coerentes entre si? Há contradições entre o modelo, a arquitetura e a governança?
+2. Qual pergunta da due diligence este pacote não respondeu satisfatoriamente?
+3. Há algum red flag de governança, modelagem ou arquitetura que recomendaria investigar antes de aprovar o investimento?
+4. Se fosse apresentar este pacote ao comitê do fundo, qual seria o principal ponto forte e o principal risco?
+
+Seja direto e técnico — como em um parecer real de due diligence.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-green">
+      <div class="callout-tag">Política de Uso de IA</div>
+      IA pode e deve ser usada para revisar componentes, verificar consistência e gerar hipóteses. O que será avaliado é a capacidade de analisar, justificar e apresentar o que foi produzido. Indique no documento quais partes receberam assistência de IA e o que o grupo modificou, rejeitou ou aprofundou.
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p5')">← Narrativa</button>
+      <button class="pn-btn pn-fwd" onclick="show('menu')">← Menu Principal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) { el.classList.add('active'); window.scrollTo(0, 0); }
+}
+</script>
+</body>
+</html>

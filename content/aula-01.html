@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GBDBI · Aula 1 — Fundamentos de Dados</title>
+<style>
+:root {
+  --bg:     #fdf8f6;
+  --s1:     #f5ecea;
+  --s2:     #ecdeda;
+  --border: #dfc9c0;
+  --c1:     #7a1a1a;
+  --c2:     #b83030;
+  --text:   #1a0d0d;
+  --muted:  #8a6060;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* PAGE SYSTEM */
+.page { display: none; min-height: 100vh; flex-direction: column; }
+.page.active { display: flex; animation: fadeUp .3s ease both; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── MENU ── */
+.m-header { padding: 72px 56px 48px; }
+.m-eyebrow {
+  font-size: 10.5px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--c1); font-weight: 600; margin-bottom: 18px;
+}
+.m-title {
+  font-size: 50px; font-weight: 800; line-height: 1.08;
+  background: linear-gradient(140deg, #1a0d0d 30%, #7a1a1a);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.m-sub { margin-top: 14px; font-size: 15px; color: var(--muted); }
+
+.m-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+  gap: 14px; padding: 0 56px 72px;
+}
+.mcard {
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: 14px; padding: 28px 26px 32px;
+  cursor: pointer; transition: border-color .2s, transform .2s, box-shadow .2s;
+  position: relative; overflow: hidden;
+  appearance: none; -webkit-appearance: none;
+  width: 100%; text-align: left;
+  font-family: inherit; font-size: inherit; color: inherit;
+}
+.mcard:hover {
+  border-color: var(--c1); transform: translateY(-3px);
+  box-shadow: 0 16px 48px rgba(122,26,26,.10);
+}
+.mcard::after {
+  content: ''; position: absolute; inset: 0 0 auto 0;
+  height: 2px; background: linear-gradient(90deg, var(--c1), var(--c2));
+  opacity: 0; transition: opacity .2s;
+}
+.mcard:hover::after { opacity: 1; }
+.mc-num { font-size: 10px; letter-spacing: 3px; font-weight: 700; color: var(--c1); margin-bottom: 14px; text-transform: uppercase; }
+.mc-h { font-size: 16px; font-weight: 700; line-height: 1.35; margin-bottom: 8px; }
+.mc-p { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+.mc-arrow {
+  position: absolute; bottom: 22px; right: 22px;
+  color: var(--muted); font-size: 18px; transition: color .2s, transform .2s;
+}
+.mcard:hover .mc-arrow { color: var(--c1); transform: translate(2px, -2px); }
+
+/* ── TOPIC PAGES ── */
+.t-nav {
+  display: flex; align-items: center; gap: 14px;
+  padding: 18px 40px; border-bottom: 1px solid var(--border);
+  position: sticky; top: 0;
+  background: rgba(253,248,246,.92); backdrop-filter: blur(12px); z-index: 10;
+}
+.back {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 12.5px; color: var(--muted); cursor: pointer;
+  padding: 7px 14px; border: 1px solid var(--border);
+  border-radius: 8px; background: none; transition: all .2s;
+}
+.back:hover { color: var(--c1); border-color: var(--c1); }
+.t-label { font-size: 10.5px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+
+.t-body {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; padding: 56px 40px 64px;
+  max-width: 900px; margin: 0 auto; width: 100%;
+}
+.t-title { font-size: 38px; font-weight: 800; text-align: center; margin-bottom: 52px; line-height: 1.18; }
+.t-title em { font-style: normal; color: var(--c1); }
+
+.diagram { width: 100%; max-width: 720px; margin-bottom: 44px; }
+
+.kps { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; width: 100%; max-width: 720px; }
+.kp { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 18px 18px 16px; }
+.kp-tag { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 7px; }
+.kp-text { font-size: 13.5px; line-height: 1.55; color: var(--text); }
+
+/* ── PREV / NEXT NAVIGATION ── */
+.pg-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  width: 100%; max-width: 720px; margin-top: 40px;
+  padding-top: 24px; border-top: 1px solid var(--border);
+  gap: 12px;
+}
+.pn-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 8px;
+  border: 1.5px solid var(--border); background: none;
+  color: var(--muted); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all .2s; font-family: inherit;
+}
+.pn-btn:hover { border-color: var(--c1); color: var(--c1); background: rgba(122,26,26,.04); }
+.pn-fwd { margin-left: auto; }
+
+/* ── REFERENCE LINKS (p6) ── */
+.ref-links { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; width: 100%; max-width: 760px; }
+.ref-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 20px; border-radius: 8px;
+  border: 1.5px solid var(--c1); color: var(--c1);
+  font-size: 13px; font-weight: 600; text-decoration: none;
+  transition: all .2s; background: transparent;
+}
+.ref-btn:hover { background: var(--c1); color: #fdf8f6; }
+.ref-btn svg { flex-shrink: 0; }
+
+/* ── ACCORDION ── */
+.acc-hint {
+  width: 100%; max-width: 720px;
+  font-size: 12px; color: var(--muted); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 6px;
+}
+.acc-hint::before {
+  content: '';
+  display: inline-block; width: 16px; height: 1px;
+  background: var(--border); flex-shrink: 0;
+}
+.accordion { width: 100%; max-width: 720px; }
+.acc-item { border-bottom: 1px solid var(--border); }
+.acc-item:first-child { border-top: 1px solid var(--border); }
+.acc-trigger {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 17px 4px; cursor: pointer; gap: 16px;
+  transition: color .15s;
+  user-select: none;
+}
+.acc-trigger:hover .acc-criterion { color: var(--c1); }
+.acc-criterion {
+  font-size: 14px; font-weight: 600; color: var(--text);
+  transition: color .15s;
+}
+.acc-icon {
+  font-size: 20px; font-weight: 300; color: var(--c1);
+  line-height: 1; transition: transform .25s ease; flex-shrink: 0;
+}
+.acc-item.open .acc-icon { transform: rotate(45deg); }
+.acc-body {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  padding: 0 4px; max-height: 0; overflow: hidden;
+  transition: max-height .32s ease, padding-bottom .32s ease;
+}
+.acc-item.open .acc-body { max-height: 180px; padding-bottom: 20px; }
+.acc-col {
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 16px;
+}
+.acc-col-tag {
+  font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
+  font-weight: 700; margin-bottom: 7px;
+}
+.acc-col-tag.olap { color: var(--c1); }
+.acc-col-tag.oltp { color: var(--c2); }
+.acc-col-text { font-size: 13px; line-height: 1.55; color: var(--text); }
+
+/* ── TABLE ── */
+.tbl { width: 100%; max-width: 760px; border-collapse: collapse; }
+.tbl th { text-align: left; font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--border); }
+.tbl td { padding: 15px 14px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+.tbl td:first-child { color: var(--c1); font-weight: 700; white-space: nowrap; }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: var(--s2); }
+
+/* ── BLOOM OBJECTIVES ── */
+.bloom-card { width: 100%; max-width: 720px; background: var(--s1); border: 1px solid var(--border); border-left: 3px solid var(--c1); border-radius: 2px 10px 10px 2px; padding: 22px 24px; margin-bottom: 4px; }
+.bloom-eyebrow { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 16px; }
+.bloom-list { display: flex; flex-direction: column; gap: 11px; }
+.bloom-item { font-size: 13.5px; line-height: 1.55; color: var(--text); display: flex; align-items: baseline; gap: 12px; }
+.bloom-level { font-size: 8.5px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+.bloom-level.l1 { background: var(--s1); color: var(--c1); border: 1px solid var(--border); }
+.bloom-level.l2 { background: var(--s2); color: var(--c1); border: 1px solid var(--border); }
+.bloom-level.l3 { background: #e0cccc; color: var(--c1); border: 1px solid #c8aeaa; }
+.bloom-level.l4 { background: #cdb5b5; color: var(--c1); border: 1px solid #b89898; }
+.bloom-level.l5 { background: var(--c1); color: #fdf8f6; border: 1px solid var(--c1); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     MENU
+══════════════════════════════════════ -->
+<div id="menu" class="page active">
+  <nav class="t-nav">
+    <a class="back" href="index.html">← Disciplina</a>
+  </nav>
+  <div class="m-header">
+    <div class="m-eyebrow">ESPM · Gestão BD &amp; BI · 11.05.2026</div>
+    <div class="m-title">Aula 1 — O Dado que<br>Você Não Enxerga</div>
+    <div class="m-sub">Dado como Ativo · Informação · Decisão · Estrutura de Dados</div>
+  </div>
+  <div class="m-grid">
+    <button class="mcard" onclick="show('p0')">
+      <div class="mc-num">00</div>
+      <div class="mc-h">Objetivos da Aula</div>
+      <p class="mc-p">O que você vai aprender hoje — cinco objetivos baseados na Taxonomia de Bloom.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p1')">
+      <div class="mc-num">01</div>
+      <div class="mc-h">Fontes Geradoras de Dados</div>
+      <p class="mc-p">As três origens de todos os dados: pessoas, máquinas e corporações.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p2')">
+      <div class="mc-num">02</div>
+      <div class="mc-h">Dado × Informação × Decisão</div>
+      <p class="mc-p">Como o contexto transforma números brutos em decisões de negócio.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p3')">
+      <div class="mc-num">03</div>
+      <div class="mc-h">Dado Operacional vs. Analítico</div>
+      <p class="mc-p">OLTP e OLAP: a mesma base, propósitos completamente diferentes.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p4')">
+      <div class="mc-num">04</div>
+      <div class="mc-h">Jornada dos Dados</div>
+      <p class="mc-p">Do dado bruto à decisão: o pipeline de gestão de dados.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p5')">
+      <div class="mc-num">05</div>
+      <div class="mc-h">O que é um Banco de Dados?</div>
+      <p class="mc-p">Definição, características e o papel do SGBD.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p6')">
+      <div class="mc-num">06</div>
+      <div class="mc-h">Tipos de Bancos de Dados</div>
+      <p class="mc-p">Do IMS ao NoSQL: panorama dos principais sistemas.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p7')">
+      <div class="mc-num">07</div>
+      <div class="mc-h">A Estrutura Determina as Perguntas</div>
+      <p class="mc-p">Como a arquitetura do BD limita as perguntas possíveis de negócio.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P0 — OBJETIVOS DA AULA (BLOOM)
+══════════════════════════════════════ -->
+<div id="p0" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">00 · Objetivos da Aula</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">O que você vai<br><em>aprender hoje.</em></div>
+
+    <div class="bloom-card">
+      <div class="bloom-eyebrow">Objetivos — Taxonomia de Bloom</div>
+      <div class="bloom-list">
+        <div class="bloom-item"><span class="bloom-level l1">Lembrar</span> Reconhecer as três fontes geradoras de dados (pessoas, máquinas, corporações) e os principais tipos de bancos de dados, associando cada um às suas características.</div>
+        <div class="bloom-item"><span class="bloom-level l2">Compreender</span> Explicar a cadeia dado → informação → decisão e distinguir o uso operacional (OLTP) do analítico (OLAP) em situações concretas de negócio.</div>
+        <div class="bloom-item"><span class="bloom-level l3">Aplicar</span> Classificar exemplos de fontes, dados e sistemas de acordo com as categorias apresentadas e mapear a jornada de um dado em um processo real.</div>
+        <div class="bloom-item"><span class="bloom-level l4">Analisar</span> Examinar como a estrutura de um banco de dados determina quais perguntas de negócio podem ou não ser respondidas, identificando lacunas arquiteturais.</div>
+        <div class="bloom-item"><span class="bloom-level l5">Avaliar</span> Julgar se uma arquitetura de dados é adequada para suportar um determinado processo de decisão ou análise, argumentando com base nos conceitos da aula.</div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('menu')">← Início</button>
+      <button class="pn-btn pn-fwd" onclick="show('p1')">Fontes de Dados →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P1 — FONTES GERADORAS DE DADOS
+══════════════════════════════════════ -->
+<div id="p1" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">01 · Fontes Geradoras de Dados</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Três origens.<br><em>Todos os dados.</em></div>
+    <div class="diagram">
+      <svg viewBox="0 0 700 342" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+        <line x1="350" y1="82" x2="152" y2="252" stroke="#dfc9c0" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="350" y1="82" x2="548" y2="252" stroke="#dfc9c0" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="152" y1="252" x2="548" y2="252" stroke="#dfc9c0" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <!-- Pessoas (top) -->
+        <circle cx="350" cy="82" r="54" fill="#ffffff" stroke="#7a1a1a" stroke-width="1.5"/>
+        <circle cx="350" cy="67" r="11" fill="#7a1a1a" opacity=".85"/>
+        <path d="M325 98 Q325 83 350 83 Q375 83 375 98" fill="#7a1a1a" opacity=".85"/>
+        <text x="350" y="154" text-anchor="middle" fill="#1a0d0d" font-size="12" font-weight="700" font-family="system-ui" letter-spacing="1.5">PESSOAS</text>
+        <!-- Máquinas (bottom-left) -->
+        <circle cx="152" cy="252" r="54" fill="#ffffff" stroke="#b83030" stroke-width="1.5"/>
+        <circle cx="152" cy="252" r="15" fill="none" stroke="#b83030" stroke-width="2.5"/>
+        <circle cx="152" cy="252" r="5" fill="#b83030"/>
+        <rect x="148" y="232" width="8" height="8" rx="2" fill="#b83030"/>
+        <rect x="148" y="264" width="8" height="8" rx="2" fill="#b83030"/>
+        <rect x="130" y="248" width="8" height="8" rx="2" fill="#b83030"/>
+        <rect x="164" y="248" width="8" height="8" rx="2" fill="#b83030"/>
+        <text x="152" y="322" text-anchor="middle" fill="#1a0d0d" font-size="12" font-weight="700" font-family="system-ui" letter-spacing="1.5">MÁQUINAS</text>
+        <!-- Corporações (bottom-right) -->
+        <circle cx="548" cy="252" r="54" fill="#ffffff" stroke="#7a1a1a" stroke-width="1.5" stroke-opacity=".6"/>
+        <rect x="534" y="240" width="28" height="22" fill="none" stroke="#7a1a1a" stroke-width="2"/>
+        <rect x="540" y="248" width="6" height="10" fill="#7a1a1a" opacity=".7"/>
+        <rect x="550" y="248" width="6" height="10" fill="#7a1a1a" opacity=".7"/>
+        <rect x="532" y="236" width="36" height="4" rx="1" fill="#7a1a1a"/>
+        <text x="548" y="322" text-anchor="middle" fill="#1a0d0d" font-size="12" font-weight="700" font-family="system-ui" letter-spacing="1.5">CORPORAÇÕES</text>
+      </svg>
+    </div>
+    <div class="kps">
+      <div class="kp">
+        <div class="kp-tag">Pessoas</div>
+        <div class="kp-text">Redes sociais, transações, localização, comportamento digital.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag" style="color:#b83030">Máquinas</div>
+        <div class="kp-text">Sensores IoT, drones, câmeras, equipamentos industriais.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag">Corporações</div>
+        <div class="kp-text">ERP, CRM, sistemas transacionais, registros financeiros.</div>
+      </div>
+    </div>
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p0')">← Objetivos</button>
+      <button class="pn-btn pn-fwd" onclick="show('p2')">Dado × Informação →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P2 — DADO × INFORMAÇÃO × DECISÃO
+══════════════════════════════════════ -->
+<div id="p2" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">02 · Dado × Informação × Decisão</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Do número bruto<br>à <em>decisão de negócio</em>.</div>
+    <div class="diagram">
+      <svg viewBox="0 0 700 210" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+        <!-- Box 1: DADO -->
+        <rect x="16" y="55" width="160" height="90" rx="12" fill="#ffffff" stroke="#dfc9c0" stroke-width="1.5"/>
+        <text x="96" y="85" text-anchor="middle" fill="#8a6060" font-size="9.5" font-family="system-ui" letter-spacing="2.5" font-weight="700">DADO</text>
+        <text x="96" y="126" text-anchor="middle" fill="#7a1a1a" font-size="36" font-family="system-ui" font-weight="800">847</text>
+        <!-- Arrow 1 -->
+        <line x1="178" y1="100" x2="226" y2="100" stroke="#dfc9c0" stroke-width="1.5"/>
+        <polygon points="226,93 240,100 226,107" fill="#c8aeaa"/>
+        <text x="208" y="86" text-anchor="middle" fill="#8a6060" font-size="10" font-family="system-ui">contexto</text>
+        <!-- Box 2: INFORMAÇÃO -->
+        <rect x="244" y="55" width="212" height="90" rx="12" fill="#ffffff" stroke="#dfc9c0" stroke-width="1.5"/>
+        <text x="350" y="85" text-anchor="middle" fill="#8a6060" font-size="9.5" font-family="system-ui" letter-spacing="2.5" font-weight="700">INFORMAÇÃO</text>
+        <text x="350" y="115" text-anchor="middle" fill="#b83030" font-size="14" font-family="system-ui" font-weight="600">vendas caíram 12%</text>
+        <text x="350" y="134" text-anchor="middle" fill="#b83030" font-size="14" font-family="system-ui" font-weight="600">em março</text>
+        <!-- Arrow 2 -->
+        <line x1="458" y1="100" x2="506" y2="100" stroke="#dfc9c0" stroke-width="1.5"/>
+        <polygon points="506,93 520,100 506,107" fill="#c8aeaa"/>
+        <text x="488" y="86" text-anchor="middle" fill="#8a6060" font-size="10" font-family="system-ui">pergunta</text>
+        <!-- Box 3: DECISÃO -->
+        <rect x="524" y="55" width="162" height="90" rx="12" fill="#ffffff" stroke="#7a1a1a" stroke-width="1.5"/>
+        <text x="605" y="85" text-anchor="middle" fill="#7a1a1a" font-size="9.5" font-family="system-ui" letter-spacing="2.5" font-weight="700">DECISÃO</text>
+        <circle cx="605" cy="118" r="18" fill="none" stroke="#7a1a1a" stroke-width="2"/>
+        <polyline points="596,118 602,125 614,110" fill="none" stroke="#7a1a1a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="kps">
+      <div class="kp">
+        <div class="kp-tag">Dado</div>
+        <div class="kp-text">Número bruto. Sem contexto, não responde perguntas.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag" style="color:#b83030">Informação</div>
+        <div class="kp-text">Dado + contexto + significado. Responde "o quê" e "quando".</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag">Decisão</div>
+        <div class="kp-text">Informação + pergunta certa = ação de negócio.</div>
+      </div>
+    </div>
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p1')">← Fontes de Dados</button>
+      <button class="pn-btn pn-fwd" onclick="show('p3')">Dado Operacional →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P3 — DADO OPERACIONAL vs. ANALÍTICO
+══════════════════════════════════════ -->
+<div id="p3" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">03 · Dado Operacional vs. Analítico</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">A mesma base.<br><em>Dois propósitos.</em></div>
+    <div class="diagram">
+      <svg viewBox="0 0 700 290" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+        <!-- Left: OLTP -->
+        <rect x="18" y="16" width="308" height="258" rx="14" fill="#ffffff" stroke="#dfc9c0" stroke-width="1.5"/>
+        <rect x="18" y="16" width="308" height="56" rx="14" fill="#7a1a1a" opacity=".06"/>
+        <rect x="18" y="56" width="308" height="16" fill="#7a1a1a" opacity=".06"/>
+        <text x="172" y="46" text-anchor="middle" fill="#7a1a1a" font-size="14" font-weight="800" font-family="system-ui" letter-spacing="1.5">OLTP</text>
+        <text x="172" y="65" text-anchor="middle" fill="#8a6060" font-size="9.5" font-family="system-ui" letter-spacing="2">OPERACIONAL</text>
+        <circle cx="52" cy="104" r="4" fill="#7a1a1a"/>
+        <text x="66" y="108" fill="#1a0d0d" font-size="13" font-family="system-ui">Registra transações</text>
+        <circle cx="52" cy="134" r="4" fill="#7a1a1a"/>
+        <text x="66" y="138" fill="#1a0d0d" font-size="13" font-family="system-ui">Alta velocidade de escrita</text>
+        <circle cx="52" cy="164" r="4" fill="#7a1a1a"/>
+        <text x="66" y="168" fill="#1a0d0d" font-size="13" font-family="system-ui">Dados atuais</text>
+        <circle cx="52" cy="194" r="4" fill="#7a1a1a"/>
+        <text x="66" y="198" fill="#1a0d0d" font-size="13" font-family="system-ui">Tabelas normalizadas</text>
+        <circle cx="52" cy="224" r="4" fill="#7a1a1a"/>
+        <text x="66" y="228" fill="#1a0d0d" font-size="13" font-family="system-ui">Ex: ERP, e-commerce, CRM</text>
+        <!-- VS -->
+        <text x="350" y="152" text-anchor="middle" fill="#dfc9c0" font-size="13" font-weight="800" font-family="system-ui">VS</text>
+        <!-- Right: OLAP -->
+        <rect x="374" y="16" width="308" height="258" rx="14" fill="#ffffff" stroke="#dfc9c0" stroke-width="1.5"/>
+        <rect x="374" y="16" width="308" height="56" rx="14" fill="#b83030" opacity=".06"/>
+        <rect x="374" y="56" width="308" height="16" fill="#b83030" opacity=".06"/>
+        <text x="528" y="46" text-anchor="middle" fill="#b83030" font-size="14" font-weight="800" font-family="system-ui" letter-spacing="1.5">OLAP</text>
+        <text x="528" y="65" text-anchor="middle" fill="#8a6060" font-size="9.5" font-family="system-ui" letter-spacing="2">ANALÍTICO</text>
+        <circle cx="408" cy="104" r="4" fill="#b83030"/>
+        <text x="422" y="108" fill="#1a0d0d" font-size="13" font-family="system-ui">Responde perguntas</text>
+        <circle cx="408" cy="134" r="4" fill="#b83030"/>
+        <text x="422" y="138" fill="#1a0d0d" font-size="13" font-family="system-ui">Alta velocidade de leitura</text>
+        <circle cx="408" cy="164" r="4" fill="#b83030"/>
+        <text x="422" y="168" fill="#1a0d0d" font-size="13" font-family="system-ui">Dados históricos</text>
+        <circle cx="408" cy="194" r="4" fill="#b83030"/>
+        <text x="422" y="198" fill="#1a0d0d" font-size="13" font-family="system-ui">Estrutura dimensional</text>
+        <circle cx="408" cy="224" r="4" fill="#b83030"/>
+        <text x="422" y="228" fill="#1a0d0d" font-size="13" font-family="system-ui">Ex: Data Warehouse, BI</text>
+      </svg>
+    </div>
+    <div class="kps">
+      <div class="kp">
+        <div class="kp-tag">Mesma base</div>
+        <div class="kp-text">Dados transacionais alimentam os sistemas analíticos após integração.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag" style="color:#b83030">Propósitos</div>
+        <div class="kp-text">Operacional: executar o negócio. Analítico: entender e decidir.</div>
+      </div>
+    </div>
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p2')">← Dado × Informação</button>
+      <button class="pn-btn pn-fwd" onclick="show('p3b')">OLAP vs. OLTP →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P3B — OLAP vs. OLTP COMPARATIVO
+══════════════════════════════════════ -->
+<div id="p3b" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">03 · Aprofundamento — OLAP vs. OLTP</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Sete critérios.<br><em>Duas lógicas.</em></div>
+    <p class="acc-hint">Clique em cada critério para revelar a comparação.</p>
+
+    <div class="accordion">
+
+      <div class="acc-item">
+        <div class="acc-trigger" onclick="toggleAcc(this)">
+          <span class="acc-criterion">Finalidade</span>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="acc-body">
+          <div class="acc-col">
+            <div class="acc-col-tag olap">OLAP</div>
+            <div class="acc-col-text">Analisar grandes volumes de dados para apoiar a tomada de decisões.</div>
+          </div>
+          <div class="acc-col">
+            <div class="acc-col-tag oltp">OLTP</div>
+            <div class="acc-col-text">Gerenciar e processar transações em tempo real.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-trigger" onclick="toggleAcc(this)">
+          <span class="acc-criterion">Fonte de dados</span>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="acc-body">
+          <div class="acc-col">
+            <div class="acc-col-tag olap">OLAP</div>
+            <div class="acc-col-text">Dados históricos e agregados de várias fontes.</div>
+          </div>
+          <div class="acc-col">
+            <div class="acc-col-tag oltp">OLTP</div>
+            <div class="acc-col-text">Dados transacionais e em tempo real de uma única fonte.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-trigger" onclick="toggleAcc(this)">
+          <span class="acc-criterion">Estrutura de dados</span>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="acc-body">
+          <div class="acc-col">
+            <div class="acc-col-tag olap">OLAP</div>
+            <div class="acc-col-text">Bancos de dados multidimensionais (cubos) ou relacionais.</div>
+          </div>
+          <div class="acc-col">
+            <div class="acc-col-tag oltp">OLTP</div>
+            <div class="acc-col-text">Bancos de dados relacionais.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-trigger" onclick="toggleAcc(this)">
+          <span class="acc-criterion">Modelo de dados</span>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="acc-body">
+          <div class="acc-col">
+            <div class="acc-col-tag olap">OLAP</div>
+            <div class="acc-col-text">Esquema em estrela, esquema de floco de neve ou outros modelos analíticos.</div>
+          </div>
+          <div class="acc-col">
+            <div class="acc-col-tag oltp">OLTP</div>
+            <div class="acc-col-text">Modelos normalizados ou desnormalizados.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-trigger" onclick="toggleAcc(this)">
+          <span class="acc-criterion">Volume de dados</span>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="acc-body">
+          <div class="acc-col">
+            <div class="acc-col-tag olap">OLAP</div>
+            <div class="acc-col-text">Grandes requisitos de armazenamento — terabytes (TB) e petabytes (PB).</div>
+          </div>
+          <div class="acc-col">
+            <div class="acc-col-tag oltp">OLTP</div>
+            <div class="acc-col-text">Requisitos comparativamente menores — gigabytes (GB).</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-trigger" onclick="toggleAcc(this)">
+          <span class="acc-criterion">Tempo de resposta</span>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="acc-body">
+          <div class="acc-col">
+            <div class="acc-col-tag olap">OLAP</div>
+            <div class="acc-col-text">Tempos de resposta mais longos — normalmente segundos ou minutos.</div>
+          </div>
+          <div class="acc-col">
+            <div class="acc-col-tag oltp">OLTP</div>
+            <div class="acc-col-text">Tempos de resposta mais curtos — normalmente milissegundos.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-trigger" onclick="toggleAcc(this)">
+          <span class="acc-criterion">Aplicativos de exemplo</span>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="acc-body">
+          <div class="acc-col">
+            <div class="acc-col-tag olap">OLAP</div>
+            <div class="acc-col-text">Analisar tendências, prever comportamento do cliente e identificar lucratividade.</div>
+          </div>
+          <div class="acc-col">
+            <div class="acc-col-tag oltp">OLTP</div>
+            <div class="acc-col-text">Processar pagamentos, gerenciar dados de clientes e processar pedidos.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p3')">← Dado Operacional</button>
+      <button class="pn-btn pn-fwd" onclick="show('p4')">Jornada dos Dados →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P4 — JORNADA DOS DADOS
+══════════════════════════════════════ -->
+<div id="p4" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">04 · Jornada dos Dados</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Do dado bruto<br>à <em>decisão</em>.</div>
+    <div class="diagram">
+      <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+        <!-- Step 1: Geração -->
+        <rect x="10" y="64" width="110" height="62" rx="10" fill="#ffffff" stroke="#7a1a1a" stroke-width="1.5"/>
+        <text x="65" y="88" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" letter-spacing="1.5" font-weight="700">01</text>
+        <text x="65" y="110" text-anchor="middle" fill="#1a0d0d" font-size="12" font-family="system-ui" font-weight="700">Geração</text>
+        <text x="65" y="152" text-anchor="middle" fill="#b09898" font-size="10" font-family="system-ui">Fontes</text>
+        <!-- Arrow -->
+        <line x1="122" y1="95" x2="142" y2="95" stroke="#dfc9c0" stroke-width="1.5"/>
+        <polygon points="142,89 154,95 142,101" fill="#c8aeaa"/>
+        <!-- Step 2: Armazenamento -->
+        <rect x="156" y="64" width="110" height="62" rx="10" fill="#ffffff" stroke="#7a1a1a" stroke-width="1.5" stroke-opacity=".5"/>
+        <text x="211" y="88" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" letter-spacing="1.5" font-weight="700">02</text>
+        <text x="211" y="107" text-anchor="middle" fill="#1a0d0d" font-size="11" font-family="system-ui" font-weight="700">Armazena-</text>
+        <text x="211" y="121" text-anchor="middle" fill="#1a0d0d" font-size="11" font-family="system-ui" font-weight="700">mento</text>
+        <text x="211" y="152" text-anchor="middle" fill="#b09898" font-size="10" font-family="system-ui">BD / Lake</text>
+        <!-- Arrow -->
+        <line x1="268" y1="95" x2="288" y2="95" stroke="#dfc9c0" stroke-width="1.5"/>
+        <polygon points="288,89 300,95 288,101" fill="#c8aeaa"/>
+        <!-- Step 3: Integração -->
+        <rect x="302" y="64" width="110" height="62" rx="10" fill="#ffffff" stroke="#b83030" stroke-width="1.5"/>
+        <text x="357" y="88" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" letter-spacing="1.5" font-weight="700">03</text>
+        <text x="357" y="110" text-anchor="middle" fill="#1a0d0d" font-size="12" font-family="system-ui" font-weight="700">Integração</text>
+        <text x="357" y="152" text-anchor="middle" fill="#b09898" font-size="10" font-family="system-ui">ETL / DW</text>
+        <!-- Arrow -->
+        <line x1="414" y1="95" x2="434" y2="95" stroke="#dfc9c0" stroke-width="1.5"/>
+        <polygon points="434,89 446,95 434,101" fill="#c8aeaa"/>
+        <!-- Step 4: Análise -->
+        <rect x="448" y="64" width="110" height="62" rx="10" fill="#ffffff" stroke="#b83030" stroke-width="1.5" stroke-opacity=".5"/>
+        <text x="503" y="88" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" letter-spacing="1.5" font-weight="700">04</text>
+        <text x="503" y="110" text-anchor="middle" fill="#1a0d0d" font-size="12" font-family="system-ui" font-weight="700">Análise</text>
+        <text x="503" y="152" text-anchor="middle" fill="#b09898" font-size="10" font-family="system-ui">BI / ML</text>
+        <!-- Arrow -->
+        <line x1="560" y1="95" x2="580" y2="95" stroke="#dfc9c0" stroke-width="1.5"/>
+        <polygon points="580,89 592,95 580,101" fill="#c8aeaa"/>
+        <!-- Step 5: Decisão -->
+        <rect x="594" y="64" width="98" height="62" rx="10" fill="#ffffff" stroke="#7a1a1a" stroke-width="1.5"/>
+        <text x="643" y="88" text-anchor="middle" fill="#7a1a1a" font-size="9" font-family="system-ui" letter-spacing="1.5" font-weight="700">05</text>
+        <text x="643" y="110" text-anchor="middle" fill="#7a1a1a" font-size="12" font-family="system-ui" font-weight="700">Decisão</text>
+        <text x="643" y="152" text-anchor="middle" fill="#b09898" font-size="10" font-family="system-ui">Gestão</text>
+      </svg>
+    </div>
+    <div class="kps">
+      <div class="kp">
+        <div class="kp-tag">Governança</div>
+        <div class="kp-text">Políticas de qualidade e uso dos dados permeiam cada etapa.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag" style="color:#b83030">Integração</div>
+        <div class="kp-text">Múltiplos sistemas transacionais consolidados em Data Warehouse ou Data Lake.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag">Modelo de dados</div>
+        <div class="kp-text">Mapeia relações para atender às necessidades de negócio.</div>
+      </div>
+    </div>
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p3b')">← OLAP vs. OLTP</button>
+      <button class="pn-btn pn-fwd" onclick="show('p5')">Banco de Dados →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P5 — O QUE É UM BANCO DE DADOS?
+══════════════════════════════════════ -->
+<div id="p5" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">05 · O que é um Banco de Dados?</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Quatro <em>características</em>.<br>Uma definição.</div>
+    <div class="diagram">
+      <svg viewBox="0 0 700 330" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+        <!-- Connector lines -->
+        <line x1="298" y1="116" x2="190" y2="66" stroke="#dfc9c0" stroke-width="1.5"/>
+        <line x1="402" y1="116" x2="510" y2="66" stroke="#dfc9c0" stroke-width="1.5"/>
+        <line x1="298" y1="208" x2="190" y2="260" stroke="#dfc9c0" stroke-width="1.5"/>
+        <line x1="402" y1="208" x2="510" y2="260" stroke="#dfc9c0" stroke-width="1.5"/>
+        <!-- Center -->
+        <circle cx="350" cy="162" r="64" fill="#ffffff" stroke="#7a1a1a" stroke-width="2"/>
+        <text x="350" y="154" text-anchor="middle" fill="#1a0d0d" font-size="13" font-weight="800" font-family="system-ui">BANCO DE</text>
+        <text x="350" y="175" text-anchor="middle" fill="#7a1a1a" font-size="13" font-weight="800" font-family="system-ui">DADOS</text>
+        <!-- Top-left: Estruturado -->
+        <rect x="80" y="28" width="175" height="54" rx="10" fill="#ffffff" stroke="#dfc9c0" stroke-width="1.5"/>
+        <text x="167" y="50" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" letter-spacing="2" font-weight="700">ESTRUTURADO</text>
+        <text x="167" y="69" text-anchor="middle" fill="#1a0d0d" font-size="12" font-family="system-ui">Dados organizados</text>
+        <!-- Top-right: Relacionado -->
+        <rect x="445" y="28" width="175" height="54" rx="10" fill="#ffffff" stroke="#dfc9c0" stroke-width="1.5"/>
+        <text x="532" y="50" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" letter-spacing="2" font-weight="700">RELACIONADO</text>
+        <text x="532" y="69" text-anchor="middle" fill="#1a0d0d" font-size="12" font-family="system-ui">Dados conectados</text>
+        <!-- Bottom-left: Eletrônico -->
+        <rect x="80" y="246" width="175" height="54" rx="10" fill="#ffffff" stroke="#dfc9c0" stroke-width="1.5"/>
+        <text x="167" y="268" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" letter-spacing="2" font-weight="700">ELETRÔNICO</text>
+        <text x="167" y="287" text-anchor="middle" fill="#1a0d0d" font-size="12" font-family="system-ui">Armazenado digitalmente</text>
+        <!-- Bottom-right: Acessível -->
+        <rect x="445" y="246" width="175" height="54" rx="10" fill="#ffffff" stroke="#dfc9c0" stroke-width="1.5"/>
+        <text x="532" y="268" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" letter-spacing="2" font-weight="700">ACESSÍVEL</text>
+        <text x="532" y="287" text-anchor="middle" fill="#1a0d0d" font-size="12" font-family="system-ui">Gerenciado via SGBD</text>
+      </svg>
+    </div>
+    <div class="kps">
+      <div class="kp">
+        <div class="kp-tag">SGBD</div>
+        <div class="kp-text">Cria, modifica e gerencia objetos: tabelas, views, índices, schemas.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag" style="color:#b83030">Operações</div>
+        <div class="kp-text">Gerencia requisições, transações e controle de acesso concorrente.</div>
+      </div>
+    </div>
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p4')">← Jornada dos Dados</button>
+      <button class="pn-btn pn-fwd" onclick="show('p6')">Tipos de BD →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P6 — TIPOS DE BANCOS DE DADOS
+══════════════════════════════════════ -->
+<div id="p6" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">06 · Tipos de Bancos de Dados</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title"><em>Seis categorias</em>.<br>Da herança ao presente.</div>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Categoria</th>
+          <th>Exemplos</th>
+          <th>Características</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Dinossauros</td>
+          <td style="color:#8a6060">IMS, ADABAS</td>
+          <td style="color:#8a6060">Primeiras implementações. Sistemas legados.</td>
+        </tr>
+        <tr>
+          <td>Elefantes</td>
+          <td style="color:#8a6060">Oracle, IBM, Teradata</td>
+          <td style="color:#8a6060">Maduros, robustos, rodam em mainframes e minicomputadores.</td>
+        </tr>
+        <tr>
+          <td>Open Source</td>
+          <td style="color:#8a6060">MySQL, PostgreSQL, MariaDB</td>
+          <td style="color:#8a6060">Código aberto, baixo custo, ampla adoção.</td>
+        </tr>
+        <tr>
+          <td>In-Memory</td>
+          <td style="color:#8a6060">SAP HANA</td>
+          <td style="color:#8a6060">Dados na RAM: acesso muito mais rápido que discos.</td>
+        </tr>
+        <tr>
+          <td>NoSQL</td>
+          <td style="color:#8a6060">MongoDB, Cassandra, DynamoDB</td>
+          <td style="color:#8a6060">Dados não estruturados. Escala com a explosão digital.</td>
+        </tr>
+        <tr>
+          <td>DBaaS</td>
+          <td style="color:#8a6060">AWS RDS, Azure SQL</td>
+          <td style="color:#8a6060">Banco como serviço em cloud. Deploy rápido.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="ref-links">
+      <a href="https://db-engines.com/en/ranking" target="_blank" class="ref-btn">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        DB-Engines Ranking
+      </a>
+      <a href="https://dbdb.io/" target="_blank" class="ref-btn">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Database of Databases
+      </a>
+    </div>
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p5')">← Banco de Dados</button>
+      <button class="pn-btn pn-fwd" onclick="show('p7')">Estrutura e Perguntas →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P7 — A ESTRUTURA DETERMINA AS PERGUNTAS
+══════════════════════════════════════ -->
+<div id="p7" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">07 · A Estrutura Determina as Perguntas</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">A arquitetura<br><em>limita</em> as perguntas.</div>
+    <div class="diagram">
+      <svg viewBox="0 0 700 372" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+        <!-- Layer 1 -->
+        <rect x="90" y="18" width="520" height="80" rx="13" fill="#ffffff" stroke="#7a1a1a" stroke-width="1.5"/>
+        <rect x="90" y="18" width="520" height="48" rx="13" fill="#7a1a1a" opacity=".05"/>
+        <rect x="90" y="50" width="520" height="16" fill="#7a1a1a" opacity=".05"/>
+        <text x="200" y="52" fill="#8a6060" font-size="9.5" font-family="system-ui" letter-spacing="2" font-weight="700">CAMADA 1</text>
+        <text x="200" y="76" fill="#1a0d0d" font-size="18" font-family="system-ui" font-weight="800">Arquitetura do Banco de Dados</text>
+        <ellipse cx="570" cy="42" rx="26" ry="9" fill="none" stroke="#7a1a1a" stroke-width="1.5"/>
+        <rect x="544" y="42" width="52" height="24" fill="none" stroke="#7a1a1a" stroke-width="1.5"/>
+        <ellipse cx="570" cy="66" rx="26" ry="9" fill="none" stroke="#7a1a1a" stroke-width="1.5"/>
+        <!-- Arrow down 1 -->
+        <line x1="350" y1="100" x2="350" y2="132" stroke="#dfc9c0" stroke-width="1.5"/>
+        <polygon points="343,132 350,145 357,132" fill="#c8aeaa"/>
+        <text x="366" y="122" fill="#8a6060" font-size="10.5" font-family="system-ui" font-style="italic">determina</text>
+        <!-- Layer 2 -->
+        <rect x="90" y="148" width="520" height="80" rx="13" fill="#ffffff" stroke="#b83030" stroke-width="1.5"/>
+        <rect x="90" y="148" width="520" height="48" rx="13" fill="#b83030" opacity=".05"/>
+        <rect x="90" y="180" width="520" height="16" fill="#b83030" opacity=".05"/>
+        <text x="200" y="182" fill="#8a6060" font-size="9.5" font-family="system-ui" letter-spacing="2" font-weight="700">CAMADA 2</text>
+        <text x="200" y="206" fill="#1a0d0d" font-size="18" font-family="system-ui" font-weight="800">Perguntas Possíveis</text>
+        <text x="578" y="208" text-anchor="middle" fill="#b83030" font-size="44" font-family="system-ui" font-weight="800">?</text>
+        <!-- Arrow down 2 -->
+        <line x1="350" y1="230" x2="350" y2="262" stroke="#dfc9c0" stroke-width="1.5"/>
+        <polygon points="343,262 350,275 357,262" fill="#c8aeaa"/>
+        <text x="366" y="252" fill="#8a6060" font-size="10.5" font-family="system-ui" font-style="italic">orienta</text>
+        <!-- Layer 3 -->
+        <rect x="90" y="278" width="520" height="80" rx="13" fill="#ffffff" stroke="#7a1a1a" stroke-width="1.5"/>
+        <rect x="90" y="278" width="520" height="48" rx="13" fill="#7a1a1a" opacity=".05"/>
+        <rect x="90" y="310" width="520" height="16" fill="#7a1a1a" opacity=".05"/>
+        <text x="200" y="312" fill="#8a6060" font-size="9.5" font-family="system-ui" letter-spacing="2" font-weight="700">CAMADA 3</text>
+        <text x="200" y="336" fill="#1a0d0d" font-size="18" font-family="system-ui" font-weight="800">Decisões de Negócio</text>
+        <circle cx="574" cy="318" r="22" fill="none" stroke="#7a1a1a" stroke-width="1.5"/>
+        <circle cx="574" cy="318" r="12" fill="none" stroke="#7a1a1a" stroke-width="1.5"/>
+        <circle cx="574" cy="318" r="4" fill="#7a1a1a"/>
+      </svg>
+    </div>
+    <div class="kps">
+      <div class="kp">
+        <div class="kp-tag">Para o gestor</div>
+        <div class="kp-text">Entender a estrutura do BD é saber quais perguntas são possíveis de fazer.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag" style="color:#b83030">Consequência</div>
+        <div class="kp-text">Perguntas fora da arquitetura exigem reestruturação ou novas fontes.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag">Implicação prática</div>
+        <div class="kp-text">Antes de decidir, verifique se os dados necessários estão estruturados.</div>
+      </div>
+    </div>
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p6')">← Tipos de BD</button>
+      <button class="pn-btn pn-fwd" onclick="show('menu')">Início →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function show(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function toggleAcc(trigger) {
+    const item = trigger.closest('.acc-item');
+    const wasOpen = item.classList.contains('open');
+    // fecha todos
+    document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+    // abre o clicado (se não estava aberto)
+    if (!wasOpen) item.classList.add('open');
+  }
+</script>
+</body>
+</html>

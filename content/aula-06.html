@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GBDBI · Aula 6 — A Escala do Big Data</title>
+<style>
+:root {
+  --bg:     #fdf8f6;
+  --s1:     #f5ecea;
+  --s2:     #ecdeda;
+  --border: #dfc9c0;
+  --c1:     #7a1a1a;
+  --c2:     #b83030;
+  --text:   #1a0d0d;
+  --muted:  #8a6060;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+.page { display: none; min-height: 100vh; flex-direction: column; }
+.page.active { display: flex; animation: fadeUp .3s ease both; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── MENU ── */
+.m-header { padding: 72px 56px 48px; }
+.m-eyebrow { font-size: 10.5px; letter-spacing: 4px; text-transform: uppercase; color: var(--c1); font-weight: 600; margin-bottom: 18px; }
+.m-title { font-size: 50px; font-weight: 800; line-height: 1.08; background: linear-gradient(140deg, #1a0d0d 30%, #7a1a1a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.m-sub { margin-top: 14px; font-size: 15px; color: var(--muted); }
+.m-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(265px, 1fr)); gap: 14px; padding: 0 56px 72px; }
+.mcard { background: var(--s1); border: 1px solid var(--border); border-radius: 14px; padding: 28px 26px 32px; cursor: pointer; transition: border-color .2s, transform .2s, box-shadow .2s; position: relative; overflow: hidden; appearance: none; -webkit-appearance: none; width: 100%; text-align: left; font-family: inherit; font-size: inherit; color: inherit; }
+.mcard:hover { border-color: var(--c1); transform: translateY(-3px); box-shadow: 0 16px 48px rgba(122,26,26,.10); }
+.mcard::after { content: ''; position: absolute; inset: 0 0 auto 0; height: 2px; background: linear-gradient(90deg, var(--c1), var(--c2)); opacity: 0; transition: opacity .2s; }
+.mcard:hover::after { opacity: 1; }
+.mc-num { font-size: 10px; letter-spacing: 3px; font-weight: 700; color: var(--c1); margin-bottom: 14px; text-transform: uppercase; }
+.mc-h { font-size: 16px; font-weight: 700; line-height: 1.35; margin-bottom: 8px; }
+.mc-p { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+.mc-arrow { position: absolute; bottom: 22px; right: 22px; color: var(--muted); font-size: 18px; transition: color .2s, transform .2s; }
+.mcard:hover .mc-arrow { color: var(--c1); transform: translate(2px, -2px); }
+
+/* ── TOPIC PAGES ── */
+.t-nav { display: flex; align-items: center; gap: 14px; padding: 18px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(253,248,246,.92); backdrop-filter: blur(12px); z-index: 10; }
+.back { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--muted); cursor: pointer; padding: 7px 14px; border: 1px solid var(--border); border-radius: 8px; background: none; transition: all .2s; text-decoration: none; }
+.back:hover { color: var(--c1); border-color: var(--c1); }
+.t-label { font-size: 10.5px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+.t-body { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 56px 40px 64px; max-width: 900px; margin: 0 auto; width: 100%; }
+.t-title { font-size: 38px; font-weight: 800; text-align: center; margin-bottom: 52px; line-height: 1.18; }
+.t-title em { font-style: normal; color: var(--c1); }
+.diagram { width: 100%; max-width: 720px; margin-bottom: 44px; }
+.kps { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; width: 100%; max-width: 720px; }
+.kp { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 18px 18px 16px; }
+.kp-tag { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 7px; }
+.kp-text { font-size: 13.5px; line-height: 1.55; color: var(--text); }
+
+/* ── PREV/NEXT ── */
+.pg-nav { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 720px; margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); gap: 12px; }
+.pn-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; border: 1.5px solid var(--border); background: none; color: var(--muted); font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; font-family: inherit; }
+.pn-btn:hover { border-color: var(--c1); color: var(--c1); background: rgba(122,26,26,.04); }
+.pn-fwd { margin-left: auto; }
+
+/* ── BLOOM ── */
+.bloom-card { width: 100%; max-width: 720px; background: var(--s1); border: 1px solid var(--border); border-left: 3px solid var(--c1); border-radius: 2px 10px 10px 2px; padding: 22px 24px; margin-bottom: 24px; }
+.bloom-eyebrow { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 16px; }
+.bloom-list { display: flex; flex-direction: column; gap: 11px; }
+.bloom-item { font-size: 13.5px; line-height: 1.55; color: var(--text); display: flex; align-items: baseline; gap: 12px; }
+.bloom-level { font-size: 8.5px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+.bloom-level.l1 { background: var(--s1); color: var(--c1); border: 1px solid var(--border); }
+.bloom-level.l2 { background: var(--s2); color: var(--c1); border: 1px solid var(--border); }
+.bloom-level.l3 { background: #e0cccc; color: var(--c1); border: 1px solid #c8aeaa; }
+.bloom-level.l4 { background: #cdb5b5; color: var(--c1); border: 1px solid #b89898; }
+.bloom-level.l5 { background: var(--c1); color: #fdf8f6; border: 1px solid var(--c1); }
+
+/* ── OVERVIEW ── */
+.ov-section-tag { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--muted); margin-bottom: 10px; width: 100%; max-width: 720px; }
+.ov-concepts { display: grid; grid-template-columns: repeat(auto-fit, minmax(196px, 1fr)); gap: 12px; width: 100%; max-width: 720px; margin-bottom: 16px; }
+.ov-concept { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+.ov-concept h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+.ov-concept p { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+/* ── SQL / CODE BLOCKS ── */
+.sql-wrap { width: 100%; max-width: 720px; margin-bottom: 24px; }
+.sql-label { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--muted); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.sql-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.sql-block { background: #1e0808; border-radius: 10px; padding: 20px 24px; overflow-x: auto; }
+.sql-block code { font-family: 'SF Mono','Fira Code','Consolas',monospace; font-size: 12.5px; line-height: 1.85; color: #f0e4e0; display: block; white-space: pre; }
+.cm { color: #c09898; font-style: italic; }
+.k  { color: #f4a0a0; font-weight: 600; }
+.s  { color: #9acd70; }
+.n  { color: #f0c060; }
+
+/* ── SQL HEADER + COPY ── */
+.sql-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.sql-header .sql-label { margin-bottom: 0; flex: 1; }
+.copy-btn { font-size: 10.5px; padding: 5px 13px; border-radius: 6px; border: 1px solid var(--border); background: var(--s1); color: var(--muted); cursor: pointer; font-family: inherit; font-weight: 600; letter-spacing: .3px; transition: all .18s; white-space: nowrap; flex-shrink: 0; }
+.copy-btn:hover { border-color: var(--c1); color: var(--c1); background: #fff; }
+.copy-btn.copied { border-color: #3a8a3a; color: #3a8a3a; background: rgba(58,138,58,.06); }
+
+/* ── COMPARE CARDS ── */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; max-width: 720px; margin-bottom: 28px; }
+.cmp-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.cmp-head { padding: 10px 14px; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
+.cmp-head.sql-h  { background: rgba(58,100,180,.08); color: #2a4ab0; }
+.cmp-head.nosql-h { background: rgba(58,138,58,.08); color: #3a6a40; }
+.cmp-body { padding: 14px 16px; font-size: 13px; line-height: 1.65; color: var(--text); background: #fff; }
+.cmp-body ul { list-style: none; }
+.cmp-body ul li { padding: 2px 0; display: flex; gap: 8px; }
+.cmp-body ul li::before { content: '—'; color: var(--muted); flex-shrink: 0; }
+
+/* ── ACTIVITY STEPS ── */
+.step-list { width: 100%; max-width: 720px; display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+.step { display: flex; gap: 16px; align-items: flex-start; }
+.step-num { width: 30px; height: 30px; border-radius: 50%; background: var(--c1); color: #fdf8f6; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; margin-top: 2px; }
+.step-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.step-text  { font-size: 13px; color: var(--muted); line-height: 1.55; }
+.ext-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 8px; padding: 8px 16px; border-radius: 8px; border: 1.5px solid var(--c1); color: var(--c1); font-size: 12.5px; font-weight: 600; text-decoration: none; transition: all .2s; }
+.ext-link:hover { background: var(--c1); color: #fdf8f6; }
+
+/* ── COLLAPSIBLE DISC ── */
+.disc { width: 100%; max-width: 720px; margin-bottom: 14px; }
+.disc-trigger { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; background: var(--s1); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; transition: border-color .2s, background .2s; font-family: inherit; text-align: left; }
+.disc-trigger:hover { border-color: var(--c1); background: #fff; }
+.disc-title { font-size: 13.5px; font-weight: 700; color: var(--text); }
+.disc-icon { font-size: 15px; color: var(--c1); transition: transform .25s; flex-shrink: 0; }
+.disc.open .disc-icon { transform: rotate(90deg); }
+.disc-body { max-height: 0; overflow: hidden; transition: max-height .38s ease; }
+.disc.open .disc-body { max-height: 2400px; }
+.disc-inner { padding: 18px 0 6px; }
+
+/* ── NOSQL TYPE CARDS ── */
+.nosql-type { width: 100%; max-width: 720px; margin-bottom: 10px; background: #fff; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.nosql-type-header { display: flex; align-items: center; gap: 14px; padding: 16px 20px; background: var(--s1); cursor: pointer; user-select: none; transition: background .2s; }
+.nosql-type-header:hover { background: var(--s2); }
+.nosql-type.open .nosql-type-header { border-bottom: 1px solid var(--border); }
+.nosql-type-tag { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; font-weight: 800; padding: 4px 12px; border-radius: 20px; color: #fdf8f6; flex-shrink: 0; }
+.tag-doc   { background: #2a5eb0; }
+.tag-graph { background: #4a9060; }
+.tag-kv    { background: #c05020; }
+.tag-wide  { background: #805020; }
+.nosql-type-name { font-size: 15px; font-weight: 700; }
+.nosql-type-vendor { font-size: 11px; color: var(--muted); font-weight: 500; margin-left: auto; }
+.nosql-chevron { font-size: 12px; color: var(--c1); transition: transform .25s; flex-shrink: 0; margin-left: 10px; }
+.nosql-type.open .nosql-chevron { transform: rotate(90deg); }
+.nosql-type-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; max-height: 0; overflow: hidden; transition: max-height .4s ease; }
+.nosql-type.open .nosql-type-body { max-height: 1000px; }
+.nosql-type-desc { padding: 18px 20px; font-size: 13px; line-height: 1.65; color: var(--text); border-right: 1px solid var(--border); }
+.nosql-type-desc p { margin-bottom: 10px; }
+.nosql-type-desc p:last-child { margin-bottom: 0; }
+.nosql-type-desc .use-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 5px; display: block; }
+.nosql-type-code { padding: 0; background: #1e0808; }
+.nosql-type-code code { font-family: 'SF Mono','Fira Code','Consolas',monospace; font-size: 11.5px; line-height: 1.8; color: #f0e4e0; display: block; white-space: pre; padding: 18px 18px; }
+
+/* ── ADVANTAGE LIST ── */
+.adv-list { width: 100%; max-width: 720px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.adv-item { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.adv-label { padding: 14px 16px; font-size: 12px; font-weight: 700; color: #fdf8f6; min-width: 140px; display: flex; align-items: center; }
+.adv-label.flex   { background: var(--c1); }
+.adv-label.escala { background: #3a5a9a; }
+.adv-label.desemp { background: #3a7a3a; }
+.adv-label.custo  { background: #7a5a1a; }
+.adv-label.disp   { background: #5a3a7a; }
+.adv-label.chall  { background: #5a3a3a; }
+.adv-body { padding: 14px 18px; font-size: 13px; line-height: 1.6; color: var(--text); background: #fff; flex: 1; }
+.adv-body ul { list-style: none; }
+.adv-body ul li { padding: 2px 0; display: flex; gap: 8px; }
+.adv-body ul li::before { content: '—'; color: var(--muted); flex-shrink: 0; }
+
+/* ── DATA TABLE ── */
+.data-table-wrap { width: 100%; max-width: 720px; margin-bottom: 28px; overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; font-size: 12.5px; }
+.data-table thead th { padding: 11px 14px; text-align: left; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; border-bottom: 1px solid var(--border); }
+.data-table thead th:first-child { background: var(--s1); color: var(--muted); }
+.data-table thead th:nth-child(2) { background: #e0eaf8; color: #2a4ab0; }
+.data-table thead th:nth-child(3) { background: #e8f0e8; color: #3a6a40; }
+.data-table tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; line-height: 1.55; }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover td { background: var(--s2); }
+.data-table tbody td:first-child { font-weight: 600; color: var(--muted); font-size: 11.5px; background: var(--s1); white-space: nowrap; }
+.data-table tbody td ul { list-style: none; }
+.data-table tbody td ul li { padding: 1px 0; display: flex; gap: 6px; font-size: 12px; }
+.data-table tbody td ul li::before { content: '·'; color: var(--muted); flex-shrink: 0; }
+
+/* ── V-DIAGRAM ── */
+.v-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; width: 100%; max-width: 720px; margin-bottom: 28px; }
+.v-card { border-radius: 10px; padding: 18px; border: 1px solid var(--border); }
+.v-card.v1 { background: #e8f0fa; border-color: #b0c8ec; }
+.v-card.v2 { background: #eaf8ea; border-color: #a0d0a0; }
+.v-card.v3 { background: #faf0e0; border-color: #e0c880; }
+.v-card.v4 { background: #f8eae8; border-color: #e0b0a0; }
+.v-card.v5 { background: #f0e8f8; border-color: #c0a0d8; }
+.v-letter { font-size: 36px; font-weight: 900; margin-bottom: 6px; line-height: 1; }
+.v-card.v1 .v-letter { color: #2a5eb0; }
+.v-card.v2 .v-letter { color: #3a8a3a; }
+.v-card.v3 .v-letter { color: #c08a20; }
+.v-card.v4 .v-letter { color: #b04030; }
+.v-card.v5 .v-letter { color: #7040b0; }
+.v-name { font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+.v-desc { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+/* ── QUOTE CARD ── */
+.quote-card { width: 100%; max-width: 720px; background: var(--s1); border: 1px solid var(--border); border-left: 3px solid var(--c1); border-radius: 2px 10px 10px 2px; padding: 22px 26px; margin-bottom: 28px; }
+.quote-text { font-size: 14.5px; line-height: 1.7; color: var(--text); font-style: italic; margin-bottom: 10px; }
+.quote-author { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); }
+
+/* ── CALLOUT ── */
+.callout { width: 100%; max-width: 720px; padding: 18px 20px; background: var(--s1); border-left: 3px solid var(--c1); border-radius: 2px 8px 8px 2px; font-size: 13.5px; line-height: 1.65; color: var(--text); margin-bottom: 28px; }
+.callout-tag { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 8px; }
+
+/* ── GRAPH SVG WRAPPER ── */
+.graph-demo { width: 100%; max-width: 720px; margin-bottom: 24px; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .m-header { padding: 48px 24px 32px; }
+  .m-grid { padding: 0 24px 48px; }
+  .t-body { padding: 40px 20px 52px; }
+  .t-title { font-size: 30px; margin-bottom: 36px; }
+  .compare { grid-template-columns: 1fr; }
+  .nosql-type-body { grid-template-columns: 1fr; }
+  .nosql-type-desc { border-right: none; border-bottom: 1px solid var(--border); }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     MENU
+══════════════════════════════════════ -->
+<div id="menu" class="page active">
+  <nav class="t-nav">
+    <a class="back" href="index.html">← Disciplina</a>
+  </nav>
+  <div class="m-header">
+    <div class="m-eyebrow">ESPM · Gestão BD &amp; BI · 01.06.2026</div>
+    <div class="m-title">Aula 6 — A Escala<br>do Big Data</div>
+    <div class="m-sub">Big Data · NoSQL · MongoDB · JSON</div>
+  </div>
+  <div class="m-grid">
+    <button class="mcard" onclick="show('p0')">
+      <div class="mc-num">00</div>
+      <div class="mc-h">Objetivos da Aula</div>
+      <p class="mc-p">Mapa de competências — o que você vai saber fazer ao final desta aula, segundo a Taxonomia de Bloom.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p1')">
+      <div class="mc-num">01</div>
+      <div class="mc-h">Visão Geral da Aula</div>
+      <p class="mc-p">A SoundByte lançou um app. Agora recebe 2 milhões de eventos por hora. O banco de dados relacional trava.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p2')">
+      <div class="mc-num">02</div>
+      <div class="mc-h">O Que é Big Data</div>
+      <p class="mc-p">Os 5 Vs — Volume, Velocidade, Variedade, Veracidade e Valor — e por que eles importam para o negócio.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p3')">
+      <div class="mc-num">03</div>
+      <div class="mc-h">Estruturado vs Não Estruturado</div>
+      <p class="mc-p">80% dos dados do mundo são não estruturados. O que isso significa e como cada tipo é armazenado.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p4')">
+      <div class="mc-num">04</div>
+      <div class="mc-h">NoSQL: Além das Tabelas</div>
+      <p class="mc-p">O que é NoSQL, por que surgiu e quais são os quatro tipos de banco não relacional.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p5')">
+      <div class="mc-num">05</div>
+      <div class="mc-h">Tipos de BD NoSQL</div>
+      <p class="mc-p">Documento (MongoDB), Grafo (Neo4j), Chave-Valor (Redis) e Coluna Larga (Cassandra) — cada um para um caso de uso.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p6')">
+      <div class="mc-num">06</div>
+      <div class="mc-h">SQL vs NoSQL na Prática</div>
+      <p class="mc-p">O mesmo problema modelado nos dois paradigmas — e por que a complexidade é muito diferente.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p7')">
+      <div class="mc-num">07</div>
+      <div class="mc-h">Vantagens e Desafios</div>
+      <p class="mc-p">Flexibilidade, escalabilidade e alto desempenho — mas também desafios reais de qualidade e consistência.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p8')">
+      <div class="mc-num">08</div>
+      <div class="mc-h">Atividade Prática — MongoDB</div>
+      <p class="mc-p">Criar uma coleção de documentos JSON no MongoDB Atlas simulando perfis de usuários da SoundByte.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p9')">
+      <div class="mc-num">09</div>
+      <div class="mc-h">A Pergunta Estratégica</div>
+      <p class="mc-p">SQL ou NoSQL? A resposta que a arquitetura de dados moderna exige — e que o negócio precisa entender.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P0 — OBJETIVOS
+══════════════════════════════════════ -->
+<div id="p0" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">00 · Objetivos da Aula</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">O que você vai<br><em>saber fazer.</em></div>
+    <div class="bloom-card">
+      <div class="bloom-eyebrow">Objetivos da Aula — Taxonomia de Bloom</div>
+      <div class="bloom-list">
+        <div class="bloom-item">
+          <span class="bloom-level l1">Lembrar</span>
+          Nomear os 5 Vs do Big Data e identificar os quatro tipos de banco NoSQL (Documento, Grafo, Chave-Valor, Coluna Larga).
+        </div>
+        <div class="bloom-item">
+          <span class="bloom-level l2">Compreender</span>
+          Explicar por que o modelo relacional não escala para dados de alto volume e variedade, e qual limitação cada tipo de NoSQL resolve.
+        </div>
+        <div class="bloom-item">
+          <span class="bloom-level l3">Aplicar</span>
+          Representar dados de perfil de usuário em formato JSON e inserir documentos em uma coleção MongoDB no Atlas.
+        </div>
+        <div class="bloom-item">
+          <span class="bloom-level l4">Analisar</span>
+          Comparar a modelagem SQL e NoSQL para um mesmo problema e identificar quando cada abordagem é mais adequada.
+        </div>
+        <div class="bloom-item">
+          <span class="bloom-level l5">Criar</span>
+          Projetar o esquema NoSQL adequado para o cenário de eventos da SoundByte e justificar a escolha do tipo de banco para cada pergunta de negócio.
+        </div>
+      </div>
+    </div>
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('menu')">← Menu</button>
+      <button class="pn-btn pn-fwd" onclick="show('p1')">Visão Geral →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P1 — VISÃO GERAL
+══════════════════════════════════════ -->
+<div id="p1" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">01 · Visão Geral da Aula</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">O banco de dados<br><em>travou.</em></div>
+
+    <div class="callout" style="margin-bottom:32px;">
+      <div class="callout-tag">O Problema Central</div>
+      <p style="font-size:14.5px;line-height:1.75;font-style:italic;">A SoundByte lançou um aplicativo de streaming. Agora recebe 2 milhões de eventos por hora: cliques, pausas, buscas, comentários, avaliações com emojis e dados de localização com precisão de GPS. Cada usuário interage de um jeito diferente. O banco de dados relacional trava quando tenta armazenar isso.</p>
+    </div>
+
+    <div class="disc open" id="disc-conceitos">
+      <button class="disc-trigger" onclick="toggleDisc('disc-conceitos')">
+        <span class="disc-title">Conceitos Trabalhados</span>
+        <span class="disc-icon">▶</span>
+      </button>
+      <div class="disc-body">
+        <div class="disc-inner">
+          <div class="ov-concepts">
+            <div class="ov-concept">
+              <h4>Big Data</h4>
+              <p>Conjuntos de dados tão grandes, rápidos ou variados que as ferramentas tradicionais não conseguem processar. Definido pelos 5 Vs: Volume, Velocidade, Variedade, Veracidade e Valor.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>Dados Não Estruturados</h4>
+              <p>80% dos dados do mundo não cabem em linhas e colunas fixas: textos, imagens, áudios, vídeos, posts de redes sociais, logs de eventos.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>NoSQL</h4>
+              <p>Conjunto de conceitos para tratar dados não estruturados com rapidez e confiabilidade. Surgiu da necessidade de ir além do que bancos relacionais conseguem atender.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>Banco de Documentos</h4>
+              <p>Armazena dados em estruturas semelhantes a documentos JSON. Cada documento pode ter campos diferentes — sem esquema fixo. Principal representante: MongoDB.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>JSON</h4>
+              <p>JavaScript Object Notation — formato de texto leve para troca de dados, com pares chave-valor e suporte a listas e objetos aninhados. Base do modelo de documentos.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>Arquitetura Poliglota</h4>
+              <p>Uso do banco certo para a pergunta certa. SQL e NoSQL coexistem na mesma arquitetura — cada um otimizado para um tipo de consulta.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="disc" id="disc-importa">
+      <button class="disc-trigger" onclick="toggleDisc('disc-importa')">
+        <span class="disc-title">Por Que Esta Aula Importa</span>
+        <span class="disc-icon">▶</span>
+      </button>
+      <div class="disc-body">
+        <div class="disc-inner">
+          <div style="font-size:13.5px;line-height:1.75;color:var(--text);max-width:720px;margin-bottom:16px;">
+            A abertura mostra três exemplos reais de dados que não cabem em tabelas:
+          </div>
+          <div class="ov-concepts">
+            <div class="ov-concept">
+              <h4>LinkedIn — Perfil de Usuário</h4>
+              <p>Campos que alguns têm e outros não: certificações, idiomas, publicações, projetos. Uma tabela com colunas fixas deixaria 80% das células vazias.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>Amazon — Catálogo de Produtos</h4>
+              <p>Cada categoria tem atributos completamente diferentes: um livro tem ISBN e autor; um tênis tem numeração e material; um DVD tem resolução e legendas.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>Spotify — Histórico de Interações</h4>
+              <p>Eventos sem estrutura fixa por usuário: um ouve, pausa, busca, cria playlist, compartilha, pula. Cada sessão é uma sequência única de ações.</p>
+            </div>
+          </div>
+          <div class="callout" style="margin-top:4px;">
+            <strong>A pergunta para a turma:</strong> o que aconteceria se você tentasse colocar esses dados em uma tabela com colunas fixas?
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="disc" id="disc-summary">
+      <button class="disc-trigger" onclick="toggleDisc('disc-summary')">
+        <span class="disc-title">Conteúdo, Atividade e IA</span>
+        <span class="disc-icon">▶</span>
+      </button>
+      <div class="disc-body">
+        <div class="disc-inner">
+          <div class="ov-concepts">
+            <div class="ov-concept">
+              <h4>Conteúdo Fundamental</h4>
+              <p>Conceitos de Big Data (V's), bancos de dados NoSQL (Documento, Chave-Valor, Grafos) e limitações do modelo relacional.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>Atividade Prática</h4>
+              <p>Utilizando o MongoDB Atlas (plano gratuito), os alunos criarão uma coleção de documentos JSON simulando perfis de usuários com campos variáveis e praticarão consultas básicas.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>Integração com IA</h4>
+              <p>Prompt sugerido: <em>"Converta esta estrutura de tabelas de Clientes e Endereços SQL em um único documento JSON otimizado para leituras frequentes em um banco NoSQL como o MongoDB."</em></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p0')">← Objetivos</button>
+      <button class="pn-btn pn-fwd" onclick="show('p2')">Big Data →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P2 — O QUE É BIG DATA
+══════════════════════════════════════ -->
+<div id="p2" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">02 · O Que é Big Data</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Tudo o que fazemos<br><em>deixa um rastro.</em></div>
+
+    <div class="quote-card">
+      <div class="quote-text">"A ideia básica por trás do termo 'Big Data' é que tudo o que fazemos está deixando cada vez mais um rastro digital — ou dados — que podemos usar e analisar para nos tornarmos mais inteligentes. As forças motrizes neste admirável mundo novo são o acesso a volumes cada vez maiores de dados e nossa capacidade tecnológica cada vez maior de minerar esses dados para obter insights comerciais."</div>
+      <div class="quote-author">Bernard Marr</div>
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">Os 5 Vs do Big Data</div>
+    <div class="v-grid">
+      <div class="v-card v1">
+        <div class="v-letter">V</div>
+        <div class="v-name">Volume</div>
+        <div class="v-desc">2 milhões de eventos por hora na SoundByte. 90% dos dados do mundo foram criados nos últimos 2 anos. Escala que os bancos relacionais não sustentam sozinhos.</div>
+      </div>
+      <div class="v-card v2">
+        <div class="v-letter">V</div>
+        <div class="v-name">Velocidade</div>
+        <div class="v-desc">Cliques em milissegundos, streaming em tempo real. Cada 60 segundos: 72 horas de vídeo enviadas ao YouTube, 204 milhões de e-mails, 216.000 posts no Instagram.</div>
+      </div>
+      <div class="v-card v3">
+        <div class="v-letter">V</div>
+        <div class="v-name">Variedade</div>
+        <div class="v-desc">Dados sem estrutura fixa — emojis, GPS, áudio, vídeo, texto livre. 80% do crescimento dos dados é vídeo, imagem e documentos. Não cabe em linhas e colunas.</div>
+      </div>
+      <div class="v-card v4">
+        <div class="v-letter">V</div>
+        <div class="v-name">Veracidade</div>
+        <div class="v-desc">Localização imprecisa ou falsa é um problema de veracidade. 1 em cada 3 líderes empresariais não confia nos dados que usa para tomar decisões.</div>
+      </div>
+      <div class="v-card v5">
+        <div class="v-letter">V</div>
+        <div class="v-name">Valor</div>
+        <div class="v-desc">O que as recomendações personalizadas geram para o negócio é o valor. Big Data = capacidade de extrair maior Valor por meio de insights superiores.</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-tag">Os 5 Vs e os Tipos de NoSQL</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:8px;">
+        <div>
+          <strong>Volume, Velocidade e Variedade</strong><br>
+          <span style="font-size:12.5px;color:var(--muted)">2 milhões de eventos por hora, cliques em milissegundos, dados sem estrutura fixa — os três Vs que o banco relacional não sustenta sozinho.</span>
+        </div>
+        <div>
+          <strong>Veracidade e Valor</strong><br>
+          <span style="font-size:12.5px;color:var(--muted)">Localização imprecisa é um problema de veracidade. O que as recomendações personalizadas geram é o valor. Os dois Vs que definem se vale a pena coletar o dado.</span>
+        </div>
+        <div>
+          <strong>Documento, Grafo, Chave-Valor, Coluna Larga</strong><br>
+          <span style="font-size:12.5px;color:var(--muted)">Cada tipo de NoSQL existe para um caso de uso. A escolha depende da pergunta que você quer responder — não da tecnologia preferida.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p1')">← Visão Geral</button>
+      <button class="pn-btn pn-fwd" onclick="show('p3')">Estruturado vs Não Estruturado →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P3 — DADOS ESTRUTURADOS vs NÃO ESTRUTURADOS
+══════════════════════════════════════ -->
+<div id="p3" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">03 · Estruturado vs Não Estruturado</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">80% dos dados<br><em>não são estruturados.</em></div>
+
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Dados Estruturados</th>
+            <th>Dados Não Estruturados</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Características</td>
+            <td>
+              <ul>
+                <li>Modelos de dados pré-definidos</li>
+                <li>Apenas texto (inclui números), usualmente</li>
+                <li>Fácil de fazer buscas</li>
+              </ul>
+            </td>
+            <td>
+              <ul>
+                <li>Não tem modelos de dados pré-definidos</li>
+                <li>Pode ser textos, imagens, sons, vídeos ou outro formato</li>
+                <li>Difícil de fazer buscas</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>Armazenados em</td>
+            <td>
+              <ul>
+                <li>Bancos de dados relacionais</li>
+                <li>Data Warehouses</li>
+              </ul>
+            </td>
+            <td>
+              <ul>
+                <li>Aplicações</li>
+                <li>Bancos de dados NoSQL</li>
+                <li>Data Warehouses</li>
+                <li>Data Lakes</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>Gerados por</td>
+            <td><ul><li>Humanos ou máquinas</li></ul></td>
+            <td><ul><li>Humanos ou máquinas</li></ul></td>
+          </tr>
+          <tr>
+            <td>Aplicações típicas</td>
+            <td>
+              <ul>
+                <li>Sistemas de reservas aéreas</li>
+                <li>Controle de estoque</li>
+                <li>Sistemas CRM</li>
+                <li>Sistemas ERP</li>
+              </ul>
+            </td>
+            <td>
+              <ul>
+                <li>Processamento de texto</li>
+                <li>Softwares de apresentação</li>
+                <li>Clientes de e-mail</li>
+                <li>Ferramentas de edição de vídeos</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>Exemplos</td>
+            <td>
+              <ul>
+                <li>Datas</li>
+                <li>Números de telefone</li>
+                <li>Números de cartão de crédito</li>
+                <li>Nomes de clientes</li>
+                <li>Endereços</li>
+                <li>Informações transacionais</li>
+              </ul>
+            </td>
+            <td>
+              <ul>
+                <li>Arquivos de texto</li>
+                <li>Relatórios</li>
+                <li>Mensagens de e-mail</li>
+                <li>Arquivos de áudio</li>
+                <li>Arquivos de vídeo</li>
+                <li>Imagens</li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:28px;width:100%;max-width:720px;">
+      Fonte: <a href="https://www.ibm.com/think/topics/structured-vs-unstructured-data" target="_blank" rel="noopener" style="color:var(--c1)">IBM — Structured vs Unstructured Data</a>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p2')">← Big Data</button>
+      <button class="pn-btn pn-fwd" onclick="show('p4')">NoSQL →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P4 — NOSQL: ALÉM DAS TABELAS
+══════════════════════════════════════ -->
+<div id="p4" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">04 · NoSQL: Além das Tabelas</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Não é "sem SQL".<br><em>É "além do SQL".</em></div>
+
+    <div class="callout" style="margin-bottom:32px;">
+      <div class="callout-tag">O que é NoSQL</div>
+      NoSQL é, em verdade, um conjunto de conceitos utilizados para tratar dados não estruturados <strong>com rapidez e confiabilidade</strong>. Esses conceitos surgiram da necessidade em se buscar uma solução que os bancos de dados relacionais não conseguiam atender.<br><br>
+      Diferente do modelo relacional, que armazena dados em linhas e colunas, o NoSQL permite diferentes formas de armazenamento, cada uma otimizada para um caso de uso específico.
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">Os 4 Tipos de Banco NoSQL</div>
+
+    <!-- SVG with 4 NoSQL types diagram -->
+    <div class="diagram">
+      <svg viewBox="0 0 720 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+        <!-- Document -->
+        <rect x="20" y="20" width="155" height="140" rx="10" fill="#e8f0fa" stroke="#b0c8ec" stroke-width="1.5"/>
+        <text x="97" y="46" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#2a5eb0">DOCUMENTO</text>
+        <!-- doc icon (simplified) -->
+        <rect x="72" y="56" width="22" height="28" rx="2" fill="#fff" stroke="#b0c8ec" stroke-width="1"/>
+        <line x1="76" y1="66" x2="90" y2="66" stroke="#b0c8ec" stroke-width="1.2"/>
+        <line x1="76" y1="71" x2="90" y2="71" stroke="#b0c8ec" stroke-width="1.2"/>
+        <line x1="76" y1="76" x2="84" y2="76" stroke="#b0c8ec" stroke-width="1.2"/>
+        <rect x="85" y="64" width="14" height="18" rx="1" fill="#c8d8f0" stroke="#b0c8ec" stroke-width="1"/>
+        <rect x="97" y="70" width="14" height="14" rx="1" fill="#a0b8e0" stroke="#b0c8ec" stroke-width="1"/>
+        <text x="97" y="104" text-anchor="middle" font-family="system-ui" font-size="10" fill="#2a5eb0" font-weight="700">MongoDB</text>
+        <text x="97" y="120" text-anchor="middle" font-family="system-ui" font-size="10" fill="#5a7aaa">Perfis · Catálogos</text>
+        <text x="97" y="135" text-anchor="middle" font-family="system-ui" font-size="10" fill="#5a7aaa">Conteúdo · Eventos</text>
+
+        <!-- Graph -->
+        <rect x="195" y="20" width="155" height="140" rx="10" fill="#eaf8ea" stroke="#a0d0a0" stroke-width="1.5"/>
+        <text x="272" y="46" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#3a8a3a">GRAFO</text>
+        <!-- graph icon -->
+        <circle cx="258" cy="70" r="8" fill="#fff" stroke="#a0d0a0" stroke-width="1.5"/>
+        <circle cx="278" cy="60" r="6" fill="#c8e8c8" stroke="#a0d0a0" stroke-width="1.2"/>
+        <circle cx="286" cy="78" r="6" fill="#c8e8c8" stroke="#a0d0a0" stroke-width="1.2"/>
+        <circle cx="264" cy="86" r="6" fill="#c8e8c8" stroke="#a0d0a0" stroke-width="1.2"/>
+        <line x1="258" y1="62" x2="274" y2="63" stroke="#a0d0a0" stroke-width="1.5"/>
+        <line x1="263" y1="75" x2="282" y2="74" stroke="#a0d0a0" stroke-width="1.5"/>
+        <line x1="258" y1="78" x2="260" y2="80" stroke="#a0d0a0" stroke-width="1.5"/>
+        <text x="272" y="104" text-anchor="middle" font-family="system-ui" font-size="10" fill="#3a8a3a" font-weight="700">Neo4j</text>
+        <text x="272" y="120" text-anchor="middle" font-family="system-ui" font-size="10" fill="#5aaa5a">Recomendações</text>
+        <text x="272" y="135" text-anchor="middle" font-family="system-ui" font-size="10" fill="#5aaa5a">Redes Sociais</text>
+
+        <!-- Key-Value -->
+        <rect x="370" y="20" width="155" height="140" rx="10" fill="#faf0e0" stroke="#e0c880" stroke-width="1.5"/>
+        <text x="447" y="46" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#c08a20">CHAVE-VALOR</text>
+        <!-- kv icon -->
+        <rect x="415" y="54" width="28" height="10" rx="2" fill="#e8c860" stroke="#c0a040" stroke-width="1"/>
+        <rect x="447" y="54" width="34" height="10" rx="2" fill="#fff8e0" stroke="#c0a040" stroke-width="1"/>
+        <rect x="415" y="68" width="28" height="10" rx="2" fill="#e8c860" stroke="#c0a040" stroke-width="1"/>
+        <rect x="447" y="68" width="34" height="10" rx="2" fill="#fff8e0" stroke="#c0a040" stroke-width="1"/>
+        <rect x="415" y="82" width="28" height="10" rx="2" fill="#e8c860" stroke="#c0a040" stroke-width="1"/>
+        <rect x="447" y="82" width="34" height="10" rx="2" fill="#fff8e0" stroke="#c0a040" stroke-width="1"/>
+        <text x="447" y="104" text-anchor="middle" font-family="system-ui" font-size="10" fill="#c08a20" font-weight="700">Redis</text>
+        <text x="447" y="120" text-anchor="middle" font-family="system-ui" font-size="10" fill="#aaa050">Cache · Sessões</text>
+        <text x="447" y="135" text-anchor="middle" font-family="system-ui" font-size="10" fill="#aaa050">Logs · Filas</text>
+
+        <!-- Wide-column -->
+        <rect x="545" y="20" width="155" height="140" rx="10" fill="#f8f0e0" stroke="#d0b888" stroke-width="1.5"/>
+        <text x="622" y="46" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#805020">COLUNA LARGA</text>
+        <!-- wide-col icon -->
+        <rect x="575" y="54" width="12" height="36" rx="1" fill="#c8a060" stroke="#a07840" stroke-width="1"/>
+        <rect x="590" y="54" width="18" height="36" rx="1" fill="#e8c898" stroke="#a07840" stroke-width="1"/>
+        <rect x="611" y="54" width="12" height="20" rx="1" fill="#c8a060" stroke="#a07840" stroke-width="1"/>
+        <rect x="626" y="54" width="16" height="28" rx="1" fill="#e8c898" stroke="#a07840" stroke-width="1"/>
+        <text x="622" y="104" text-anchor="middle" font-family="system-ui" font-size="10" fill="#805020" font-weight="700">Cassandra</text>
+        <text x="622" y="120" text-anchor="middle" font-family="system-ui" font-size="10" fill="#a07840">Pesquisa Web</text>
+        <text x="622" y="135" text-anchor="middle" font-family="system-ui" font-size="10" fill="#a07840">IoT · Escala</text>
+      </svg>
+    </div>
+
+    <div style="font-size:11px;color:var(--muted);margin-bottom:28px;width:100%;max-width:720px;">
+      Referência: <a href="https://www.ibm.com/topics/nosql-databases" target="_blank" rel="noopener" style="color:var(--c1)">IBM — What is a NoSQL database?</a>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p3')">← Estruturado vs Não Estruturado</button>
+      <button class="pn-btn pn-fwd" onclick="show('p5')">Tipos de BD NoSQL →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P5 — TIPOS DE BD NOSQL
+══════════════════════════════════════ -->
+<div id="p5" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">05 · Tipos de BD NoSQL</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">A escolha depende<br><em>da pergunta.</em></div>
+
+    <!-- DOCUMENTO -->
+    <div class="nosql-type" id="nt-doc">
+      <div class="nosql-type-header" onclick="toggleNosql('nt-doc')" role="button" tabindex="0">
+        <span class="nosql-type-tag tag-doc">Documento</span>
+        <span class="nosql-type-name">Banco de Documentos</span>
+        <span class="nosql-type-vendor">MongoDB · CouchDB · Firestore</span>
+        <span class="nosql-chevron">▶</span>
+      </div>
+      <div class="nosql-type-body">
+        <div class="nosql-type-desc">
+          <p>Armazena elementos de dados em estruturas semelhantes a documentos que codificam informações em formatos como JSON.</p>
+          <p>Cada documento pode ter campos completamente diferentes — sem esquema rígido definido previamente.</p>
+          <span class="use-label">Usos comuns</span>
+          <p>Gerenciamento de conteúdo, monitoramento de aplicativos móveis e da Web, perfis de usuários, catálogos de produtos.</p>
+          <div style="margin-top:12px;">
+            <a class="ext-link" href="https://db-engines.com/en/ranking/document+store" target="_blank" rel="noopener" style="margin-top:0;">↗ DB-Engines Ranking of Document Stores</a>
+          </div>
+        </div>
+        <div class="nosql-type-code">
+          <code><span class="cm">// Documento simples</span>
+{
+  <span class="s">"FirstName"</span>: <span class="s">"Bob"</span>,
+  <span class="s">"Address"</span>: <span class="s">"5 Oak St."</span>,
+  <span class="s">"Hobby"</span>: <span class="s">"sailing"</span>
+}
+
+<span class="cm">// Documento com subdocumentos</span>
+{
+  <span class="s">"_id"</span>: <span class="s">"123"</span>,
+  <span class="s">"date"</span>: <span class="s">"10/10/2017"</span>,
+  <span class="s">"ship_status"</span>: <span class="s">"backordered"</span>,
+  <span class="s">"orderitems"</span>: [
+    { <span class="s">"itemid"</span>: <span class="s">"4348"</span>, <span class="s">"price"</span>: <span class="n">10.00</span> },
+    { <span class="s">"itemid"</span>: <span class="s">"5648"</span>, <span class="s">"price"</span>: <span class="n">15.00</span> }
+  ]
+}</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRAFO -->
+    <div class="nosql-type" id="nt-graph">
+      <div class="nosql-type-header" onclick="toggleNosql('nt-graph')" role="button" tabindex="0">
+        <span class="nosql-type-tag tag-graph">Grafo</span>
+        <span class="nosql-type-name">Banco de Grafos</span>
+        <span class="nosql-type-vendor">Neo4j · Amazon Neptune · ArangoDB</span>
+        <span class="nosql-chevron">▶</span>
+      </div>
+      <div class="nosql-type-body">
+        <div class="nosql-type-desc">
+          <p>Enfatiza as conexões entre os elementos de dados, armazenando "nós" relacionados em grafos para acelerar as consultas.</p>
+          <p>Ideal quando os relacionamentos entre os dados são tão importantes quanto os dados em si.</p>
+          <span class="use-label">Usos comuns</span>
+          <p>Mecanismos de recomendação, aplicativos geoespaciais, redes sociais, detecção de fraudes.</p>
+          <div style="margin-top:12px;">
+            <a class="ext-link" href="https://db-engines.com/en/ranking/graph+dbms" target="_blank" rel="noopener" style="margin-top:0;">↗ DB-Engines Ranking of Graph DBMS</a>
+          </div>
+        </div>
+        <div class="nosql-type-code">
+          <code><span class="cm">// Exemplo de grafo</span>
+<span class="cm">// Nós: Julie, Bob, Jim, Steve</span>
+<span class="cm">// Nós: Rock Music, BMW, IBM, Fido</span>
+
+Julie ──Sister In-Law To──▶ Steve
+  │
+Listens To
+  │
+  ▼
+Rock Music ◀── Listens To ── Bob
+                               │
+                    ┌──────────┼──────┐
+                 Married     Drives  Works
+                   To          │     For
+                    │         BMW    IBM
+                    ▼
+                 Colleague Of
+                    │
+                    ▼
+                   Jim ── Has Pet ──▶ Fido
+                    │
+                 Works For
+                    │
+                    ▼
+                   IBM</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAVE-VALOR -->
+    <div class="nosql-type" id="nt-kv">
+      <div class="nosql-type-header" onclick="toggleNosql('nt-kv')" role="button" tabindex="0">
+        <span class="nosql-type-tag tag-kv">Chave-Valor</span>
+        <span class="nosql-type-name">Banco Chave-Valor</span>
+        <span class="nosql-type-vendor">Redis · DynamoDB · Riak</span>
+        <span class="nosql-chevron">▶</span>
+      </div>
+      <div class="nosql-type-body">
+        <div class="nosql-type-desc">
+          <p>Usa um modelo de dados simples que combina uma chave exclusiva e seu valor associado no armazenamento de elementos de dados.</p>
+          <p>Extremamente rápido para leituras e gravações — ideal para dados acessados com frequência.</p>
+          <span class="use-label">Usos comuns</span>
+          <p>Armazenamento de dados de fluxo de cliques, logs de aplicativos, cache de sessões, filas de mensagens.</p>
+          <div style="margin-top:12px;">
+            <a class="ext-link" href="https://db-engines.com/en/ranking/key-value+store" target="_blank" rel="noopener" style="margin-top:0;">↗ DB-Engines Ranking of Key-value Stores</a>
+          </div>
+        </div>
+        <div class="nosql-type-code">
+          <code><span class="cm">// Estrutura Chave → Valor</span>
+
+<span class="n">user:1001</span>  →  { nome: "Alice",
+               plano: "premium" }
+
+<span class="n">session:xyz</span> →  { userId: 1001,
+               expires: "2026-06-01",
+               token: "abc123" }
+
+<span class="cm">// Exemplo DynamoDB</span>
+<span class="cm">// Partition Key + Sort Key</span>
+
+Product ID │ Type      │ Attributes
+───────────┼───────────┼──────────────────
+    1      │ Book ID   │ Odyssey, Homer
+    2      │ Album ID  │ 6 Partitas, Bach
+    3      │ Movie ID  │ The Kid, Chaplin</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUNA LARGA -->
+    <div class="nosql-type" id="nt-wide">
+      <div class="nosql-type-header" onclick="toggleNosql('nt-wide')" role="button" tabindex="0">
+        <span class="nosql-type-tag tag-wide">Coluna Larga</span>
+        <span class="nosql-type-name">Banco de Coluna Larga</span>
+        <span class="nosql-type-vendor">Cassandra · HBase · Google Bigtable</span>
+        <span class="nosql-chevron">▶</span>
+      </div>
+      <div class="nosql-type-body">
+        <div class="nosql-type-desc">
+          <p>Também chamados de bancos de dados em estilo de tabela. Armazenam dados em tabelas que podem ter um número muito grande de colunas — e cada linha pode ter colunas diferentes.</p>
+          <p>Projetados para escalar horizontalmente por clusters de servidores.</p>
+          <span class="use-label">Usos comuns</span>
+          <p>Pesquisa na Internet e outros aplicativos da Web em grande escala, IoT, análise de séries temporais.</p>
+          <div style="margin-top:12px;">
+            <a class="ext-link" href="https://db-engines.com/en/ranking/wide+column+store" target="_blank" rel="noopener" style="margin-top:0;">↗ DB-Engines Ranking of Wide Column Stores</a>
+          </div>
+        </div>
+        <div class="nosql-type-code">
+          <code><span class="cm">// Tabela UserProfile (Wide-column)</span>
+<span class="cm">// Cada linha tem colunas diferentes!</span>
+
+Bob:
+  emailAddress: bob@example.com
+  gender: male
+  age: 35
+
+Britney:
+  emailAddress: brit@example.com
+  gender: female
+  <span class="cm">// sem campo "age"</span>
+
+Tori:
+  emailAddress: tori@example.com
+  country: Sweden
+  hairColor: Blue
+  <span class="cm">// sem "gender" nem "age"</span></code>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABELA COMPARATIVA -->
+    <div class="ov-section-tag" style="margin-top:32px;margin-bottom:16px;">Quadro comparativo — modelos de banco de dados</div>
+    <div class="data-table-wrap" style="margin-bottom:28px;">
+      <table class="data-table" style="font-size:12px;">
+        <thead>
+          <tr>
+            <th style="background:var(--s1);color:var(--muted);">Modelo</th>
+            <th style="background:var(--s1);color:var(--text);">Estrutura do valor</th>
+            <th style="background:var(--s1);color:var(--text);">Como se consulta</th>
+            <th style="background:var(--s1);color:var(--text);">Quando usar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:700;color:#2a5eb0;white-space:nowrap;">Documento</td>
+            <td>Documentos estruturados (JSON/BSON), com campos aninhados e arrays.</td>
+            <td>Consulta por chave <strong>e</strong> por campos internos; possível indexar atributos e realizar filtros ricos.</td>
+            <td>Perfis de usuário, catálogos, CMS, e-commerce, logs estruturados, qualquer cenário com esquema flexível.</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;color:#3a8a3a;white-space:nowrap;">Grafo</td>
+            <td>Nós (entidades) e arestas (relacionamentos), com propriedades em ambos.</td>
+            <td>Consulta focada em <strong>relacionamentos</strong> e travessias (ex.: "amigos de amigos", caminhos, recomendações).</td>
+            <td>Redes sociais, recomendação de produtos, fraud detection, sistemas com grafos densos de relacionamentos.</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;color:#c08a20;white-space:nowrap;">Chave-Valor</td>
+            <td>Par simples: <code style="background:var(--s2);padding:1px 4px;border-radius:3px;">chave → valor</code>; o valor é tratado como blob/opaco.</td>
+            <td>Acesso muito rápido <strong>apenas pela chave</strong>; não há consulta interna ao valor.</td>
+            <td>Sessões de usuário, cache, flags de configuração, carrinhos temporários, quando o acesso é sempre por ID.</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;color:#805020;white-space:nowrap;">Coluna Larga</td>
+            <td>Linhas com conjuntos de colunas muito esparsas, agrupadas em famílias; cada linha pode ter colunas diferentes.</td>
+            <td>Consulta por chave de linha e por faixa de colunas; otimizada para escanear muitas colunas em poucas linhas.</td>
+            <td>Logs de eventos, métricas de tempo (time series), big data analítico, histórico de atividades com muitas colunas esparsas.</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;color:var(--c1);white-space:nowrap;">Relacional (SQL)</td>
+            <td>Tabelas com <strong>linhas e colunas fixas</strong>, relacionadas por chaves estrangeiras.</td>
+            <td>Consulta com <strong>SQL</strong>: filtros, joins, agrupamentos, subquerys etc.; forte suporte a transações ACID.</td>
+            <td>Sistemas com dados bem estruturados e relacionamentos fixos (ERP, financeiro, inventário, CRM, aplicações transacionais críticas).</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p4')">← NoSQL</button>
+      <button class="pn-btn pn-fwd" onclick="show('p6')">SQL vs NoSQL →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P6 — SQL vs NOSQL NA PRÁTICA
+══════════════════════════════════════ -->
+<div id="p6" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">06 · SQL vs NoSQL na Prática</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Um problema,<br><em>dois paradigmas.</em></div>
+
+    <p style="font-size:13.5px;line-height:1.7;max-width:720px;width:100%;margin-bottom:28px;color:var(--text);">
+      Estudantes têm hobbies. Um estudante pode ter vários hobbies e um hobby pode ser compartilhado por vários estudantes (relação M:M). Veja como cada paradigma resolve este problema.
+    </p>
+
+    <!-- Passo 1: diagrama SQL inicial -->
+    <div class="disc open" id="disc-sql1">
+      <button class="disc-trigger" onclick="toggleDisc('disc-sql1')">
+        <span class="disc-title">1. SQL — Modelo Inicial (problema)</span>
+        <span class="disc-icon">▶</span>
+      </button>
+      <div class="disc-body">
+        <div class="disc-inner">
+          <p style="font-size:13px;line-height:1.65;color:var(--text);margin-bottom:16px;">
+            No modelo inicial, cada estudante só pode ter <strong>um</strong> hobby — porque a coluna <code style="background:var(--s2);padding:1px 5px;border-radius:3px;font-size:12px;">hobby</code> admite apenas um valor.
+          </p>
+          <div class="compare" style="margin-bottom:16px;">
+            <div class="cmp-card">
+              <div class="cmp-head sql-h">Disciplinas</div>
+              <div class="cmp-body" style="font-family:'SF Mono','Fira Code',monospace;font-size:12px;">
+                PK &nbsp;id &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INT<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;nome_disciplina &nbsp;VARCHAR(45)
+              </div>
+            </div>
+            <div class="cmp-card">
+              <div class="cmp-head sql-h">Estudantes</div>
+              <div class="cmp-body" style="font-family:'SF Mono','Fira Code',monospace;font-size:12px;">
+                PK &nbsp;id &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INT<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;nome &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VARCHAR(45)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#b83030;">hobby &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VARCHAR(45)</span><br>
+                FK &nbsp;disciplinas_id INT
+              </div>
+            </div>
+          </div>
+          <div class="callout" style="background:rgba(184,48,48,.06);border-color:var(--c2);">
+            <strong style="color:var(--c2);">Problema:</strong> Como fazer para que um estudante possa ter <em>vários</em> hobbies e que um hobby seja compartilhado por <em>vários</em> estudantes?
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Passo 2: SQL solução M:M -->
+    <div class="disc open" id="disc-sql2">
+      <button class="disc-trigger" onclick="toggleDisc('disc-sql2')">
+        <span class="disc-title">2. SQL — Solução M:M (tabela intermediária)</span>
+        <span class="disc-icon">▶</span>
+      </button>
+      <div class="disc-body">
+        <div class="disc-inner">
+          <p style="font-size:13px;line-height:1.65;color:var(--text);margin-bottom:16px;">
+            A solução relacional exige uma <strong>tabela intermediária</strong> <code style="background:var(--s2);padding:1px 5px;border-radius:3px;font-size:12px;">Estudantes_Hobbies</code> para modelar a relação M:M. Resultado: 4 tabelas, 3 JOINs para uma consulta simples.
+          </p>
+
+          <div class="sql-wrap">
+            <div class="sql-header">
+              <div class="sql-label">Schema SQL</div>
+              <button class="copy-btn" onclick="copyCode(this, 'sql-schema')">Copiar</button>
+            </div>
+            <div class="sql-block">
+              <code id="sql-schema"><span class="k">CREATE TABLE</span> `Disciplinas` (
+  `id` INT,
+  `nome_disciplina` <span class="k">VARCHAR</span>(<span class="n">45</span>),
+  <span class="k">PRIMARY KEY</span> (`id`)
+);
+
+<span class="k">CREATE TABLE</span> `Estudantes` (
+  `id` INT,
+  `nome` <span class="k">VARCHAR</span>(<span class="n">45</span>),
+  `disciplinas_id` INT,
+  <span class="k">PRIMARY KEY</span> (`id`),
+  <span class="k">FOREIGN KEY</span> (`disciplinas_id`)
+    <span class="k">REFERENCES</span> `Disciplinas`(`id`)
+);
+
+<span class="k">CREATE TABLE</span> `Hobbies` (
+  `id` INT,
+  `hobby` <span class="k">VARCHAR</span>(<span class="n">45</span>),
+  <span class="k">PRIMARY KEY</span> (`id`)
+);
+
+<span class="k">CREATE TABLE</span> `Estudantes_Hobbies` (
+  `estudantes_id` INT,
+  `hobbies_id` INT,
+  <span class="k">FOREIGN KEY</span> (`hobbies_id`)
+    <span class="k">REFERENCES</span> `Hobbies`(`id`),
+  <span class="k">FOREIGN KEY</span> (`estudantes_id`)
+    <span class="k">REFERENCES</span> `Estudantes`(`id`)
+);</code>
+            </div>
+          </div>
+
+          <div class="sql-wrap">
+            <div class="sql-header">
+              <div class="sql-label">Dados de Exemplo</div>
+              <button class="copy-btn" onclick="copyCode(this, 'sql-data')">Copiar</button>
+            </div>
+            <div class="sql-block">
+              <code id="sql-data"><span class="k">INSERT INTO</span> Disciplinas (`id`, `nome_disciplina`)
+<span class="k">VALUES</span>
+  (<span class="n">1</span>, <span class="s">'eletromagnetismo'</span>),
+  (<span class="n">2</span>, <span class="s">'cálculo diferencial'</span>);
+
+<span class="k">INSERT INTO</span> Estudantes (`id`, `nome`, `disciplinas_id`)
+<span class="k">VALUES</span>
+  (<span class="n">1</span>, <span class="s">'Emmanuel Kant'</span>, <span class="n">1</span>),
+  (<span class="n">2</span>, <span class="s">'Albert Einstein'</span>, <span class="n">2</span>);
+
+<span class="k">INSERT INTO</span> Hobbies (`id`, `hobby`)
+<span class="k">VALUES</span>
+  (<span class="n">1</span>, <span class="s">'jardinagem'</span>), (<span class="n">2</span>, <span class="s">'leitura'</span>),
+  (<span class="n">3</span>, <span class="s">'natação'</span>), (<span class="n">4</span>, <span class="s">'corrida'</span>),
+  (<span class="n">5</span>, <span class="s">'xadrez'</span>);
+
+<span class="k">INSERT INTO</span> Estudantes_Hobbies
+  (`estudantes_id`, `hobbies_id`)
+<span class="k">VALUES</span>
+  (<span class="n">1</span>, <span class="n">1</span>),  <span class="cm">-- Kant: jardinagem</span>
+  (<span class="n">2</span>, <span class="n">3</span>),  <span class="cm">-- Einstein: natação</span>
+  (<span class="n">2</span>, <span class="n">4</span>);  <span class="cm">-- Einstein: corrida</span></code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Passo 3: NoSQL -->
+    <div class="disc open" id="disc-nosql">
+      <button class="disc-trigger" onclick="toggleDisc('disc-nosql')">
+        <span class="disc-title">3. NoSQL — Schema MongoDB</span>
+        <span class="disc-icon">▶</span>
+      </button>
+      <div class="disc-body">
+        <div class="disc-inner">
+          <p style="font-size:13px;line-height:1.65;color:var(--text);margin-bottom:16px;">
+            No NoSQL, tudo em <strong>um único documento</strong>. Os hobbies são arrays embutidos, os campos são livres por documento — sem necessidade de tabelas intermediárias.
+          </p>
+          <div class="sql-wrap">
+            <div class="sql-header">
+              <div class="sql-label">Schema NoSQL — MongoDB</div>
+              <button class="copy-btn" onclick="copyCode(this, 'nosql-schema')">Copiar</button>
+            </div>
+            <div class="sql-block">
+              <code id="nosql-schema">db.disciplina.insert_many([
+  {
+    <span class="s">"nome"</span>: <span class="s">"Emmanuel Kant"</span>,
+    <span class="s">"hobbies"</span>: <span class="s">"jardinagem"</span>,
+    <span class="s">"nome_disciplina"</span>: <span class="s">"eletromagnetismo"</span>
+  },
+  {
+    <span class="s">"nome"</span>: <span class="s">"Albert Einstein"</span>,
+    <span class="s">"hobbies"</span>: {
+      <span class="s">"exercícios"</span>: [<span class="s">"natação"</span>, <span class="s">"corrida"</span>],
+      <span class="s">"jogos"</span>: <span class="s">"xadrez"</span>
+    },
+    <span class="s">"nome_disciplina"</span>: <span class="s">"cálculo diferencial"</span>,
+    <span class="s">"notas_provas"</span>: [<span class="n">100</span>, <span class="n">100</span>, <span class="n">100</span>]
+  }
+])</code>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:720px;margin-bottom:0;">
+            <div style="background:rgba(58,100,180,.06);border:1px solid rgba(58,100,180,.2);border-radius:10px;padding:14px 16px;">
+              <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:#2a4ab0;margin-bottom:8px;">SQL</div>
+              <ul style="list-style:none;font-size:12.5px;line-height:1.65;color:var(--text);">
+                <li style="display:flex;gap:8px;padding:2px 0;"><span style="color:var(--muted)">—</span>4 tabelas</li>
+                <li style="display:flex;gap:8px;padding:2px 0;"><span style="color:var(--muted)">—</span>3 JOINs para consulta simples</li>
+                <li style="display:flex;gap:8px;padding:2px 0;"><span style="color:var(--muted)">—</span>Esquema rígido e pré-definido</li>
+                <li style="display:flex;gap:8px;padding:2px 0;"><span style="color:var(--muted)">—</span>Adicionar campo exige ALTER TABLE</li>
+              </ul>
+            </div>
+            <div style="background:rgba(58,138,58,.06);border:1px solid rgba(58,138,58,.2);border-radius:10px;padding:14px 16px;">
+              <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:#3a6a40;margin-bottom:8px;">NoSQL</div>
+              <ul style="list-style:none;font-size:12.5px;line-height:1.65;color:var(--text);">
+                <li style="display:flex;gap:8px;padding:2px 0;"><span style="color:var(--muted)">—</span>1 coleção</li>
+                <li style="display:flex;gap:8px;padding:2px 0;"><span style="color:var(--muted)">—</span>Consulta direta no documento</li>
+                <li style="display:flex;gap:8px;padding:2px 0;"><span style="color:var(--muted)">—</span>Esquema flexível por documento</li>
+                <li style="display:flex;gap:8px;padding:2px 0;"><span style="color:var(--muted)">—</span>Novos campos sem migração</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p5')">← Tipos de BD NoSQL</button>
+      <button class="pn-btn pn-fwd" onclick="show('p7')">Vantagens e Desafios →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P7 — VANTAGENS E DESAFIOS
+══════════════════════════════════════ -->
+<div id="p7" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">07 · Vantagens e Desafios</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Não existe<br><em>bala de prata.</em></div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">Vantagens de usar um banco de dados NoSQL</div>
+    <div class="adv-list">
+      <div class="adv-item">
+        <div class="adv-label flex">Flexibilidade</div>
+        <div class="adv-body">
+          <ul>
+            <li>Permitem armazenar dados não estruturados em vários formatos: documentos, colunas e pares chave-valor</li>
+            <li>Não requerem um esquema rígido definido previamente, permitindo adicionar novos dados sem ter que predefini-los</li>
+          </ul>
+        </div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-label escala">Escalabilidade</div>
+        <div class="adv-body">
+          <ul>
+            <li>São projetados para aumentar a escala horizontalmente usando clusters distribuídos de hardware</li>
+            <li>Podem lidar com grandes volumes de dados e usuários simultâneos sem comprometer o desempenho</li>
+            <li>Permitem aumentar a capacidade de armazenamento e processamento conforme o aplicativo cresce</li>
+          </ul>
+        </div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-label desemp">Alto desempenho</div>
+        <div class="adv-body">
+          <ul>
+            <li>São construídos para ter ótimo desempenho, medido pela taxa de transferência e latência</li>
+            <li>Oferecem baixa latência e alto desempenho mesmo com grandes volumes de dados</li>
+          </ul>
+        </div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-label custo">Custos reduzidos</div>
+        <div class="adv-body">
+          <ul>
+            <li>Muitos são gratuitos e de código aberto, como o MongoDB</li>
+            <li>Possuem uma arquitetura eficiente e escalável, evitando a necessidade de uma arquitetura monolítica cara</li>
+            <li>Podem reduzir os custos de infraestrutura por serem projetados para rodar em cluster e na nuvem</li>
+          </ul>
+        </div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-label disp">Disponibilidade</div>
+        <div class="adv-body">
+          <ul>
+            <li>Costumam contar com arquiteturas de software eficientes de replicação de dados</li>
+            <li>Se um ou mais servidores caem, outro está apto para continuar o trabalho</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;margin-top:16px;">Principais desafios ao usar NoSQL</div>
+    <div class="adv-list">
+      <div class="adv-item">
+        <div class="adv-label chall" style="background:#5a4a3a;">Integração de dados</div>
+        <div class="adv-body" style="font-size:13px;line-height:1.6;color:var(--text);">A diversidade de fontes e formatos pode dificultar a integração e a sincronização de dados, levando a inconsistências entre diferentes conjuntos de dados.</div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-label chall" style="background:#3a4a5a;">Qualidade dos dados</div>
+        <div class="adv-body" style="font-size:13px;line-height:1.6;color:var(--text);">A combinação de dados não estruturados e inconsistentes pode resultar em dados ausentes, duplicados ou conflitantes — um desafio significativo para análises confiáveis.</div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-label chall" style="background:#3a5a4a;">Gerenciamento de esquemas</div>
+        <div class="adv-body" style="font-size:13px;line-height:1.6;color:var(--text);">A flexibilidade de esquema pode complicar o gerenciamento de dados. A falta de estrutura rígida pode levar a uma organização desorganizada e difícil de manter ao longo do tempo.</div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-label chall" style="background:#4a3a5a;">Consultas complexas</div>
+        <div class="adv-body" style="font-size:13px;line-height:1.6;color:var(--text);">Consultas que exigem junções ou agregações podem ser menos eficientes em NoSQL do que em bancos relacionais tradicionais — impacta análises de dados mais sofisticadas.</div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-label chall" style="background:#5a3a4a;">Analytics limitado</div>
+        <div class="adv-body" style="font-size:13px;line-height:1.6;color:var(--text);">Muitos bancos NoSQL não possuem as mesmas capacidades analíticas que sistemas de data warehouse tradicionais, limitando a profundidade das análises realizadas diretamente.</div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-label chall" style="background:#4a4a4a;">Falta de padrões</div>
+        <div class="adv-body" style="font-size:13px;line-height:1.6;color:var(--text);">A ausência de padrões uniformes entre diferentes tecnologias NoSQL dificulta a adoção, a migração entre plataformas e a formação de equipes que trabalham com múltiplas tecnologias.</div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p6')">← SQL vs NoSQL</button>
+      <button class="pn-btn pn-fwd" onclick="show('p8')">Atividade Prática →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P8 — ATIVIDADE PRÁTICA
+══════════════════════════════════════ -->
+<div id="p8" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">08 · Atividade Prática — MongoDB</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Mãos ao<br><em>documento.</em></div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">Atividade — Perfis de Usuários no MongoDB Atlas</div>
+
+    <div class="step-list">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">Crie sua conta no MongoDB Atlas</div>
+          <div class="step-text" style="margin-top:6px;display:flex;flex-direction:column;gap:6px;">
+            <span>Utilize o plano gratuito (M0 Free Tier). Nenhum cartão de crédito é necessário.</span>
+            <a class="ext-link" href="https://www.mongodb.com/cloud/atlas/register" target="_blank" rel="noopener">↗ MongoDB Atlas — Criar Conta</a>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">Crie um Cluster e um Database</div>
+          <div class="step-text" style="margin-top:6px;">
+            Crie um cluster M0 (gratuito), um banco de dados chamado <code style="background:var(--s2);padding:1px 5px;border-radius:3px;">soundbyte</code> e uma coleção chamada <code style="background:var(--s2);padding:1px 5px;border-radius:3px;">usuarios</code>.
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-title">Insira Perfis com Campos Variáveis</div>
+          <div class="step-text" style="margin-top:6px;margin-bottom:8px;">
+            Note que cada documento tem campos diferentes — demonstrando a flexibilidade do esquema NoSQL.
+          </div>
+          <div class="sql-wrap" style="margin-bottom:0;">
+            <div class="sql-header">
+              <div class="sql-label">Insert Document — cole o array JSON no Data Explorer</div>
+              <button class="copy-btn" onclick="copyCode(this, 'mongo-insert')">Copiar</button>
+            </div>
+            <div class="sql-block">
+              <code id="mongo-insert">[
+  {
+    <span class="s">"nome"</span>: <span class="s">"Ana Souza"</span>,
+    <span class="s">"plano"</span>: <span class="s">"premium"</span>,
+    <span class="s">"generos_favoritos"</span>: [<span class="s">"pop"</span>, <span class="s">"mpb"</span>],
+    <span class="s">"localizacao"</span>: {
+      <span class="s">"cidade"</span>: <span class="s">"São Paulo"</span>,
+      <span class="s">"lat"</span>: <span class="n">-23.5</span>,
+      <span class="s">"lon"</span>: <span class="n">-46.6</span>
+    },
+    <span class="s">"ultima_sessao"</span>: <span class="s">"2026-05-30T14:22:00"</span>,
+    <span class="s">"avaliacoes"</span>: [<span class="s">"😍"</span>, <span class="s">"🔥"</span>, <span class="s">"😴"</span>]
+  },
+  {
+    <span class="s">"nome"</span>: <span class="s">"Bruno Mendes"</span>,
+    <span class="s">"plano"</span>: <span class="s">"gratuito"</span>,
+    <span class="s">"generos_favoritos"</span>: [<span class="s">"rock"</span>],
+    <span class="s">"dispositivos"</span>: [<span class="s">"android"</span>, <span class="s">"smart_tv"</span>],
+    <span class="s">"ultima_sessao"</span>: <span class="s">"2026-05-29T08:05:00"</span>
+  },
+  {
+    <span class="s">"nome"</span>: <span class="s">"Carla Lima"</span>,
+    <span class="s">"plano"</span>: <span class="s">"premium"</span>,
+    <span class="s">"podcast_favorito"</span>: <span class="s">"Roda Viva"</span>,
+    <span class="s">"horas_ouvidas_mes"</span>: <span class="n">42.5</span>,
+    <span class="s">"historico_recente"</span>: [
+      {
+        <span class="s">"faixa"</span>: <span class="s">"Aquarela"</span>,
+        <span class="s">"artista"</span>: <span class="s">"Toquinho"</span>,
+        <span class="s">"duracao_s"</span>: <span class="n">240</span>
+      },
+      {
+        <span class="s">"faixa"</span>: <span class="s">"Garota de Ipanema"</span>,
+        <span class="s">"artista"</span>: <span class="s">"Tom Jobim"</span>,
+        <span class="s">"duracao_s"</span>: <span class="n">186</span>
+      }
+    ]
+  }
+]</code>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-title">Pratique Consultas Básicas</div>
+          <div class="step-text" style="margin-top:6px;margin-bottom:12px;">
+            No Data Explorer, cole cada filtro abaixo no campo <strong>Filter</strong> da coleção e clique em <strong>Apply</strong>. Observe como o MongoDB retorna documentos com estruturas diferentes.
+          </div>
+
+          <div class="sql-wrap" style="margin-bottom:12px;">
+            <div class="sql-label">Todos os usuários</div>
+            <div class="sql-block">
+              <code id="mongo-q1">{}</code>
+            </div>
+          </div>
+          <div class="sql-wrap" style="margin-bottom:12px;">
+            <div class="sql-label">Apenas usuários premium</div>
+            <div class="sql-block">
+              <code id="mongo-q2">{ <span class="s">"plano"</span>: <span class="s">"premium"</span> }</code>
+            </div>
+          </div>
+          <div class="sql-wrap" style="margin-bottom:12px;">
+            <div class="sql-label">Usuários com rock entre os gêneros favoritos</div>
+            <div class="sql-block">
+              <code id="mongo-q3">{ <span class="s">"generos_favoritos"</span>: <span class="s">"rock"</span> }</code>
+            </div>
+          </div>
+          <div class="sql-wrap" style="margin-bottom:0;">
+            <div class="sql-label">Usuários com mais de 40 horas ouvidas no mês</div>
+            <div class="sql-block">
+              <code id="mongo-q4">{ <span class="s">"horas_ouvidas_mes"</span>: { <span class="s">"$gt"</span>: <span class="n">40</span> } }</code>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div>
+          <div class="step-title">Adicione um Novo Campo sem Migração</div>
+          <div class="step-text" style="margin-top:6px;margin-bottom:12px;">
+            No Data Explorer: filtre com o JSON abaixo, clique no ícone de edição (✏️) de um documento premium e acrescente o campo <code style="background:var(--s2);padding:1px 5px;border-radius:3px;">"notificacoes_ativas": true</code> diretamente no JSON — sem precisar tocar nos documentos de plano gratuito.
+          </div>
+
+          <div class="sql-wrap" style="margin-bottom:12px;">
+            <div class="sql-label">1 — Filtro: localize os documentos a editar</div>
+            <div class="sql-block">
+              <code id="mongo-filter-update">{ <span class="s">"plano"</span>: <span class="s">"premium"</span> }</code>
+            </div>
+          </div>
+          <div class="sql-wrap" style="margin-bottom:12px;">
+            <div class="sql-header">
+              <div class="sql-label">2 — Documento editado (exemplo: Ana Souza)</div>
+              <button class="copy-btn" onclick="copyCode(this, 'mongo-update')">Copiar</button>
+            </div>
+            <div class="sql-block">
+              <code id="mongo-update">{
+  <span class="s">"nome"</span>: <span class="s">"Ana Souza"</span>,
+  <span class="s">"plano"</span>: <span class="s">"premium"</span>,
+  <span class="s">"generos_favoritos"</span>: [<span class="s">"pop"</span>, <span class="s">"mpb"</span>],
+  <span class="s">"localizacao"</span>: {
+    <span class="s">"cidade"</span>: <span class="s">"São Paulo"</span>,
+    <span class="s">"lat"</span>: <span class="n">-23.5</span>,
+    <span class="s">"lon"</span>: <span class="n">-46.6</span>
+  },
+  <span class="s">"ultima_sessao"</span>: <span class="s">"2026-05-30T14:22:00"</span>,
+  <span class="s">"avaliacoes"</span>: [<span class="s">"😍"</span>, <span class="s">"🔥"</span>, <span class="s">"😴"</span>],
+  <span class="s">"notificacoes_ativas"</span>: <span class="k">true</span>
+}</code>
+            </div>
+          </div>
+
+          <div style="font-size:12px;color:var(--muted);margin:4px 0 12px;width:100%;max-width:720px;">
+            Para atualizar <strong>múltiplos documentos</strong> de uma vez, use o botão <strong>Update</strong> da coleção no Data Explorer e preencha os dois campos abaixo.
+          </div>
+          <div class="sql-wrap" style="margin-bottom:12px;">
+            <div class="sql-label">3 — Update: campo Filter (quais documentos atualizar)</div>
+            <div class="sql-block">
+              <code id="mongo-bulk-filter">{ <span class="s">"plano"</span>: <span class="s">"premium"</span> }</code>
+            </div>
+          </div>
+          <div class="sql-wrap" style="margin-bottom:0;">
+            <div class="sql-header">
+              <div class="sql-label">3 — Update: campo Update (o que alterar)</div>
+              <button class="copy-btn" onclick="copyCode(this, 'mongo-bulk-update')">Copiar</button>
+            </div>
+            <div class="sql-block">
+              <code id="mongo-bulk-update">{
+  <span class="s">"$set"</span>: {
+    <span class="s">"notificacoes_ativas"</span>: <span class="k">true</span>
+  }
+}</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-bottom:28px;">
+      <div class="callout-tag">Integração com IA</div>
+      <strong>Prompt sugerido:</strong> <em>"Converta esta estrutura de tabelas SQL em um único documento JSON otimizado para leituras frequentes em um banco NoSQL como o MongoDB Atlas, adaptado para inserir os dados usando o Data Explorer (modo JSON estrito, isto é, puro, sem comentários, apenas aspas duplas, sem vírgulas finais e apenas dados)."</em>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p7')">← Vantagens e Desafios</button>
+      <button class="pn-btn pn-fwd" onclick="show('p9')">A Pergunta Estratégica →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P9 — A PERGUNTA ESTRATÉGICA
+══════════════════════════════════════ -->
+<div id="p9" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">09 · A Pergunta Estratégica</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">O banco certo<br><em>para a pergunta certa.</em></div>
+
+    <div class="callout" style="margin-bottom:32px;font-size:14.5px;line-height:1.75;">
+      <div class="callout-tag">A Pergunta Estratégica do Debriefing</div>
+      Se a SoundByte quiser saber o <strong>faturamento total por usuário nos últimos 12 meses</strong>, qual banco usa? Se quiser saber <strong>quais músicas um usuário específico ouviu hoje às 15h</strong>, qual banco usa? A resposta esperada: <em>os dois coexistem</em>. Arquitetura de dados moderna usa o banco certo para a pergunta certa.
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">SQL ou NoSQL? Depende da pergunta.</div>
+
+    <div class="compare" style="margin-bottom:28px;">
+      <div class="cmp-card">
+        <div class="cmp-head sql-h">Use SQL quando...</div>
+        <div class="cmp-body">
+          <ul>
+            <li>Os dados são estruturados e o esquema é estável</li>
+            <li>Você precisa de JOINs complexos e transações ACID</li>
+            <li>A pergunta é agregação histórica (faturamento, churn)</li>
+            <li>A equipe conhece SQL bem — menor curva de aprendizado</li>
+            <li>O volume é gerenciável por um servidor vertical</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cmp-card">
+        <div class="cmp-head nosql-h">Use NoSQL quando...</div>
+        <div class="cmp-body">
+          <ul>
+            <li>Os dados são variáveis, sem esquema fixo</li>
+            <li>O volume é massivo e cresce rapidamente</li>
+            <li>A velocidade de gravação/leitura é crítica</li>
+            <li>Cada registro pode ter campos completamente diferentes</li>
+            <li>Você precisa escalar horizontalmente em cluster</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">Na SoundByte — Arquitetura Poliglota</div>
+    <div class="ov-concepts" style="margin-bottom:28px;">
+      <div class="ov-concept">
+        <h4>PostgreSQL (SQL)</h4>
+        <p>Faturamento por usuário, histórico de assinaturas, relatórios financeiros, dados transacionais. Respostas para o conselho e para o BI.</p>
+      </div>
+      <div class="ov-concept">
+        <h4>MongoDB (Documento)</h4>
+        <p>Perfis de usuários, catálogo de músicas, avaliações com emojis, histórico detalhado de reprodução. Esquema flexível por usuário.</p>
+      </div>
+      <div class="ov-concept">
+        <h4>Redis (Chave-Valor)</h4>
+        <p>Sessões ativas, cache de recomendações, fila de eventos em tempo real. Baixíssima latência para os 2 milhões de eventos por hora.</p>
+      </div>
+      <div class="ov-concept">
+        <h4>Neo4j (Grafo)</h4>
+        <p>Engine de recomendação: "usuários que ouviram X também ouviram Y". Relacionamentos entre artistas, gêneros e ouvintes.</p>
+      </div>
+    </div>
+
+    <div style="width:100%;max-width:720px;padding:20px 24px;background:var(--s1);border:1px solid var(--border);border-radius:10px;font-size:13.5px;line-height:1.7;color:var(--text);margin-bottom:28px;">
+      <strong>A lição desta aula:</strong> NoSQL não substitui SQL — complementa. A escolha do banco não é sobre tecnologia preferida: é sobre <em>qual pergunta você quer responder</em> e <em>qual é a natureza dos seus dados</em>. O gestor de dados moderno precisa entender os dois paradigmas.
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:12px;">Atividade Avaliativa</div>
+    <div style="width:100%;max-width:720px;margin-bottom:28px;">
+      <a class="ext-link" href="atividade_avaliativa_6_mongodb.html" target="_blank" rel="noopener" style="margin-top:0;">↗ Atividade Avaliativa 6 — MongoDB</a>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p8')">← Atividade Prática</button>
+      <button class="pn-btn pn-fwd" onclick="show('menu')">← Menu Principal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) { el.classList.add('active'); window.scrollTo(0, 0); }
+}
+
+function toggleDisc(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function toggleNosql(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function copyCode(btn, codeId) {
+  const code = document.getElementById(codeId);
+  if (!code) return;
+  const text = code.innerText || code.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    btn.textContent = 'Erro';
+    setTimeout(() => { btn.textContent = 'Copiar'; }, 2000);
+  });
+}
+</script>
+</body>
+</html>

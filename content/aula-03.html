@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GBDBI · Aula 3 — A Linguagem das Respostas</title>
+<style>
+:root {
+  --bg:     #fdf8f6;
+  --s1:     #f5ecea;
+  --s2:     #ecdeda;
+  --border: #dfc9c0;
+  --c1:     #7a1a1a;
+  --c2:     #b83030;
+  --text:   #1a0d0d;
+  --muted:  #8a6060;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+.page { display: none; min-height: 100vh; flex-direction: column; }
+.page.active { display: flex; animation: fadeUp .3s ease both; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── MENU ── */
+.m-header { padding: 72px 56px 48px; }
+.m-eyebrow { font-size: 10.5px; letter-spacing: 4px; text-transform: uppercase; color: var(--c1); font-weight: 600; margin-bottom: 18px; }
+.m-title { font-size: 50px; font-weight: 800; line-height: 1.08; background: linear-gradient(140deg, #1a0d0d 30%, #7a1a1a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.m-sub { margin-top: 14px; font-size: 15px; color: var(--muted); }
+.m-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(265px, 1fr)); gap: 14px; padding: 0 56px 72px; }
+.mcard { background: var(--s1); border: 1px solid var(--border); border-radius: 14px; padding: 28px 26px 32px; cursor: pointer; transition: border-color .2s, transform .2s, box-shadow .2s; position: relative; overflow: hidden; appearance: none; -webkit-appearance: none; width: 100%; text-align: left; font-family: inherit; font-size: inherit; color: inherit; }
+.mcard:hover { border-color: var(--c1); transform: translateY(-3px); box-shadow: 0 16px 48px rgba(122,26,26,.10); }
+.mcard::after { content: ''; position: absolute; inset: 0 0 auto 0; height: 2px; background: linear-gradient(90deg, var(--c1), var(--c2)); opacity: 0; transition: opacity .2s; }
+.mcard:hover::after { opacity: 1; }
+.mc-num { font-size: 10px; letter-spacing: 3px; font-weight: 700; color: var(--c1); margin-bottom: 14px; text-transform: uppercase; }
+.mc-h { font-size: 16px; font-weight: 700; line-height: 1.35; margin-bottom: 8px; }
+.mc-p { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+.mc-arrow { position: absolute; bottom: 22px; right: 22px; color: var(--muted); font-size: 18px; transition: color .2s, transform .2s; }
+.mcard:hover .mc-arrow { color: var(--c1); transform: translate(2px, -2px); }
+
+/* ── TOPIC PAGES ── */
+.t-nav { display: flex; align-items: center; gap: 14px; padding: 18px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(253,248,246,.92); backdrop-filter: blur(12px); z-index: 10; }
+.back { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--muted); cursor: pointer; padding: 7px 14px; border: 1px solid var(--border); border-radius: 8px; background: none; transition: all .2s; text-decoration: none; }
+.back:hover { color: var(--c1); border-color: var(--c1); }
+.t-label { font-size: 10.5px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+.t-body { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 56px 40px 64px; max-width: 900px; margin: 0 auto; width: 100%; }
+.t-title { font-size: 38px; font-weight: 800; text-align: center; margin-bottom: 52px; line-height: 1.18; }
+.t-title em { font-style: normal; color: var(--c1); }
+.diagram { width: 100%; max-width: 720px; margin-bottom: 44px; }
+.kps { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; width: 100%; max-width: 720px; }
+.kp { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 18px 18px 16px; }
+.kp-tag { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 7px; }
+.kp-text { font-size: 13.5px; line-height: 1.55; color: var(--text); }
+
+/* ── PREV/NEXT ── */
+.pg-nav { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 720px; margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); gap: 12px; }
+.pn-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; border: 1.5px solid var(--border); background: none; color: var(--muted); font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; font-family: inherit; }
+.pn-btn:hover { border-color: var(--c1); color: var(--c1); background: rgba(122,26,26,.04); }
+.pn-fwd { margin-left: auto; }
+
+/* ── BLOOM OBJECTIVES ── */
+.bloom-card { width: 100%; max-width: 720px; background: var(--s1); border: 1px solid var(--border); border-left: 3px solid var(--c1); border-radius: 2px 10px 10px 2px; padding: 22px 24px; margin-bottom: 24px; }
+.bloom-eyebrow { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 16px; }
+.bloom-list { display: flex; flex-direction: column; gap: 11px; }
+.bloom-item { font-size: 13.5px; line-height: 1.55; color: var(--text); display: flex; align-items: baseline; gap: 12px; }
+.bloom-level { font-size: 8.5px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+.bloom-level.l1 { background: var(--s1); color: var(--c1); border: 1px solid var(--border); }
+.bloom-level.l2 { background: var(--s2); color: var(--c1); border: 1px solid var(--border); }
+.bloom-level.l3 { background: #e0cccc; color: var(--c1); border: 1px solid #c8aeaa; }
+.bloom-level.l4 { background: #cdb5b5; color: var(--c1); border: 1px solid #b89898; }
+.bloom-level.l5 { background: var(--c1); color: #fdf8f6; border: 1px solid var(--c1); }
+
+/* ── OVERVIEW ── */
+.ov-section-tag { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--muted); margin-bottom: 10px; width: 100%; max-width: 720px; }
+.ov-concepts { display: grid; grid-template-columns: repeat(auto-fit, minmax(196px, 1fr)); gap: 12px; width: 100%; max-width: 720px; margin-bottom: 16px; }
+.ov-concept { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+.ov-concept h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+.ov-concept p { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+/* ── SQL BLOCKS ── */
+.sql-wrap { width: 100%; max-width: 720px; margin-bottom: 24px; }
+.sql-label { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--muted); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.sql-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.sql-block { background: #1e0808; border-radius: 10px; padding: 20px 24px; overflow-x: auto; }
+.sql-block code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; font-size: 12.5px; line-height: 1.85; color: #f0e4e0; display: block; white-space: pre; }
+.k { color: #f4a0a0; font-weight: 600; }
+.f { color: #f0c07a; }
+.s { color: #9acd70; }
+.n { color: #c0d8f0; }
+.cm { color: #c09898; font-style: italic; }
+
+/* ── SCHEMA REFERENCE ── */
+.schema-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(195px, 1fr)); gap: 10px; width: 100%; max-width: 720px; margin-bottom: 28px; }
+.schema-tbl { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 13px 15px; }
+.schema-tbl-name { font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--c1); margin-bottom: 9px; }
+.schema-col { font-size: 11.5px; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; color: var(--text); padding: 1.5px 0; line-height: 1.5; display: flex; align-items: center; gap: 5px; }
+.badge-pk { background: var(--c1); color: #fdf8f6; font-size: 7.5px; padding: 1px 5px; border-radius: 3px; font-family: system-ui; letter-spacing: 1px; font-weight: 700; flex-shrink: 0; }
+.badge-fk { background: var(--c2); color: #fdf8f6; font-size: 7.5px; padding: 1px 5px; border-radius: 3px; font-family: system-ui; letter-spacing: 1px; font-weight: 700; flex-shrink: 0; }
+
+/* ── COMPARE BEFORE/AFTER ── */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; max-width: 720px; margin-bottom: 28px; }
+.cmp-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.cmp-head { padding: 10px 14px; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
+.cmp-head.bad { background: rgba(184,48,48,.1); color: var(--c2); }
+.cmp-head.good { background: rgba(122,26,26,.07); color: var(--c1); }
+.cmp-body { padding: 14px 16px; font-size: 13px; line-height: 1.65; color: var(--text); }
+.cmp-body ul { list-style: none; }
+.cmp-body ul li { padding: 2px 0; }
+.cmp-body ul li::before { content: '·  '; color: var(--muted); }
+
+/* ── RESULT TABLE (mini preview) ── */
+.result-wrap { width: 100%; max-width: 720px; margin-bottom: 24px; }
+.result-label { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--muted); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.result-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.result-tbl { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; font-size: 12.5px; }
+.result-tbl thead th { background: var(--s1); padding: 9px 12px; text-align: left; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); font-weight: 700; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.result-tbl tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); white-space: nowrap; }
+.result-tbl tbody tr:last-child td { border-bottom: none; }
+.result-tbl tbody tr:hover td { background: var(--s2); }
+.result-tbl td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.result-tbl td.hl { color: var(--c2); font-weight: 600; }
+
+/* ── AI COMPARISON ── */
+.ai-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; max-width: 720px; margin-bottom: 24px; }
+.ai-card { border-radius: 10px; padding: 18px 18px 16px; border: 1px solid var(--border); }
+.ai-card.can { background: var(--s1); }
+.ai-card.must { background: #fff; border-color: var(--c2); }
+.ai-card-tag { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; margin-bottom: 12px; }
+.ai-card.can  .ai-card-tag { color: var(--c1); }
+.ai-card.must .ai-card-tag { color: var(--c2); }
+.ai-list { list-style: none; }
+.ai-list li { font-size: 13px; line-height: 1.65; color: var(--text); padding: 3px 0; display: flex; gap: 8px; }
+.ai-list li::before { content: '—'; color: var(--muted); flex-shrink: 0; }
+
+/* ── ACTIVITY STEPS ── */
+.step-list { width: 100%; max-width: 720px; display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+.step { display: flex; gap: 16px; align-items: flex-start; }
+.step-num { width: 30px; height: 30px; border-radius: 50%; background: var(--c1); color: #fdf8f6; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; margin-top: 2px; }
+.step-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.step-text { font-size: 13px; color: var(--muted); line-height: 1.55; }
+.ext-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 8px; padding: 8px 16px; border-radius: 8px; border: 1.5px solid var(--c1); color: var(--c1); font-size: 12.5px; font-weight: 600; text-decoration: none; transition: all .2s; }
+.ext-link:hover { background: var(--c1); color: #fdf8f6; }
+
+/* ── BROKEN QUERY ── */
+.broken-wrap { width: 100%; max-width: 720px; margin-bottom: 24px; }
+.broken-label { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c2); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.broken-label::after { content: ''; flex: 1; height: 1px; background: rgba(184,48,48,.2); }
+.broken-block { background: #1e0808; border-radius: 10px; padding: 20px 24px; overflow-x: auto; border: 1px solid rgba(184,48,48,.3); }
+.broken-block code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; font-size: 12.5px; line-height: 1.85; color: #f0e4e0; display: block; white-space: pre; }
+.err { background: rgba(240,100,100,.25); border-radius: 3px; padding: 1px 3px; }
+
+/* ── EXERCISE CARDS ── */
+.ex-cards { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 720px; margin-bottom: 24px; }
+.ex-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+.ex-num { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 6px; }
+.ex-q { font-size: 14px; font-weight: 700; margin-bottom: 6px; line-height: 1.35; }
+.ex-hint { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+.ex-hint code { font-family: 'SF Mono', 'Consolas', monospace; font-size: 11.5px; background: var(--s1); padding: 1px 6px; border-radius: 4px; color: var(--c1); }
+
+/* ── COLLAPSIBLE DISC ── */
+.disc { width: 100%; max-width: 720px; margin-bottom: 14px; }
+.disc-trigger { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; background: var(--s1); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; transition: border-color .2s, background .2s; font-family: inherit; text-align: left; }
+.disc-trigger:hover { border-color: var(--c1); background: #fff; }
+.disc-title { font-size: 13.5px; font-weight: 700; color: var(--text); }
+.disc-icon { font-size: 15px; color: var(--c1); transition: transform .25s; flex-shrink: 0; }
+.disc.open .disc-icon { transform: rotate(90deg); }
+.disc-body { max-height: 0; overflow: hidden; transition: max-height .38s ease; }
+.disc.open .disc-body { max-height: 800px; }
+.disc-inner { padding: 18px 0 6px; }
+
+/* ── SQL HEADER + COPY BUTTON ── */
+.sql-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.sql-header .sql-label { margin-bottom: 0; flex: 1; }
+.copy-btn { font-size: 10.5px; padding: 5px 13px; border-radius: 6px; border: 1px solid var(--border); background: var(--s1); color: var(--muted); cursor: pointer; font-family: inherit; font-weight: 600; letter-spacing: .3px; transition: all .18s; white-space: nowrap; flex-shrink: 0; }
+.copy-btn:hover { border-color: var(--c1); color: var(--c1); background: #fff; }
+.copy-btn.copied { border-color: #3a8a3a; color: #3a8a3a; background: rgba(58,138,58,.06); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .m-header { padding: 48px 24px 32px; }
+  .m-grid { padding: 0 24px 48px; }
+  .t-body { padding: 40px 20px 52px; }
+  .t-title { font-size: 30px; margin-bottom: 36px; }
+  .compare, .ai-compare { grid-template-columns: 1fr; }
+  .sql-block code, .broken-block code { font-size: 11.5px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     MENU
+══════════════════════════════════════ -->
+<div id="menu" class="page active">
+  <nav class="t-nav">
+    <a class="back" href="index.html">← Disciplina</a>
+  </nav>
+  <div class="m-header">
+    <div class="m-eyebrow">ESPM · Gestão BD &amp; BI · 16.05.2026</div>
+    <div class="m-title">Aula 3 — A Linguagem<br>das Respostas</div>
+    <div class="m-sub">DDL · DML · SELECT · FROM · WHERE · JOIN · GROUP BY</div>
+  </div>
+  <div class="m-grid">
+    <button class="mcard" onclick="show('p0')">
+      <div class="mc-num">00</div>
+      <div class="mc-h">Objetivos da Aula</div>
+      <p class="mc-p">O que você vai saber fazer ao final desta aula — mapa de competências segundo a Taxonomia de Bloom.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p1')">
+      <div class="mc-num">01</div>
+      <div class="mc-h">Visão Geral da Aula</div>
+      <p class="mc-p">O problema da segunda-feira na SoundByte e os cinco comandos que resolvem 80% das perguntas.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p2')">
+      <div class="mc-num">02</div>
+      <div class="mc-h">O Modelo SoundByte</div>
+      <p class="mc-p">Do catálogo desnormalizado às 7 tabelas relacionais prontas para consulta.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p3')">
+      <div class="mc-num">03</div>
+      <div class="mc-h">SELECT e FROM</div>
+      <p class="mc-p">Escolha o quê mostrar e de qual tabela — a base de qualquer consulta.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p_where')">
+      <div class="mc-num">04</div>
+      <div class="mc-h">WHERE — Filtrando Linhas</div>
+      <p class="mc-p">Filtre linhas por condição antes de retornar o resultado. Operadores: =, BETWEEN, LIKE, IN, AND, OR.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p4')">
+      <div class="mc-num">05</div>
+      <div class="mc-h">JOIN — Cruzando Tabelas</div>
+      <p class="mc-p">INNER, LEFT, RIGHT e FULL OUTER JOIN: cruze tabelas pela chave e entenda o que cada tipo retorna.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p5')">
+      <div class="mc-num">06</div>
+      <div class="mc-h">GROUP BY e Agregações</div>
+      <p class="mc-p">Agrupe para calcular totais, médias e contagens — a SQL equivalente da tabela dinâmica.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p6')">
+      <div class="mc-num">07</div>
+      <div class="mc-h">O que a IA pode e não pode fazer</div>
+      <p class="mc-p">A IA gera código correto sintaticamente. Quem valida se a resposta faz sentido de negócio ainda é o humano.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P0 — OBJETIVOS DA AULA
+══════════════════════════════════════ -->
+<div id="p0" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">00 · Objetivos da Aula</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">O que você vai<br><em>saber fazer.</em></div>
+
+    <div class="bloom-card">
+      <div class="bloom-eyebrow">Objetivos da Aula — Taxonomia de Bloom</div>
+      <div class="bloom-list">
+        <div class="bloom-item"><span class="bloom-level l1">Lembrar</span> Reconhecer os cinco comandos SQL fundamentais — SELECT, FROM, WHERE, JOIN e GROUP BY — e seus propósitos básicos.</div>
+        <div class="bloom-item"><span class="bloom-level l2">Compreender</span> Explicar como cada cláusula SQL transforma os dados para responder uma pergunta de negócio específica.</div>
+        <div class="bloom-item"><span class="bloom-level l3">Aplicar</span> Escrever consultas com SELECT, WHERE, JOIN e GROUP BY para extrair informações de um banco relacional normalizado.</div>
+        <div class="bloom-item"><span class="bloom-level l4">Analisar</span> Interpretar o resultado de uma consulta e diagnosticar por que uma query retorna dados errados ou gera erros de sintaxe.</div>
+        <div class="bloom-item"><span class="bloom-level l5">Avaliar</span> Julgar se a resposta retornada por uma query — inclusive gerada por IA — responde corretamente a pergunta de negócio original.</div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('menu')">← Menu</button>
+      <button class="pn-btn pn-fwd" onclick="show('p1')">Visão Geral →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P1 — VISÃO GERAL
+══════════════════════════════════════ -->
+<div id="p1" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">01 · Visão Geral da Aula</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Quem vai buscar<br><em>as respostas?</em></div>
+
+    <!-- SQL demo -->
+    <div class="sql-wrap">
+      <div class="sql-header">
+        <div class="sql-label">SQL é quase português — leia em voz alta</div>
+        <button class="copy-btn" onclick="copyCode(this,'c-demo')">Copiar</button>
+      </div>
+      <div class="sql-block"><code id="c-demo"><span class="cm">-- SELECIONE o nome dos artistas</span>
+<span class="k">SELECT</span> artista_nome
+<span class="cm">-- DA tabela artistas</span>
+<span class="k">FROM</span>   artistas
+<span class="cm">-- ONDE o gênero seja MPB</span>
+<span class="k">WHERE</span>  artista_genero = <span class="s">'MPB'</span>;</code></div>
+    </div>
+
+    <!-- Disc 1: Conceitos Trabalhados -->
+    <div class="disc" id="disc-conceitos">
+      <button class="disc-trigger" onclick="toggleDisc('disc-conceitos')">
+        <span class="disc-title">Conceitos Trabalhados</span>
+        <span class="disc-icon">▶</span>
+      </button>
+      <div class="disc-body">
+        <div class="disc-inner">
+          <div class="ov-concepts">
+            <div class="ov-concept">
+              <h4>SQL como alfabetização</h4>
+              <p>SQL é quase português. Uma query pode ser lida em voz alta e compreendida por quem nunca programou — o ponto é esse.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>Os 5 comandos do dia a dia</h4>
+              <p>SELECT · FROM · WHERE · JOIN · GROUP BY resolvem 80% das perguntas analíticas de uma empresa. Os outros 20% são variações.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>Humano valida, IA gera</h4>
+              <p>A IA pode gerar código correto que responde a pergunta errada. A curadoria analítica ainda é humana.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Disc 2: O Problema da Segunda-Feira -->
+    <div class="disc" id="disc-problema">
+      <button class="disc-trigger" onclick="toggleDisc('disc-problema')">
+        <span class="disc-title">O Problema da Segunda-Feira</span>
+        <span class="disc-icon">▶</span>
+      </button>
+      <div class="disc-body">
+        <div class="disc-inner">
+          <div class="ov-concepts">
+            <div class="ov-concept">
+              <h4>Clientes inativos</h4>
+              <p>Quais clientes não compram há mais de seis meses? Marketing precisa da lista para a campanha de reativação.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>Artistas em crescimento</h4>
+              <p>Quais artistas tiveram crescimento de receita nos últimos 12 meses? Curadoria precisa renovar contratos.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>Ticket médio por país</h4>
+              <p>Quais países têm o maior ticket médio? Expansão precisa definir mercados prioritários.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p0')">← Objetivos</button>
+      <button class="pn-btn pn-fwd" onclick="show('p2')">O Modelo SoundByte →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P2 — O MODELO SOUNDBYTE
+══════════════════════════════════════ -->
+<div id="p2" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">02 · O Modelo SoundByte</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Do caos à consulta:<br><em>7 tabelas.</em></div>
+
+    <div class="compare">
+      <div class="cmp-card">
+        <div class="cmp-head bad">✗ Antes — 1 tabela, 23 colunas</div>
+        <div class="cmp-body">
+          <ul>
+            <li>pedido_id, pedido_data</li>
+            <li>cliente_id, cliente_nome, cliente_email, cliente_pais, cliente_cidade</li>
+            <li>artista_id, artista_nome, artista_genero, artista_pais_origem</li>
+            <li>faixa_id, faixa_titulo, album_id, album_titulo, album_ano, faixa_duracao_seg, faixa_preco_usd, faixa_formato</li>
+            <li>gravadora_id, gravadora_nome</li>
+            <li>qtd_comprada, total_pedido_usd</li>
+          </ul>
+          <p style="margin-top:10px;font-size:12px;color:var(--c2);">Anomalias de inserção, alteração e exclusão. Ana Lima com dois IDs. Preço zerado em 4 linhas.</p>
+        </div>
+      </div>
+      <div class="cmp-card">
+        <div class="cmp-head good">✓ Depois — 7 tabelas relacionadas</div>
+        <div class="cmp-body">
+          <ul>
+            <li>clientes</li>
+            <li>artistas</li>
+            <li>gravadoras</li>
+            <li>albuns</li>
+            <li>faixas</li>
+            <li>pedidos</li>
+            <li>itens_pedido</li>
+          </ul>
+          <p style="margin-top:10px;font-size:12px;color:var(--c1);">Cada entidade em sua tabela. PKs e FKs garantem integridade. Preço centralizado em faixas.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:12px;width:100%;max-width:720px;">Schema PostgreSQL — SoundByte</div>
+    <div class="schema-grid">
+      <div class="schema-tbl">
+        <div class="schema-tbl-name">clientes</div>
+        <div class="schema-col"><span class="badge-pk">PK</span> cliente_id</div>
+        <div class="schema-col">cliente_nome</div>
+        <div class="schema-col">cliente_email</div>
+        <div class="schema-col">cliente_pais</div>
+        <div class="schema-col">cliente_cidade</div>
+      </div>
+      <div class="schema-tbl">
+        <div class="schema-tbl-name">artistas</div>
+        <div class="schema-col"><span class="badge-pk">PK</span> artista_id</div>
+        <div class="schema-col">artista_nome</div>
+        <div class="schema-col">artista_genero</div>
+        <div class="schema-col">artista_pais_origem</div>
+      </div>
+      <div class="schema-tbl">
+        <div class="schema-tbl-name">gravadoras</div>
+        <div class="schema-col"><span class="badge-pk">PK</span> gravadora_id</div>
+        <div class="schema-col">gravadora_nome</div>
+      </div>
+      <div class="schema-tbl">
+        <div class="schema-tbl-name">albuns</div>
+        <div class="schema-col"><span class="badge-pk">PK</span> album_id</div>
+        <div class="schema-col">album_titulo</div>
+        <div class="schema-col">album_ano</div>
+        <div class="schema-col"><span class="badge-fk">FK</span> artista_id</div>
+        <div class="schema-col"><span class="badge-fk">FK</span> gravadora_id</div>
+      </div>
+      <div class="schema-tbl">
+        <div class="schema-tbl-name">faixas</div>
+        <div class="schema-col"><span class="badge-pk">PK</span> faixa_id</div>
+        <div class="schema-col">faixa_titulo</div>
+        <div class="schema-col">faixa_duracao_seg</div>
+        <div class="schema-col">faixa_preco_usd</div>
+        <div class="schema-col">faixa_formato</div>
+        <div class="schema-col"><span class="badge-fk">FK</span> album_id</div>
+      </div>
+      <div class="schema-tbl">
+        <div class="schema-tbl-name">pedidos</div>
+        <div class="schema-col"><span class="badge-pk">PK</span> pedido_id</div>
+        <div class="schema-col">pedido_data</div>
+        <div class="schema-col"><span class="badge-fk">FK</span> cliente_id</div>
+      </div>
+      <div class="schema-tbl">
+        <div class="schema-tbl-name">itens_pedido</div>
+        <div class="schema-col"><span class="badge-fk">FK</span> pedido_id</div>
+        <div class="schema-col"><span class="badge-fk">FK</span> faixa_id</div>
+        <div class="schema-col">qtd_comprada</div>
+        <div class="schema-col">total_item_usd</div>
+      </div>
+    </div>
+
+    <div class="sql-wrap">
+      <div class="sql-header">
+        <div class="sql-label">DDL — Schema completo SoundByte (PostgreSQL)</div>
+        <button class="copy-btn" id="ddl-copy-btn" onclick="copyCode(this,'ddl-code')">Copiar DDL</button>
+      </div>
+      <div class="sql-block"><code id="ddl-code"><span class="k">CREATE TABLE</span> clientes (
+  cliente_id     <span class="f">SERIAL</span>       <span class="k">PRIMARY KEY</span>,
+  cliente_nome   <span class="f">VARCHAR</span>(<span class="n">100</span>) <span class="k">NOT NULL</span>,
+  cliente_email  <span class="f">VARCHAR</span>(<span class="n">100</span>) <span class="k">UNIQUE NOT NULL</span>,
+  cliente_pais   <span class="f">VARCHAR</span>(<span class="n">50</span>),
+  cliente_cidade <span class="f">VARCHAR</span>(<span class="n">50</span>)
+);
+
+<span class="k">CREATE TABLE</span> artistas (
+  artista_id          <span class="f">SERIAL</span>       <span class="k">PRIMARY KEY</span>,
+  artista_nome        <span class="f">VARCHAR</span>(<span class="n">100</span>) <span class="k">NOT NULL</span>,
+  artista_genero      <span class="f">VARCHAR</span>(<span class="n">50</span>),
+  artista_pais_origem <span class="f">VARCHAR</span>(<span class="n">50</span>)
+);
+
+<span class="k">CREATE TABLE</span> gravadoras (
+  gravadora_id   <span class="f">SERIAL</span>       <span class="k">PRIMARY KEY</span>,
+  gravadora_nome <span class="f">VARCHAR</span>(<span class="n">100</span>) <span class="k">NOT NULL</span>
+);
+
+<span class="k">CREATE TABLE</span> albuns (
+  album_id      <span class="f">SERIAL</span>       <span class="k">PRIMARY KEY</span>,
+  album_titulo  <span class="f">VARCHAR</span>(<span class="n">150</span>) <span class="k">NOT NULL</span>,
+  album_ano     <span class="f">SMALLINT</span>,
+  artista_id    <span class="f">INTEGER</span>      <span class="k">REFERENCES</span> artistas(artista_id),
+  gravadora_id  <span class="f">INTEGER</span>      <span class="k">REFERENCES</span> gravadoras(gravadora_id)
+);
+
+<span class="k">CREATE TABLE</span> faixas (
+  faixa_id          <span class="f">SERIAL</span>       <span class="k">PRIMARY KEY</span>,
+  faixa_titulo      <span class="f">VARCHAR</span>(<span class="n">200</span>) <span class="k">NOT NULL</span>,
+  faixa_duracao_seg <span class="f">INTEGER</span>,
+  faixa_preco_usd   <span class="f">NUMERIC</span>(<span class="n">6</span>,<span class="n">2</span>) <span class="k">NOT NULL</span>,
+  faixa_formato     <span class="f">VARCHAR</span>(<span class="n">10</span>),
+  album_id          <span class="f">INTEGER</span>      <span class="k">REFERENCES</span> albuns(album_id)
+);
+
+<span class="k">CREATE TABLE</span> pedidos (
+  pedido_id   <span class="f">SERIAL</span>  <span class="k">PRIMARY KEY</span>,
+  pedido_data <span class="f">DATE</span>    <span class="k">NOT NULL</span>,
+  cliente_id  <span class="f">INTEGER</span> <span class="k">REFERENCES</span> clientes(cliente_id)
+);
+
+<span class="k">CREATE TABLE</span> itens_pedido (
+  pedido_id      <span class="f">INTEGER</span>      <span class="k">REFERENCES</span> pedidos(pedido_id),
+  faixa_id       <span class="f">INTEGER</span>      <span class="k">REFERENCES</span> faixas(faixa_id),
+  qtd_comprada   <span class="f">INTEGER</span>      <span class="k">DEFAULT</span> <span class="n">1</span>,
+  total_item_usd <span class="f">NUMERIC</span>(<span class="n">6</span>,<span class="n">2</span>),
+  <span class="k">PRIMARY KEY</span> (pedido_id, faixa_id)
+);</code></div>
+    </div>
+
+    <div class="kps">
+      <div class="kp">
+        <div class="kp-tag">DDL</div>
+        <div class="kp-text">Data Definition Language — comandos que criam e alteram a estrutura do banco (CREATE, ALTER, DROP).</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag" style="color:#b83030">DML</div>
+        <div class="kp-text">Data Manipulation Language — comandos que movimentam dados (INSERT, UPDATE, DELETE, SELECT).</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag">REFERENCES</div>
+        <div class="kp-text">Declara a FK e delega ao SGBD a responsabilidade de garantir a integridade referencial automaticamente.</div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p1')">← Visão Geral</button>
+      <button class="pn-btn pn-fwd" onclick="show('p3')">SELECT e FROM →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P3 — SELECT e FROM
+══════════════════════════════════════ -->
+<div id="p3" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">03 · SELECT e FROM</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Escolha o quê<br><em>e de onde.</em></div>
+
+    <div class="diagram">
+      <svg viewBox="0 0 700 148" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+        <!-- SELECT box -->
+        <rect x="20" y="18" width="205" height="84" rx="10" fill="#fff" stroke="#7a1a1a" stroke-width="1.5"/>
+        <text x="122" y="43" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" letter-spacing="2.5" font-weight="700">SELECT</text>
+        <text x="122" y="68" text-anchor="middle" fill="#7a1a1a" font-size="15" font-family="'SF Mono','Consolas',monospace" font-weight="700">cliente_nome</text>
+        <text x="122" y="89" text-anchor="middle" fill="#8a6060" font-size="12" font-family="system-ui">Quais colunas mostrar</text>
+        <!-- Arrow -->
+        <line x1="227" y1="60" x2="260" y2="60" stroke="#dfc9c0" stroke-width="1.5"/>
+        <polygon points="258,54 270,60 258,66" fill="#c8aeaa"/>
+        <!-- FROM box -->
+        <rect x="273" y="18" width="162" height="84" rx="10" fill="#fff" stroke="#b83030" stroke-width="1.5"/>
+        <text x="354" y="43" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" letter-spacing="2.5" font-weight="700">FROM</text>
+        <text x="354" y="68" text-anchor="middle" fill="#b83030" font-size="15" font-family="'SF Mono','Consolas',monospace" font-weight="700">clientes</text>
+        <text x="354" y="89" text-anchor="middle" fill="#8a6060" font-size="12" font-family="system-ui">Qual tabela consultar</text>
+        <!-- Arrow -->
+        <line x1="437" y1="60" x2="468" y2="60" stroke="#dfc9c0" stroke-width="1.5"/>
+        <polygon points="466,54 478,60 466,66" fill="#c8aeaa"/>
+        <!-- Result box -->
+        <rect x="481" y="8" width="205" height="104" rx="10" fill="#f5ecea" stroke="#dfc9c0" stroke-width="1.5"/>
+        <text x="583" y="32" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" letter-spacing="2.5" font-weight="700">RESULTADO</text>
+        <line x1="493" y1="40" x2="674" y2="40" stroke="#dfc9c0" stroke-width="1"/>
+        <text x="503" y="58" fill="#8a6060" font-size="12" font-family="system-ui">Carlos Mendes</text>
+        <text x="503" y="76" fill="#8a6060" font-size="12" font-family="system-ui">Julia Ferreira</text>
+        <text x="503" y="94" fill="#8a6060" font-size="12" font-family="system-ui">Emma Clarke</text>
+        <text x="503" y="104" fill="#8a6060" font-size="10" font-family="system-ui">…</text>
+      </svg>
+    </div>
+
+    <div class="sql-wrap">
+      <div class="sql-header">
+        <div class="sql-label">Selecionar colunas específicas</div>
+        <button class="copy-btn" onclick="copyCode(this,'c-p3a')">Copiar</button>
+      </div>
+      <div class="sql-block"><code id="c-p3a"><span class="k">SELECT</span> cliente_nome, cliente_email, cliente_pais
+<span class="k">FROM</span>   clientes;</code></div>
+    </div>
+
+    <div class="result-wrap">
+      <div class="result-label">Resultado</div>
+      <table class="result-tbl">
+        <thead><tr><th>cliente_nome</th><th>cliente_email</th><th>cliente_pais</th></tr></thead>
+        <tbody>
+          <tr><td>Carlos Mendes</td><td>carlos@email.com</td><td>Brasil</td></tr>
+          <tr><td>Julia Ferreira</td><td>julia@email.com</td><td>Brasil</td></tr>
+          <tr><td>Emma Clarke</td><td>emma@email.com</td><td>UK</td></tr>
+          <tr><td>Yuki Tanaka</td><td>yuki@email.com</td><td>Japão</td></tr>
+          <tr><td style="color:var(--muted)">…</td><td style="color:var(--muted)">…</td><td style="color:var(--muted)">…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sql-wrap">
+      <div class="sql-header">
+        <div class="sql-label">Selecionar colunas e ordenar por preço</div>
+        <button class="copy-btn" onclick="copyCode(this,'c-p3b')">Copiar</button>
+      </div>
+      <div class="sql-block"><code id="c-p3b"><span class="k">SELECT</span> faixa_titulo, faixa_preco_usd, faixa_formato
+<span class="k">FROM</span>   faixas
+<span class="k">ORDER BY</span> faixa_preco_usd <span class="k">DESC</span>;</code></div>
+    </div>
+
+    <div class="result-wrap">
+      <div class="result-label">Resultado — faixas mais caras primeiro</div>
+      <table class="result-tbl">
+        <thead><tr><th>faixa_titulo</th><th>faixa_preco_usd</th><th>faixa_formato</th></tr></thead>
+        <tbody>
+          <tr><td>Milonga Infinita</td><td class="num hl">4.99</td><td>MP3</td></tr>
+          <tr><td>Nacht Signal</td><td class="num hl">4.49</td><td>FLAC</td></tr>
+          <tr><td>Saudade Eterna</td><td class="num">3.99</td><td>MP3</td></tr>
+          <tr><td>Foggy Days</td><td class="num">3.99</td><td>AAC</td></tr>
+          <tr><td>Teranga</td><td class="num">1.99</td><td>MP3</td></tr>
+          <tr><td style="color:var(--muted)">…</td><td style="color:var(--muted)" class="num">…</td><td style="color:var(--muted)">…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="kps">
+      <div class="kp">
+        <div class="kp-tag">SELECT *</div>
+        <div class="kp-text">O asterisco retorna todas as colunas. Útil para explorar, mas evite em produção — traz dados desnecessários e sobrecarrega o banco.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag" style="color:#b83030">ORDER BY</div>
+        <div class="kp-text">Ordena o resultado. <code style="font-size:11px;background:var(--s2);padding:1px 5px;border-radius:3px;">ASC</code> (padrão, crescente) ou <code style="font-size:11px;background:var(--s2);padding:1px 5px;border-radius:3px;">DESC</code> (decrescente).</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag">Alias com AS</div>
+        <div class="kp-text"><code style="font-size:11px;background:var(--s2);padding:1px 5px;border-radius:3px;">SELECT faixa_preco_usd AS preco</code> renomeia a coluna no resultado, útil para relatórios mais legíveis.</div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p2')">← Modelo SoundByte</button>
+      <button class="pn-btn pn-fwd" onclick="show('p_where')">WHERE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P_WHERE — WHERE
+══════════════════════════════════════ -->
+<div id="p_where" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">04 · WHERE</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Filtre as linhas<br><em>que importam.</em></div>
+
+    <div style="font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:10px;width:100%;max-width:720px;">Tabela de origem — clientes</div>
+    <div class="result-wrap">
+      <div class="result-label">Todos os registros (sem filtro)</div>
+      <table class="result-tbl">
+        <thead><tr><th>cliente_id</th><th>cliente_nome</th><th>cliente_email</th><th>cliente_pais</th></tr></thead>
+        <tbody>
+          <tr><td class="num">5001</td><td>Carlos Mendes</td><td>carlos@email.com</td><td>Brasil</td></tr>
+          <tr><td class="num">5002</td><td>Julia Ferreira</td><td>julia@email.com</td><td>Brasil</td></tr>
+          <tr><td class="num">5003</td><td>Yuki Tanaka</td><td>yuki@email.com</td><td>Japão</td></tr>
+          <tr><td class="num">5004</td><td>Emma Clarke</td><td>emma@email.com</td><td>UK</td></tr>
+          <tr><td class="num">5005</td><td>Ana Lima</td><td>ana@email.com</td><td>Brasil</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sql-wrap">
+      <div class="sql-header">
+        <div class="sql-label">WHERE — filtrando por país</div>
+        <button class="copy-btn" onclick="copyCode(this,'c-pw1')">Copiar</button>
+      </div>
+      <div class="sql-block"><code id="c-pw1"><span class="k">SELECT</span> cliente_nome, cliente_email, cliente_pais
+<span class="k">FROM</span>   clientes
+<span class="k">WHERE</span>  cliente_pais = <span class="s">'Brasil'</span>;</code></div>
+    </div>
+
+    <div class="result-wrap">
+      <div class="result-label">Resultado — apenas clientes do Brasil</div>
+      <table class="result-tbl">
+        <thead><tr><th>cliente_nome</th><th>cliente_email</th><th>cliente_pais</th></tr></thead>
+        <tbody>
+          <tr><td>Carlos Mendes</td><td>carlos@email.com</td><td class="hl">Brasil</td></tr>
+          <tr><td>Julia Ferreira</td><td>julia@email.com</td><td class="hl">Brasil</td></tr>
+          <tr><td>Ana Lima</td><td>ana@email.com</td><td class="hl">Brasil</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sql-wrap">
+      <div class="sql-header">
+        <div class="sql-label">Combinando condições — AND, BETWEEN, LIKE</div>
+        <button class="copy-btn" onclick="copyCode(this,'c-pw2')">Copiar</button>
+      </div>
+      <div class="sql-block"><code id="c-pw2"><span class="cm">-- Faixas baratas em formato MP3</span>
+<span class="k">SELECT</span> faixa_titulo, faixa_preco_usd, faixa_formato
+<span class="k">FROM</span>   faixas
+<span class="k">WHERE</span>  faixa_preco_usd <span class="k">BETWEEN</span> <span class="n">1.99</span> <span class="k">AND</span> <span class="n">3.99</span>
+  <span class="k">AND</span>  faixa_formato = <span class="s">'MP3'</span>
+<span class="k">ORDER BY</span> faixa_preco_usd <span class="k">DESC</span>;</code></div>
+    </div>
+
+    <div class="kps">
+      <div class="kp">
+        <div class="kp-tag">Operadores de comparação</div>
+        <div class="kp-text"><code style="font-size:11px;background:var(--s2);padding:1px 5px;border-radius:3px;">=</code> igual &nbsp;·&nbsp; <code style="font-size:11px;background:var(--s2);padding:1px 5px;border-radius:3px;">&lt;&gt;</code> diferente &nbsp;·&nbsp; <code style="font-size:11px;background:var(--s2);padding:1px 5px;border-radius:3px;">&gt;</code> maior &nbsp;·&nbsp; <code style="font-size:11px;background:var(--s2);padding:1px 5px;border-radius:3px;">&lt;</code> menor &nbsp;·&nbsp; <code style="font-size:11px;background:var(--s2);padding:1px 5px;border-radius:3px;">&gt;=</code> <code style="font-size:11px;background:var(--s2);padding:1px 5px;border-radius:3px;">&lt;=</code> maior/menor ou igual.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag" style="color:#b83030">BETWEEN · LIKE · IN</div>
+        <div class="kp-text"><strong>BETWEEN a AND b</strong> — intervalo inclusivo &nbsp;·&nbsp; <strong>LIKE '%texto%'</strong> — busca parcial &nbsp;·&nbsp; <strong>IN (a, b, c)</strong> — lista de valores permitidos.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag">AND · OR · IS NULL</div>
+        <div class="kp-text"><strong>AND</strong> todas as condições devem ser verdadeiras · <strong>OR</strong> basta uma · <strong>IS NULL</strong> / <strong>IS NOT NULL</strong> verificam ausência de valor — campo vazio não é igual a zero.</div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p3')">← SELECT e FROM</button>
+      <button class="pn-btn pn-fwd" onclick="show('p4')">JOIN →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P4 — WHERE e JOIN
+══════════════════════════════════════ -->
+<div id="p4" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">05 · JOIN</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Cruze tabelas<br><em>pela chave.</em></div>
+
+    <!-- Venn diagram — 4 tipos de JOIN -->
+    <div class="diagram">
+      <svg viewBox="0 0 750 168" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+        <defs>
+          <clipPath id="clip-inner-join"><circle cx="80" cy="85" r="47"/></clipPath>
+        </defs>
+
+        <!-- INNER JOIN -->
+        <text x="102" y="14" text-anchor="middle" fill="#7a1a1a" font-size="9" font-family="system-ui" letter-spacing="2" font-weight="700">INNER JOIN</text>
+        <circle cx="80" cy="85" r="47" fill="#f5ecea" stroke="#dfc9c0" stroke-width="1.5"/>
+        <circle cx="125" cy="85" r="47" fill="#f5ecea" stroke="#dfc9c0" stroke-width="1.5"/>
+        <circle cx="125" cy="85" r="47" clip-path="url(#clip-inner-join)" fill="#7a1a1a" opacity=".82"/>
+        <circle cx="80"  cy="85" r="47" fill="none" stroke="#dfc9c0" stroke-width="1.5"/>
+        <circle cx="125" cy="85" r="47" fill="none" stroke="#dfc9c0" stroke-width="1.5"/>
+        <text x="53"  y="89" text-anchor="middle" fill="#8a6060" font-size="8.5" font-family="system-ui">TABLE1</text>
+        <text x="153" y="89" text-anchor="middle" fill="#8a6060" font-size="8.5" font-family="system-ui">TABLE2</text>
+        <text x="102" y="150" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" font-style="italic">Apenas registros comuns</text>
+
+        <line x1="185" y1="18" x2="185" y2="142" stroke="#dfc9c0" stroke-width="1" stroke-dasharray="3 3"/>
+
+        <!-- LEFT JOIN -->
+        <text x="286" y="14" text-anchor="middle" fill="#7a1a1a" font-size="9" font-family="system-ui" letter-spacing="2" font-weight="700">LEFT JOIN</text>
+        <circle cx="305" cy="85" r="47" fill="#f5ecea"/>
+        <circle cx="260" cy="85" r="47" fill="#7a1a1a" opacity=".82"/>
+        <circle cx="260" cy="85" r="47" fill="none" stroke="#7a1a1a" stroke-width="1.5"/>
+        <circle cx="305" cy="85" r="47" fill="none" stroke="#dfc9c0" stroke-width="1.5"/>
+        <text x="233" y="89" text-anchor="middle" fill="#fdf8f6" font-size="8.5" font-family="system-ui">TABLE1</text>
+        <text x="333" y="89" text-anchor="middle" fill="#8a6060" font-size="8.5" font-family="system-ui">TABLE2</text>
+        <text x="286" y="150" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" font-style="italic">Todos da esquerda</text>
+
+        <line x1="370" y1="18" x2="370" y2="142" stroke="#dfc9c0" stroke-width="1" stroke-dasharray="3 3"/>
+
+        <!-- RIGHT JOIN -->
+        <text x="471" y="14" text-anchor="middle" fill="#7a1a1a" font-size="9" font-family="system-ui" letter-spacing="2" font-weight="700">RIGHT JOIN</text>
+        <circle cx="445" cy="85" r="47" fill="#f5ecea"/>
+        <circle cx="490" cy="85" r="47" fill="#7a1a1a" opacity=".82"/>
+        <circle cx="445" cy="85" r="47" fill="none" stroke="#dfc9c0" stroke-width="1.5"/>
+        <circle cx="490" cy="85" r="47" fill="none" stroke="#7a1a1a" stroke-width="1.5"/>
+        <text x="418" y="89" text-anchor="middle" fill="#8a6060" font-size="8.5" font-family="system-ui">TABLE1</text>
+        <text x="518" y="89" text-anchor="middle" fill="#fdf8f6" font-size="8.5" font-family="system-ui">TABLE2</text>
+        <text x="471" y="150" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" font-style="italic">Todos da direita</text>
+
+        <line x1="555" y1="18" x2="555" y2="142" stroke="#dfc9c0" stroke-width="1" stroke-dasharray="3 3"/>
+
+        <!-- FULL OUTER JOIN -->
+        <text x="656" y="14" text-anchor="middle" fill="#7a1a1a" font-size="9" font-family="system-ui" letter-spacing="2" font-weight="700">FULL OUTER JOIN</text>
+        <circle cx="630" cy="85" r="47" fill="#7a1a1a" opacity=".82"/>
+        <circle cx="675" cy="85" r="47" fill="#7a1a1a" opacity=".82"/>
+        <circle cx="630" cy="85" r="47" fill="none" stroke="#7a1a1a" stroke-width="1.5"/>
+        <circle cx="675" cy="85" r="47" fill="none" stroke="#7a1a1a" stroke-width="1.5"/>
+        <text x="603" y="89" text-anchor="middle" fill="#fdf8f6" font-size="8.5" font-family="system-ui">TABLE1</text>
+        <text x="703" y="89" text-anchor="middle" fill="#fdf8f6" font-size="8.5" font-family="system-ui">TABLE2</text>
+        <text x="656" y="150" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" font-style="italic">Todos, de ambas as tabelas</text>
+      </svg>
+    </div>
+
+    <!-- Tabelas CLIENTES ↔ PEDIDOS -->
+    <div class="diagram" style="margin-bottom:28px;">
+      <svg viewBox="0 0 700 210" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+        <rect x="20" y="18" width="230" height="170" rx="10" fill="#fff" stroke="#7a1a1a" stroke-width="1.5"/>
+        <rect x="20" y="18" width="230" height="36" rx="10" fill="#7a1a1a" opacity=".06"/>
+        <rect x="20" y="38" width="230" height="16" fill="#7a1a1a" opacity=".06"/>
+        <text x="135" y="42" text-anchor="middle" fill="#7a1a1a" font-size="10" font-family="system-ui" font-weight="800" letter-spacing=".5">CLIENTES</text>
+        <text x="57"  y="68" fill="#8a6060" font-size="8.5" font-family="system-ui" font-weight="700" letter-spacing="1">CLIENTE_ID</text>
+        <text x="120" y="68" fill="#8a6060" font-size="8.5" font-family="system-ui" font-weight="700" letter-spacing="1">NOME</text>
+        <text x="185" y="68" fill="#8a6060" font-size="8.5" font-family="system-ui" font-weight="700" letter-spacing="1">PAÍS</text>
+        <line x1="32" y1="74" x2="238" y2="74" stroke="#f0e0da" stroke-width="1"/>
+        <rect x="32" y="59" width="22" height="10" rx="2" fill="#7a1a1a"/>
+        <text x="43" y="67" text-anchor="middle" fill="#fdf8f6" font-size="7.5" font-family="system-ui" font-weight="800">PK</text>
+        <text x="58"  y="96"  fill="#1a0d0d" font-size="12" font-family="system-ui" font-weight="600">5001</text>
+        <text x="118" y="96"  fill="#1a0d0d" font-size="12" font-family="system-ui">Carlos</text>
+        <text x="185" y="96"  fill="#1a0d0d" font-size="12" font-family="system-ui">Brasil</text>
+        <line x1="32" y1="104" x2="238" y2="104" stroke="#f5ece8" stroke-width="1"/>
+        <text x="58"  y="122" fill="#1a0d0d" font-size="12" font-family="system-ui" font-weight="600">5002</text>
+        <text x="118" y="122" fill="#1a0d0d" font-size="12" font-family="system-ui">Julia</text>
+        <text x="185" y="122" fill="#1a0d0d" font-size="12" font-family="system-ui">Brasil</text>
+        <line x1="32" y1="130" x2="238" y2="130" stroke="#f5ece8" stroke-width="1"/>
+        <text x="58"  y="148" fill="#1a0d0d" font-size="12" font-family="system-ui" font-weight="600">5004</text>
+        <text x="118" y="148" fill="#1a0d0d" font-size="12" font-family="system-ui">Emma</text>
+        <text x="185" y="148" fill="#1a0d0d" font-size="12" font-family="system-ui">UK</text>
+        <line x1="32" y1="156" x2="238" y2="156" stroke="#f5ece8" stroke-width="1"/>
+        <text x="58"  y="174" fill="#8a6060" font-size="12" font-family="system-ui">…</text>
+        <line x1="252" y1="96" x2="316" y2="96" stroke="#b83030" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <polygon points="316,90 328,96 316,102" fill="#b83030"/>
+        <text x="284" y="86"  text-anchor="middle" fill="#b83030" font-size="9" font-family="system-ui" font-weight="700">JOIN</text>
+        <text x="284" y="112" text-anchor="middle" fill="#b09898" font-size="8.5" font-family="system-ui">cliente_id</text>
+        <rect x="330" y="18" width="350" height="170" rx="10" fill="#fff" stroke="#b83030" stroke-width="1.5"/>
+        <rect x="330" y="18" width="350" height="36" rx="10" fill="#b83030" opacity=".06"/>
+        <rect x="330" y="38" width="350" height="16" fill="#b83030" opacity=".06"/>
+        <text x="505" y="42" text-anchor="middle" fill="#b83030" font-size="10" font-family="system-ui" font-weight="800" letter-spacing=".5">PEDIDOS</text>
+        <text x="368" y="68" fill="#8a6060" font-size="8.5" font-family="system-ui" font-weight="700" letter-spacing="1">PED_ID</text>
+        <text x="421" y="68" fill="#8a6060" font-size="8.5" font-family="system-ui" font-weight="700" letter-spacing="1">CLI_ID</text>
+        <text x="466" y="68" fill="#8a6060" font-size="8.5" font-family="system-ui" font-weight="700" letter-spacing="1">DATA</text>
+        <text x="566" y="68" fill="#8a6060" font-size="8.5" font-family="system-ui" font-weight="700" letter-spacing="1">TOTAL</text>
+        <line x1="342" y1="74" x2="668" y2="74" stroke="#f0e0da" stroke-width="1"/>
+        <rect x="342" y="59" width="22" height="10" rx="2" fill="#7a1a1a"/>
+        <text x="353" y="67" text-anchor="middle" fill="#fdf8f6" font-size="7.5" font-family="system-ui" font-weight="800">PK</text>
+        <rect x="397" y="59" width="20" height="10" rx="2" fill="#b83030"/>
+        <text x="407" y="67" text-anchor="middle" fill="#fdf8f6" font-size="7.5" font-family="system-ui" font-weight="800">FK</text>
+        <text x="358" y="96"  fill="#1a0d0d" font-size="12" font-family="system-ui">1001</text>
+        <text x="415" y="96"  fill="#b83030" font-size="12" font-family="system-ui" font-weight="600">5001</text>
+        <text x="462" y="96"  fill="#1a0d0d" font-size="12" font-family="system-ui">2024-03-01</text>
+        <text x="564" y="96"  fill="#1a0d0d" font-size="12" font-family="system-ui">2.99</text>
+        <line x1="342" y1="104" x2="668" y2="104" stroke="#f5ece8" stroke-width="1"/>
+        <text x="358" y="122" fill="#1a0d0d" font-size="12" font-family="system-ui">1002</text>
+        <text x="415" y="122" fill="#b83030" font-size="12" font-family="system-ui" font-weight="600">5002</text>
+        <text x="462" y="122" fill="#1a0d0d" font-size="12" font-family="system-ui">2024-03-02</text>
+        <text x="564" y="122" fill="#1a0d0d" font-size="12" font-family="system-ui">6.98</text>
+        <line x1="342" y1="130" x2="668" y2="130" stroke="#f5ece8" stroke-width="1"/>
+        <text x="358" y="148" fill="#1a0d0d" font-size="12" font-family="system-ui">1006</text>
+        <text x="415" y="148" fill="#b83030" font-size="12" font-family="system-ui" font-weight="600">5001</text>
+        <text x="462" y="148" fill="#1a0d0d" font-size="12" font-family="system-ui">2024-03-06</text>
+        <text x="564" y="148" fill="#1a0d0d" font-size="12" font-family="system-ui">2.99</text>
+        <line x1="342" y1="156" x2="668" y2="156" stroke="#f5ece8" stroke-width="1"/>
+        <text x="358" y="174" fill="#8a6060" font-size="12" font-family="system-ui">…</text>
+      </svg>
+    </div>
+
+    <div class="sql-wrap">
+      <div class="sql-header">
+        <div class="sql-label">INNER JOIN — Pedidos com nome do cliente</div>
+        <button class="copy-btn" onclick="copyCode(this,'c-p4a')">Copiar</button>
+      </div>
+      <div class="sql-block"><code id="c-p4a"><span class="k">SELECT</span> p.pedido_id,
+       p.pedido_data,
+       c.cliente_nome,
+       c.cliente_pais,
+       ip.total_item_usd
+<span class="k">FROM</span>   pedidos        p
+<span class="k">JOIN</span>   clientes       c  <span class="k">ON</span> p.cliente_id = c.cliente_id
+<span class="k">JOIN</span>   itens_pedido   ip <span class="k">ON</span> p.pedido_id  = ip.pedido_id
+<span class="k">WHERE</span>  p.pedido_data &gt;= <span class="s">'2024-03-01'</span>
+<span class="k">ORDER BY</span> p.pedido_data;</code></div>
+    </div>
+
+    <div class="sql-wrap">
+      <div class="sql-header">
+        <div class="sql-label">LEFT JOIN — Clientes sem compra há 6 meses (PostgreSQL)</div>
+        <button class="copy-btn" onclick="copyCode(this,'c-p4b')">Copiar</button>
+      </div>
+      <div class="sql-block"><code id="c-p4b"><span class="k">SELECT</span> c.cliente_nome,
+       c.cliente_email,
+       <span class="f">MAX</span>(p.pedido_data) <span class="k">AS</span> ultima_compra
+<span class="k">FROM</span>   clientes c
+<span class="k">LEFT JOIN</span> pedidos p <span class="k">ON</span> c.cliente_id = p.cliente_id
+<span class="k">GROUP BY</span> c.cliente_id, c.cliente_nome, c.cliente_email
+<span class="k">HAVING</span>   <span class="f">MAX</span>(p.pedido_data) &lt; <span class="f">CURRENT_DATE</span> - <span class="f">INTERVAL</span> <span class="s">'180 days'</span>
+   <span class="k">OR</span>    <span class="f">MAX</span>(p.pedido_data) <span class="k">IS NULL</span>
+<span class="k">ORDER BY</span> ultima_compra <span class="k">ASC NULLS LAST</span>;</code></div>
+    </div>
+
+    <div class="kps">
+      <div class="kp">
+        <div class="kp-tag">INNER JOIN</div>
+        <div class="kp-text">Retorna apenas linhas com correspondência nas duas tabelas. É o JOIN padrão — equivale a cruzar duas planilhas pelo ID em comum.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag" style="color:#b83030">LEFT JOIN</div>
+        <div class="kp-text">Retorna todas as linhas da tabela esquerda, mesmo sem correspondência na direita. Linhas sem match chegam com NULL — útil para detectar clientes sem pedidos.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag">NULLS LAST</div>
+        <div class="kp-text">PostgreSQL: <code style="font-size:11px;background:var(--s2);padding:1px 5px;border-radius:3px;">ORDER BY x ASC NULLS LAST</code> empurra os NULLs para o final — clientes sem nenhuma compra ficam no final da lista.</div>
+      </div>
+    </div>
+
+    <!-- ── EXERCÍCIO PRÁTICO ── -->
+    <div style="width:100%;max-width:720px;margin-top:44px;margin-bottom:8px;">
+
+      <div class="ov-section-tag" style="margin-bottom:18px;">Exercício Prático</div>
+
+      <p style="font-size:13.5px;color:var(--muted);line-height:1.65;margin-bottom:20px;">
+        Considere as duas tabelas abaixo. Use-as para praticar JOIN no seu navegador.
+      </p>
+
+      <!-- Tabelas de dados -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:24px;">
+        <div style="overflow-x:auto;">
+          <div class="schema-tbl-name" style="margin-bottom:8px;">CLIENTES</div>
+          <table class="result-tbl">
+            <thead>
+              <tr><th>NUM_CLIENTE</th><th>NOME_CLIENTE</th><th>CIDADE</th><th>ESTADO</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="num">1001</td><td>Jose Andrade</td><td>Rio de Janeiro</td><td>RJ</td></tr>
+              <tr><td class="num">1002</td><td>Maria Mendonca</td><td>Campinas</td><td>SP</td></tr>
+              <tr><td class="num">1003</td><td>Marcio Mota</td><td>Curitiba</td><td>PR</td></tr>
+              <tr><td class="num">1004</td><td>Claudia Silva</td><td>Santa Catarina</td><td>SC</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="overflow-x:auto;">
+          <div class="schema-tbl-name" style="margin-bottom:8px;">PEDIDOS</div>
+          <table class="result-tbl">
+            <thead>
+              <tr><th>NUM_PEDIDO</th><th>NUM_CLIENTE</th><th>DATA_PEDIDO</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="num">10</td><td class="num">1001</td><td>2020-03-10</td></tr>
+              <tr><td class="num">20</td><td class="num">1002</td><td>2020-03-11</td></tr>
+              <tr><td class="num">30</td><td class="num">1003</td><td>2020-03-11</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Instruções -->
+      <div class="kp" style="border-left:3px solid var(--c1);margin-bottom:22px;">
+        <div class="kp-tag">Como fazer</div>
+        <div class="kp-text">
+          <ol style="margin:10px 0 2px 18px;line-height:2.1;font-size:13px;">
+            <li>Acesse <a href="https://sqliteonline.com/" target="_blank" rel="noopener" style="color:var(--c1);font-weight:600;">sqliteonline.com</a> e selecione <strong>PGLite</strong> no painel lateral esquerdo.</li>
+            <li>Copie o esquema SQL abaixo, cole no editor e clique em <strong>▶ Run</strong> para criar as tabelas e inserir os dados.</li>
+            <li>Escreva uma nova consulta com <strong>JOIN</strong> que retorne: número do pedido, nome do cliente, data do pedido e estado.</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Esquema SQL -->
+      <div class="sql-wrap">
+        <div class="sql-header">
+          <div class="sql-label">Esquema SQL — copie e execute no PGLite</div>
+          <button class="copy-btn" onclick="copyCode(this,'c-ex-schema')">Copiar</button>
+        </div>
+        <div class="sql-block"><code id="c-ex-schema"><span class="cm">-- Tabela de clientes</span>
+<span class="k">CREATE TABLE</span> <span class="n">CLIENTES</span> (
+    <span class="n">Num_Cliente</span>  <span class="f">INTEGER</span>      <span class="k">PRIMARY KEY</span>,
+    <span class="n">Nome_Cliente</span> <span class="f">VARCHAR</span>(<span class="n">100</span>),
+    <span class="n">Cidade</span>       <span class="f">VARCHAR</span>(<span class="n">100</span>),
+    <span class="n">Estado</span>       <span class="f">CHAR</span>(<span class="n">2</span>)
+);
+
+<span class="cm">-- Tabela de pedidos</span>
+<span class="k">CREATE TABLE</span> <span class="n">PEDIDOS</span> (
+    <span class="n">Num_Pedido</span>  <span class="f">INTEGER</span> <span class="k">PRIMARY KEY</span>,
+    <span class="n">Num_Cliente</span> <span class="f">INTEGER</span>,
+    <span class="n">Data_Pedido</span> <span class="f">DATE</span>,
+    <span class="k">FOREIGN KEY</span> (<span class="n">Num_Cliente</span>) <span class="k">REFERENCES</span> <span class="n">CLIENTES</span>(<span class="n">Num_Cliente</span>)
+);
+
+<span class="cm">-- Inserindo dados na tabela CLIENTES</span>
+<span class="k">INSERT INTO</span> <span class="n">CLIENTES</span> (<span class="n">Num_Cliente</span>, <span class="n">Nome_Cliente</span>, <span class="n">Cidade</span>, <span class="n">Estado</span>) <span class="k">VALUES</span>
+(<span class="n">1001</span>, <span class="s">'Jose Andrade'</span>,   <span class="s">'Rio de Janeiro'</span>,  <span class="s">'RJ'</span>),
+(<span class="n">1002</span>, <span class="s">'Maria Mendonca'</span>,  <span class="s">'Campinas'</span>,         <span class="s">'SP'</span>),
+(<span class="n">1003</span>, <span class="s">'Marcio Mota'</span>,    <span class="s">'Curitiba'</span>,         <span class="s">'PR'</span>),
+(<span class="n">1004</span>, <span class="s">'Claudia Silva'</span>,  <span class="s">'Santa Catarina'</span>,   <span class="s">'SC'</span>);
+
+<span class="cm">-- Inserindo dados na tabela PEDIDOS</span>
+<span class="k">INSERT INTO</span> <span class="n">PEDIDOS</span> (<span class="n">Num_Pedido</span>, <span class="n">Num_Cliente</span>, <span class="n">Data_Pedido</span>) <span class="k">VALUES</span>
+(<span class="n">10</span>, <span class="n">1001</span>, <span class="s">'2020-03-10'</span>),
+(<span class="n">20</span>, <span class="n">1002</span>, <span class="s">'2020-03-11'</span>),
+(<span class="n">30</span>, <span class="n">1003</span>, <span class="s">'2020-03-11'</span>);</code></div>
+      </div>
+
+      <!-- Desafio -->
+      <div class="kp" style="background:#fff;border:1.5px solid var(--c1);margin-bottom:0;">
+        <div class="kp-tag" style="color:var(--c1);font-size:10px;letter-spacing:2.5px;">🎯 Desafio</div>
+        <div class="kp-text" style="margin-top:6px;">
+          Escreva uma consulta <strong>JOIN</strong> que retorne uma tabela com as colunas:<br>
+          <strong>Num_Pedido · Nome_Cliente · Data_Pedido · Estado</strong>
+        </div>
+      </div>
+
+    </div><!-- /exercício -->
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p_where')">← WHERE</button>
+      <button class="pn-btn pn-fwd" onclick="show('p5')">GROUP BY →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P5 — GROUP BY e AGREGAÇÕES
+══════════════════════════════════════ -->
+<div id="p5" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">06 · GROUP BY e Agregações</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Agrupe para<br><em>enxergar padrões.</em></div>
+
+    <div class="diagram">
+      <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+        <!-- Before: individual rows -->
+        <text x="140" y="20" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" letter-spacing="2" font-weight="700">SEM GROUP BY</text>
+        <rect x="20" y="30" width="240" height="178" rx="10" fill="#fff" stroke="#dfc9c0" stroke-width="1.5"/>
+        <text x="68" y="54" fill="#8a6060" font-size="8.5" font-family="system-ui" letter-spacing="1" font-weight="700">PAÍS</text>
+        <text x="155" y="54" fill="#8a6060" font-size="8.5" font-family="system-ui" letter-spacing="1" font-weight="700">TOTAL</text>
+        <line x1="32" y1="60" x2="248" y2="60" stroke="#f0e0da" stroke-width="1"/>
+        <text x="66" y="79" fill="#1a0d0d" font-size="11.5" font-family="system-ui">Brasil</text>
+        <text x="158" y="79" fill="#1a0d0d" font-size="11.5" font-family="system-ui">2.99</text>
+        <line x1="32" y1="86" x2="248" y2="86" stroke="#f5ece8" stroke-width="1"/>
+        <text x="66" y="105" fill="#1a0d0d" font-size="11.5" font-family="system-ui">Brasil</text>
+        <text x="158" y="105" fill="#1a0d0d" font-size="11.5" font-family="system-ui">6.98</text>
+        <line x1="32" y1="112" x2="248" y2="112" stroke="#f5ece8" stroke-width="1"/>
+        <text x="66" y="131" fill="#1a0d0d" font-size="11.5" font-family="system-ui">UK</text>
+        <text x="158" y="131" fill="#1a0d0d" font-size="11.5" font-family="system-ui">3.99</text>
+        <line x1="32" y1="138" x2="248" y2="138" stroke="#f5ece8" stroke-width="1"/>
+        <text x="66" y="157" fill="#1a0d0d" font-size="11.5" font-family="system-ui">Brasil</text>
+        <text x="158" y="157" fill="#1a0d0d" font-size="11.5" font-family="system-ui">2.99</text>
+        <line x1="32" y1="164" x2="248" y2="164" stroke="#f5ece8" stroke-width="1"/>
+        <text x="66" y="183" fill="#8a6060" font-size="11.5" font-family="system-ui">…</text>
+        <text x="158" y="183" fill="#8a6060" font-size="11.5" font-family="system-ui">…</text>
+
+        <!-- Arrow -->
+        <line x1="274" y1="110" x2="320" y2="110" stroke="#b83030" stroke-width="2"/>
+        <polygon points="320,104 334,110 320,116" fill="#b83030"/>
+        <text x="296" y="100" text-anchor="middle" fill="#b83030" font-size="9.5" font-family="system-ui" font-weight="700">GROUP BY</text>
+        <text x="296" y="127" text-anchor="middle" fill="#b09898" font-size="8.5" font-family="system-ui">cliente_pais</text>
+
+        <!-- After: grouped rows -->
+        <text x="530" y="20" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" letter-spacing="2" font-weight="700">COM GROUP BY</text>
+        <rect x="340" y="30" width="340" height="148" rx="10" fill="#fff" stroke="#7a1a1a" stroke-width="1.5"/>
+        <text x="385" y="54" fill="#8a6060" font-size="8.5" font-family="system-ui" letter-spacing="1" font-weight="700">PAÍS</text>
+        <text x="470" y="54" fill="#8a6060" font-size="8.5" font-family="system-ui" letter-spacing="1" font-weight="700">PEDIDOS</text>
+        <text x="580" y="54" fill="#8a6060" font-size="8.5" font-family="system-ui" letter-spacing="1" font-weight="700">TICKET MÉD.</text>
+        <line x1="352" y1="60" x2="668" y2="60" stroke="#f0e0da" stroke-width="1"/>
+        <text x="383" y="85" fill="#1a0d0d" font-size="12" font-family="system-ui" font-weight="700">Brasil</text>
+        <text x="490" y="85" fill="#1a0d0d" font-size="12" font-family="system-ui">18</text>
+        <text x="590" y="85" fill="#7a1a1a" font-size="12" font-family="system-ui" font-weight="700">4.12</text>
+        <line x1="352" y1="93" x2="668" y2="93" stroke="#f5ece8" stroke-width="1"/>
+        <text x="383" y="118" fill="#1a0d0d" font-size="12" font-family="system-ui" font-weight="700">UK</text>
+        <text x="490" y="118" fill="#1a0d0d" font-size="12" font-family="system-ui">4</text>
+        <text x="590" y="118" fill="#7a1a1a" font-size="12" font-family="system-ui" font-weight="700">3.99</text>
+        <line x1="352" y1="126" x2="668" y2="126" stroke="#f5ece8" stroke-width="1"/>
+        <text x="383" y="151" fill="#1a0d0d" font-size="12" font-family="system-ui" font-weight="700">Japão</text>
+        <text x="490" y="151" fill="#1a0d0d" font-size="12" font-family="system-ui">3</text>
+        <text x="590" y="151" fill="#7a1a1a" font-size="12" font-family="system-ui" font-weight="700">4.65</text>
+        <line x1="352" y1="159" x2="668" y2="159" stroke="#f5ece8" stroke-width="1"/>
+        <text x="383" y="178" fill="#8a6060" font-size="12" font-family="system-ui">…</text>
+      </svg>
+    </div>
+
+    <div class="sql-wrap">
+      <div class="sql-header">
+        <div class="sql-label">Respondendo a pergunta — Ticket médio por país</div>
+        <button class="copy-btn" onclick="copyCode(this,'c-p5a')">Copiar</button>
+      </div>
+      <div class="sql-block"><code id="c-p5a"><span class="k">SELECT</span> c.cliente_pais,
+       <span class="f">COUNT</span>(<span class="k">DISTINCT</span> p.pedido_id)    <span class="k">AS</span> total_pedidos,
+       <span class="f">ROUND</span>(<span class="f">SUM</span>(ip.total_item_usd), <span class="n">2</span>)  <span class="k">AS</span> receita_total,
+       <span class="f">ROUND</span>(<span class="f">AVG</span>(ip.total_item_usd), <span class="n">2</span>)  <span class="k">AS</span> ticket_medio
+<span class="k">FROM</span>   clientes c
+<span class="k">JOIN</span>   pedidos p       <span class="k">ON</span> c.cliente_id = p.cliente_id
+<span class="k">JOIN</span>   itens_pedido ip <span class="k">ON</span> p.pedido_id  = ip.pedido_id
+<span class="k">WHERE</span>  c.cliente_pais <span class="k">IS NOT NULL</span>
+<span class="k">GROUP BY</span> c.cliente_pais
+<span class="k">ORDER BY</span> ticket_medio <span class="k">DESC</span>;</code></div>
+    </div>
+
+    <div class="result-wrap">
+      <div class="result-label">Resultado parcial</div>
+      <table class="result-tbl">
+        <thead><tr><th>cliente_pais</th><th>total_pedidos</th><th>receita_total</th><th>ticket_medio</th></tr></thead>
+        <tbody>
+          <tr><td>Japão</td><td class="num">3</td><td class="num">17.94</td><td class="num hl">5.98</td></tr>
+          <tr><td>Alemanha</td><td class="num">2</td><td class="num">11.46</td><td class="num hl">5.73</td></tr>
+          <tr><td>Argentina</td><td class="num">2</td><td class="num">9.98</td><td class="num hl">4.99</td></tr>
+          <tr><td>Brasil</td><td class="num">18</td><td class="num">57.84</td><td class="num hl">3.21</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="kps">
+      <div class="kp">
+        <div class="kp-tag">Funções de agregação</div>
+        <div class="kp-text"><strong>COUNT</strong> conta linhas · <strong>SUM</strong> soma · <strong>AVG</strong> média · <strong>MAX/MIN</strong> extremos. Sempre usadas com GROUP BY ou aplicadas a toda a tabela.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag" style="color:#b83030">HAVING vs WHERE</div>
+        <div class="kp-text"><strong>WHERE</strong> filtra antes da agregação (linha por linha). <strong>HAVING</strong> filtra depois — é o WHERE dos grupos. Ex.: <code style="font-size:11px;background:var(--s2);padding:1px 5px;border-radius:3px;">HAVING COUNT(*) &gt; 5</code></div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag">A tabela dinâmica do SQL</div>
+        <div class="kp-text">GROUP BY é a SQL equivalente de arrastar um campo para "Linhas" no pivot e outro para "Valores". A diferença: é reproduzível, auditável e escalável.</div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p4')">← WHERE e JOIN</button>
+      <button class="pn-btn pn-fwd" onclick="show('p6')">IA e SQL →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P6 — O QUE A IA PODE E NÃO PODE
+══════════════════════════════════════ -->
+<div id="p6" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">07 · O que a IA pode e não pode fazer</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">A IA escreve.<br><em>Você valida.</em></div>
+
+    <div class="ai-compare">
+      <div class="ai-card can">
+        <div class="ai-card-tag">O que a IA faz bem</div>
+        <ul class="ai-list">
+          <li>Gerar queries sintaticamente corretas a partir de uma descrição em português</li>
+          <li>Identificar erros de sintaxe em queries quebradas</li>
+          <li>Sugerir índices e otimizações de performance</li>
+          <li>Explicar o que cada cláusula de uma query faz</li>
+          <li>Converter queries entre dialetos (PostgreSQL, MySQL, SQLite)</li>
+        </ul>
+      </div>
+      <div class="ai-card must">
+        <div class="ai-card-tag">O que o humano deve validar</div>
+        <ul class="ai-list">
+          <li>Se a query responde a pergunta de negócio certa — não apenas a pergunta literal</li>
+          <li>Se os JOINs estão duplicando ou perdendo linhas</li>
+          <li>Se o filtro de data usa o campo correto da tabela correta</li>
+          <li>Se o resultado faz sentido no contexto do negócio</li>
+          <li>Se há valores NULL afetando a média ou o total</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sql-wrap" style="margin-bottom:8px;">
+      <div class="sql-header">
+        <div class="sql-label">Exemplo de bom prompt para a IA</div>
+        <button class="copy-btn" onclick="copyCode(this,'c-p6a')">Copiar</button>
+      </div>
+      <div class="sql-block"><code id="c-p6a"><span class="cm">Tenho um banco PostgreSQL com as tabelas:
+  - clientes (cliente_id, cliente_nome, cliente_pais)
+  - pedidos (pedido_id, cliente_id, pedido_data)
+  - itens_pedido (pedido_id, faixa_id, total_item_usd)
+
+Escreva uma query que retorne os 5 países com maior
+ticket médio por pedido, excluindo clientes sem país
+cadastrado. Ordene do maior para o menor.</span></code></div>
+    </div>
+
+    <div style="font-size:13px;color:var(--muted);line-height:1.6;width:100%;max-width:720px;margin-bottom:28px;">
+      <strong style="color:var(--text);">Regra de ouro:</strong> quanto mais contexto você dá à IA (nomes reais das tabelas, colunas existentes, o que a query deve responder), mais precisa e validável fica a resposta.
+    </div>
+
+    <div class="broken-wrap">
+      <div class="sql-header" style="margin-bottom:8px;">
+        <div class="broken-label" style="margin-bottom:0;flex:1;">Query com erros — exercício em sala</div>
+        <button class="copy-btn" onclick="copyCode(this,'c-p6b')">Copiar</button>
+      </div>
+      <div class="broken-block"><code id="c-p6b"><span class="cm">-- Pergunta: Quais os artistas com maior receita em 2024?
+-- Esta query tem 3 erros. Use a IA para encontrá-los.</span>
+
+<span class="k">SELECT</span> ar.Name <span class="k">AS</span> artista,
+       <span class="f">SUM</span>(il.UnitPrice * il.Quantity) <span class="k">AS</span> receita
+<span class="k">FROM</span>   Artist ar
+<span class="k">JOIN</span>   Album  al <span class="k">ON</span> ar.ArtistId = al.ArtistId
+<span class="k">JOIN</span>   Track   t <span class="k">ON</span> al.AlbumId  = t.AlbumId
+<span class="k">JOIN</span>   InvoiceLine il <span class="k">ON</span> t.TrackId = il.TrackId
+<span class="k">WHERE</span>  <span class="err">il.InvoiceDate</span> &gt; <span class="s">'2024-01-01'</span>   <span class="cm">-- Erro 1</span>
+<span class="k">GROUP BY</span> ar.Name
+<span class="err">ORDERED BY</span> receita <span class="k">DESC</span>              <span class="cm">-- Erro 2</span>
+<span class="err">LIMIT</span> <span class="n">10</span>;                              <span class="cm">-- Erro 3 (lógico)</span></code></div>
+    </div>
+
+    <div class="kps">
+      <div class="kp">
+        <div class="kp-tag">Erro 1 — Campo errado</div>
+        <div class="kp-text"><code style="font-size:11px;background:var(--s2);padding:1px 5px;border-radius:3px;">InvoiceDate</code> pertence à tabela <strong>Invoice</strong>, não a <strong>InvoiceLine</strong>. Falta o JOIN com Invoice na query.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag" style="color:#b83030">Erro 2 — Sintaxe</div>
+        <div class="kp-text"><code style="font-size:11px;background:var(--s2);padding:1px 5px;border-radius:3px;">ORDERED BY</code> não existe em SQL. O comando correto é <code style="font-size:11px;background:var(--s2);padding:1px 5px;border-radius:3px;">ORDER BY</code>. O banco retorna erro imediatamente.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag">Erro 3 — Lógico</div>
+        <div class="kp-text">Sem o JOIN com Invoice, a query não filtra por data e retorna receita histórica completa, não apenas de 2024 — a resposta parece correta mas está errada.</div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p5')">← GROUP BY</button>
+      <button class="pn-btn pn-fwd" onclick="show('menu')">Início →</button>
+    </div>
+  </div>
+</div>
+
+<!-- p7 removido conforme solicitado -->
+<div id="p7" class="page" style="display:none!important">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">07 · Atividade Prática — Chinook</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Responda com<br><em>dados.</em></div>
+
+    <div class="diagram">
+      <svg viewBox="0 0 700 170" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+        <!-- Schema simplificado Chinook -->
+        <text x="350" y="16" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui" letter-spacing="2.5" font-weight="700">SCHEMA CHINOOK — TABELAS PRINCIPAIS</text>
+        <!-- Artist -->
+        <rect x="20" y="26" width="100" height="44" rx="7" fill="#fff" stroke="#7a1a1a" stroke-width="1.5"/>
+        <text x="70" y="45" text-anchor="middle" fill="#7a1a1a" font-size="9" font-family="system-ui" font-weight="800">ARTIST</text>
+        <text x="70" y="61" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui">ArtistId · Name</text>
+        <!-- Album -->
+        <rect x="148" y="26" width="110" height="44" rx="7" fill="#fff" stroke="#7a1a1a" stroke-width="1.5"/>
+        <text x="203" y="45" text-anchor="middle" fill="#7a1a1a" font-size="9" font-family="system-ui" font-weight="800">ALBUM</text>
+        <text x="203" y="61" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui">AlbumId · Title · ArtistId</text>
+        <!-- Track -->
+        <rect x="286" y="26" width="128" height="56" rx="7" fill="#fff" stroke="#b83030" stroke-width="1.5"/>
+        <text x="350" y="45" text-anchor="middle" fill="#b83030" font-size="9" font-family="system-ui" font-weight="800">TRACK</text>
+        <text x="350" y="59" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui">TrackId · Name</text>
+        <text x="350" y="73" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui">AlbumId · UnitPrice</text>
+        <!-- InvoiceLine -->
+        <rect x="442" y="26" width="120" height="56" rx="7" fill="#fff" stroke="#7a1a1a" stroke-width="1.5"/>
+        <text x="502" y="45" text-anchor="middle" fill="#7a1a1a" font-size="9" font-family="system-ui" font-weight="800">INVOICELINE</text>
+        <text x="502" y="59" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui">InvoiceLineId</text>
+        <text x="502" y="73" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui">InvoiceId · TrackId</text>
+        <!-- Invoice -->
+        <rect x="442" y="100" width="120" height="56" rx="7" fill="#fff" stroke="#7a1a1a" stroke-width="1.5"/>
+        <text x="502" y="119" text-anchor="middle" fill="#7a1a1a" font-size="9" font-family="system-ui" font-weight="800">INVOICE</text>
+        <text x="502" y="133" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui">InvoiceId · CustomerId</text>
+        <text x="502" y="147" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui">InvoiceDate · Total</text>
+        <!-- Customer -->
+        <rect x="590" y="100" width="100" height="56" rx="7" fill="#fff" stroke="#b83030" stroke-width="1.5"/>
+        <text x="640" y="119" text-anchor="middle" fill="#b83030" font-size="9" font-family="system-ui" font-weight="800">CUSTOMER</text>
+        <text x="640" y="133" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui">CustomerId</text>
+        <text x="640" y="147" text-anchor="middle" fill="#8a6060" font-size="9" font-family="system-ui">Country · Email</text>
+        <!-- Connectors -->
+        <line x1="122" y1="48" x2="146" y2="48" stroke="#dfc9c0" stroke-width="1.2"/>
+        <polygon points="144,44 152,48 144,52" fill="#c8aeaa"/>
+        <line x1="260" y1="48" x2="284" y2="48" stroke="#dfc9c0" stroke-width="1.2"/>
+        <polygon points="282,44 290,48 282,52" fill="#c8aeaa"/>
+        <line x1="416" y1="54" x2="440" y2="54" stroke="#dfc9c0" stroke-width="1.2"/>
+        <polygon points="438,50 446,54 438,58" fill="#c8aeaa"/>
+        <line x1="502" y1="84" x2="502" y2="98" stroke="#dfc9c0" stroke-width="1.2"/>
+        <polygon points="498,96 502,104 506,96" fill="#c8aeaa"/>
+        <line x1="564" y1="128" x2="588" y2="128" stroke="#dfc9c0" stroke-width="1.2"/>
+        <polygon points="586,124 594,128 586,132" fill="#c8aeaa"/>
+      </svg>
+    </div>
+
+    <div class="step-list">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">Acesse o SQLite Online</div>
+          <div class="step-text">Abra o navegador e acesse o ambiente de consulta online. Nenhuma instalação necessária.</div>
+          <a class="ext-link" href="https://sqliteonline.com" target="_blank">Abrir SQLite Online ↗</a>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">Carregue o dataset Chinook</div>
+          <div class="step-text">Clique em <strong>File → Open DB</strong> e selecione o arquivo <code style="background:var(--s1);padding:1px 6px;border-radius:4px;font-size:12px;">Chinook_Sqlite.sql</code> fornecido pelo professor. O banco será carregado automaticamente com 11 tabelas e dados reais.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-title">Execute as consultas dos exercícios abaixo</div>
+          <div class="step-text">Cole cada query na área de texto, clique em <strong>Run</strong> e analise o resultado. Anote o que cada coluna representa e se a resposta faz sentido de negócio.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-title">Exercício de IA: debug da query quebrada</div>
+          <div class="step-text">Cole a "query com erros" da página anterior no ChatGPT com o prompt: <em>"Esta query SQL tem erros. Identifique cada erro, explique o que está errado e mostre a versão corrigida."</em> Compare a resposta com o gabarito do professor.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:14px;width:100%;max-width:720px;">Exercícios — Chinook</div>
+    <div class="ex-cards">
+
+      <div class="ex-card">
+        <div class="ex-num">Exercício 1</div>
+        <div class="ex-q">Quais são os 10 artistas com maior receita total de vendas?</div>
+        <div class="ex-hint">Tabelas: <code>Artist</code> → <code>Album</code> → <code>Track</code> → <code>InvoiceLine</code> · Função: <code>SUM(UnitPrice * Quantity)</code> · Ordenar: <code>DESC</code></div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num">Exercício 2</div>
+        <div class="ex-q">Qual o ticket médio por país dos clientes? Ordene do maior para o menor.</div>
+        <div class="ex-hint">Tabelas: <code>Customer</code> → <code>Invoice</code> · Função: <code>AVG(Total)</code> agrupado por <code>Country</code> · Excluir países com <code>NULL</code></div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num">Exercício 3</div>
+        <div class="ex-q">Quais clientes não compraram após 2013? Liste nome, país e data da última compra.</div>
+        <div class="ex-hint">Tabelas: <code>Customer</code> → <code>Invoice</code> · Condição: <code>MAX(InvoiceDate) &lt; '2014-01-01'</code> com <code>HAVING</code> · Ordenar pela data mais antiga</div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num">Exercício 4 — Desafio</div>
+        <div class="ex-q">Para cada país, qual é o artista com maior número de faixas vendidas?</div>
+        <div class="ex-hint">Requer: <code>Customer</code> → <code>Invoice</code> → <code>InvoiceLine</code> → <code>Track</code> → <code>Album</code> → <code>Artist</code> · Agrupe por <code>Country</code> e <code>ArtistId</code> · Use subquery ou CTE para pegar o top 1 por país</div>
+      </div>
+
+    </div>
+
+    <div class="sql-wrap">
+      <div class="sql-label">Query de referência — Exercício 1 (gabarito)</div>
+      <div class="sql-block"><code><span class="k">SELECT</span>  ar.Name                                    <span class="k">AS</span> artista,
+        <span class="f">ROUND</span>(<span class="f">SUM</span>(il.UnitPrice * il.Quantity), <span class="n">2</span>) <span class="k">AS</span> receita
+<span class="k">FROM</span>    Artist       ar
+<span class="k">JOIN</span>    Album        al <span class="k">ON</span> ar.ArtistId = al.ArtistId
+<span class="k">JOIN</span>    Track         t <span class="k">ON</span> al.AlbumId  = t.AlbumId
+<span class="k">JOIN</span>    InvoiceLine  il <span class="k">ON</span>  t.TrackId  = il.TrackId
+<span class="k">GROUP BY</span> ar.ArtistId, ar.Name
+<span class="k">ORDER BY</span> receita <span class="k">DESC</span>
+<span class="k">LIMIT</span> <span class="n">10</span>;</code></div>
+    </div>
+
+    <div class="kps">
+      <div class="kp">
+        <div class="kp-tag">Chinook</div>
+        <div class="kp-text">Base de dados fictícia de uma loja de música digital. 275 artistas, 347 álbuns, 3.503 faixas e 412 clientes em 24 países. Estrutura similar ao Spotify no início.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag" style="color:#b83030">SQLite Online</div>
+        <div class="kp-text">Ambiente SQL no navegador — sem instalação. Suporta SQLite com sintaxe muito similar ao PostgreSQL para os comandos desta aula.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag">Integração com IA</div>
+        <div class="kp-text">Ao pedir ajuda à IA, descreva as tabelas, as colunas e a pergunta de negócio. Quanto mais contexto, mais precisa e validável a query gerada.</div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p6')">← IA e SQL</button>
+      <button class="pn-btn pn-fwd" onclick="show('menu')">Início →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function show(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function toggleDisc(id) {
+    document.getElementById(id).classList.toggle('open');
+  }
+
+  function copyCode(btn, codeId) {
+    const code = document.getElementById(codeId);
+    navigator.clipboard.writeText(code.innerText).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = 'Copiado ✓';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2200);
+    });
+  }
+</script>
+</body>
+</html>

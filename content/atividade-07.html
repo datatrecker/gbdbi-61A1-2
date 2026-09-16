@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GBDBI · Atividade 7 — Governança de Dados</title>
+<style>
+:root {
+  --bg:       #fdf8f6;
+  --s1:       #f5ecea;
+  --s2:       #ecdeda;
+  --border:   #dfc9c0;
+  --c1:       #7a1a1a;
+  --c2:       #b83030;
+  --text:     #1a0d0d;
+  --muted:    #8a6060;
+  --green:    #2d6a2d;
+  --green-bg: #e8f5e8;
+  --blue:     #1a3a7a;
+  --blue-bg:  #e8eef8;
+  --purple:   #4a2a7a;
+  --purple-bg:#f0eafa;
+  --amber:    #7a5a10;
+  --amber-bg: #fdf5e0;
+  /* group accent colours */
+  --g1:       #1a3a7a;   /* Grupo 1 — azul */
+  --g1-bg:    #e8eef8;
+  --g2:       #4a2a7a;   /* Grupo 2 — roxo */
+  --g2-bg:    #f0eafa;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+.page { display: none; min-height: 100vh; flex-direction: column; }
+.page.active { display: flex; animation: fadeUp .3s ease both; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── NAV ── */
+.t-nav { display:flex; align-items:center; gap:14px; padding:18px 40px; border-bottom:1px solid var(--border); position:sticky; top:0; background:rgba(253,248,246,.92); backdrop-filter:blur(12px); z-index:10; }
+.back { display:inline-flex; align-items:center; gap:7px; font-size:12.5px; color:var(--muted); cursor:pointer; padding:7px 14px; border:1px solid var(--border); border-radius:8px; background:none; transition:all .2s; text-decoration:none; font-family:inherit; }
+.back:hover { color:var(--c1); border-color:var(--c1); }
+.t-label { font-size:10.5px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); }
+
+/* ── GROUP STRIPE in nav ── */
+.group-stripe { font-size:9.5px; letter-spacing:2px; font-weight:800; text-transform:uppercase; padding:4px 12px; border-radius:20px; }
+.gs-1 { background:var(--g1-bg); color:var(--g1); }
+.gs-2 { background:var(--g2-bg); color:var(--g2); }
+
+/* ── BODY ── */
+.t-body { flex:1; display:flex; flex-direction:column; align-items:center; padding:56px 40px 64px; max-width:900px; margin:0 auto; width:100%; }
+.t-title { font-size:38px; font-weight:800; text-align:center; margin-bottom:52px; line-height:1.18; }
+.t-title em { font-style:normal; color:var(--c1); }
+
+/* ── MENU ── */
+.m-header { padding:72px 56px 48px; }
+.m-eyebrow { font-size:10.5px; letter-spacing:4px; text-transform:uppercase; color:var(--c1); font-weight:600; margin-bottom:18px; }
+.m-title { font-size:50px; font-weight:800; line-height:1.08; background:linear-gradient(140deg,#1a0d0d 30%,#7a1a1a); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.m-sub { margin-top:14px; font-size:15px; color:var(--muted); }
+.m-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(265px,1fr)); gap:14px; padding:0 56px 72px; }
+.mcard { background:var(--s1); border:1px solid var(--border); border-radius:14px; padding:28px 26px 32px; cursor:pointer; transition:border-color .2s,transform .2s,box-shadow .2s; position:relative; overflow:hidden; appearance:none; -webkit-appearance:none; width:100%; text-align:left; font-family:inherit; font-size:inherit; color:inherit; }
+.mcard:hover { border-color:var(--c1); transform:translateY(-3px); box-shadow:0 16px 48px rgba(122,26,26,.10); }
+.mcard::after { content:''; position:absolute; inset:0 0 auto 0; height:2px; background:linear-gradient(90deg,var(--c1),var(--c2)); opacity:0; transition:opacity .2s; }
+.mcard:hover::after { opacity:1; }
+.mcard.g1 { border-top:3px solid var(--g1); }
+.mcard.g2 { border-top:3px solid var(--g2); }
+.mc-group { font-size:9px; letter-spacing:3px; font-weight:800; text-transform:uppercase; padding:3px 9px; border-radius:20px; display:inline-block; margin-bottom:12px; }
+.mc-group.g1 { background:var(--g1-bg); color:var(--g1); }
+.mc-group.g2 { background:var(--g2-bg); color:var(--g2); }
+.mc-num { font-size:10px; letter-spacing:3px; font-weight:700; color:var(--muted); margin-bottom:8px; text-transform:uppercase; }
+.mc-h { font-size:16px; font-weight:700; line-height:1.35; margin-bottom:8px; }
+.mc-p { font-size:12.5px; color:var(--muted); line-height:1.6; }
+.mc-arrow { position:absolute; bottom:22px; right:22px; color:var(--muted); font-size:18px; transition:color .2s,transform .2s; }
+.mcard:hover .mc-arrow { color:var(--c1); transform:translate(2px,-2px); }
+
+/* ── CALLOUT ── */
+.callout { width:100%; max-width:760px; padding:18px 20px; background:var(--s1); border-left:3px solid var(--c1); border-radius:2px 8px 8px 2px; font-size:13.5px; line-height:1.65; color:var(--text); margin-bottom:28px; }
+.callout-tag { font-size:9px; letter-spacing:2.5px; text-transform:uppercase; font-weight:700; color:var(--c1); margin-bottom:8px; }
+.callout-green  { border-left-color:var(--green);  background:var(--green-bg); }
+.callout-green  .callout-tag { color:var(--green); }
+.callout-blue   { border-left-color:var(--blue);   background:var(--blue-bg); }
+.callout-blue   .callout-tag { color:var(--blue); }
+.callout-purple { border-left-color:var(--purple); background:var(--purple-bg); }
+.callout-purple .callout-tag { color:var(--purple); }
+.callout-amber  { border-left-color:var(--amber);  background:var(--amber-bg); }
+.callout-amber  .callout-tag { color:var(--amber); }
+
+/* ── GROUP BANNER ── */
+.group-banner { width:100%; max-width:760px; border-radius:12px; padding:20px 24px; margin-bottom:28px; display:flex; align-items:center; gap:16px; }
+.group-banner.g1 { background:var(--g1-bg); border:1.5px solid var(--g1); }
+.group-banner.g2 { background:var(--g2-bg); border:1.5px solid var(--g2); }
+.gb-icon { font-size:32px; flex-shrink:0; }
+.gb-label { font-size:9.5px; letter-spacing:2.5px; text-transform:uppercase; font-weight:800; margin-bottom:4px; }
+.gb-label.g1 { color:var(--g1); }
+.gb-label.g2 { color:var(--g2); }
+.gb-title { font-size:16px; font-weight:800; line-height:1.3; }
+.gb-sub { font-size:12.5px; color:var(--muted); margin-top:3px; }
+
+/* ── QUESTIONS ── */
+.q-list { width:100%; max-width:760px; display:flex; flex-direction:column; gap:14px; margin-bottom:28px; }
+.q-item { border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.q-head { display:flex; gap:14px; align-items:flex-start; padding:16px 18px; background:var(--s1); }
+.q-num { font-size:10px; letter-spacing:2px; font-weight:800; color:#fdf8f6; padding:4px 10px; border-radius:20px; flex-shrink:0; white-space:nowrap; }
+.q-num.nivel1 { background:#3a7a3a; }
+.q-num.nivel2 { background:#7a6a1a; }
+.q-num.nivel3 { background:var(--c1); }
+.q-num.nblu { background:var(--blue); }
+.q-num.npur { background:var(--purple); }
+.q-num.ngrn { background:var(--green); }
+.q-num.namb { background:var(--amber); }
+.q-text { font-size:14px; font-weight:600; line-height:1.5; color:var(--text); }
+.q-hint { font-size:12px; color:var(--muted); line-height:1.55; padding:12px 18px; background:#fff; border-top:1px solid var(--border); }
+
+/* ── TABLE ── */
+.info-table { width:100%; max-width:760px; border-collapse:collapse; margin-bottom:28px; font-size:13px; }
+.info-table th { padding:10px 14px; text-align:left; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; font-weight:700; background:var(--s1); border-bottom:1px solid var(--border); color:var(--muted); }
+.info-table td { padding:10px 14px; border-bottom:1px solid var(--border); color:var(--text); line-height:1.5; vertical-align:top; }
+.info-table tr:last-child td { border-bottom:none; }
+.info-table tr:hover td { background:var(--s2); }
+.badge { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:3px 8px; border-radius:20px; display:inline-block; }
+.badge-r { background:#f8dcdc; color:#7a1a1a; }
+.badge-e { background:#dce8f8; color:#1a3a7a; }
+
+/* ── RBAC TABLE ── */
+.rbac-wrap { width:100%; max-width:760px; overflow-x:auto; margin-bottom:28px; }
+.rbac-table { border-collapse:collapse; font-size:12px; min-width:640px; width:100%; }
+.rbac-table th { padding:10px 12px; font-size:9.5px; letter-spacing:1.5px; text-transform:uppercase; font-weight:700; color:var(--muted); background:var(--s1); border:1px solid var(--border); text-align:center; }
+.rbac-table th.col-data { text-align:left; }
+.rbac-table td { padding:10px 12px; border:1px solid var(--border); text-align:center; font-size:12.5px; }
+.rbac-table td.data-type { text-align:left; font-weight:600; font-size:13px; background:var(--s1); }
+.rbac-table td.cell-fill { background:#fffdf8; color:var(--muted); font-size:11px; font-style:italic; min-width:100px; }
+.rbac-legend { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px; font-size:11.5px; color:var(--muted); }
+.rbac-legend span { display:flex; align-items:center; gap:6px; }
+.rbac-swatch { display:inline-block; width:14px; height:14px; border-radius:3px; }
+
+/* ── POLICY BLOCKS ── */
+.policy-block { width:100%; max-width:760px; border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:16px; }
+.policy-head { padding:12px 18px; background:var(--s1); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; }
+.policy-head-icon { font-size:16px; }
+.policy-head-title { font-size:13px; font-weight:700; }
+.policy-head-tag { font-size:9.5px; letter-spacing:2px; text-transform:uppercase; font-weight:700; color:var(--muted); margin-left:auto; }
+.policy-body { padding:16px 18px; background:#fff; }
+.policy-field { margin-bottom:14px; }
+.policy-field:last-child { margin-bottom:0; }
+.policy-field-label { font-size:9.5px; letter-spacing:2px; text-transform:uppercase; font-weight:700; color:var(--muted); margin-bottom:6px; }
+.policy-field-hint { font-size:12.5px; color:var(--muted); line-height:1.55; font-style:italic; padding:10px 14px; background:var(--bg); border-radius:6px; border:1px dashed var(--border); }
+
+/* ── AUDIT BLOCKS ── */
+.audit-block { width:100%; max-width:760px; border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:16px; }
+.audit-head { padding:12px 18px; display:flex; align-items:center; gap:12px; }
+.audit-head.green  { background:var(--green-bg);  border-bottom:1px solid #b8d8b8; }
+.audit-head.blue   { background:var(--blue-bg);   border-bottom:1px solid #b8c8e8; }
+.audit-head.red    { background:#fdeaea;           border-bottom:1px solid #e8b8b8; }
+.audit-head.amber  { background:var(--amber-bg);  border-bottom:1px solid #e8d8a0; }
+.audit-head-num { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#fff; flex-shrink:0; }
+.audit-head-num.green  { background:var(--green); }
+.audit-head-num.blue   { background:var(--blue); }
+.audit-head-num.red    { background:var(--c1); }
+.audit-head-num.amber  { background:#8a6a20; }
+.audit-head-title { font-size:14px; font-weight:700; }
+.audit-body { padding:16px 18px; background:#fff; }
+.audit-field-label { font-size:9.5px; letter-spacing:2px; text-transform:uppercase; font-weight:700; color:var(--muted); margin-bottom:6px; }
+.audit-field-hint { font-size:12.5px; color:var(--muted); line-height:1.55; font-style:italic; padding:10px 14px; background:var(--bg); border-radius:6px; border:1px dashed var(--border); margin-bottom:14px; }
+.audit-field-hint:last-child { margin-bottom:0; }
+
+/* ── QUALITY DIMENSION CARDS ── */
+.qual-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; width:100%; max-width:760px; margin-bottom:28px; }
+.qual-card { border-radius:10px; padding:16px 14px; border:1px solid var(--border); }
+.qual-card .qc-dim  { font-size:9.5px; letter-spacing:2px; text-transform:uppercase; font-weight:800; margin-bottom:6px; }
+.qual-card .qc-def  { font-size:12px; color:var(--muted); line-height:1.5; margin-bottom:8px; }
+.qual-card .qc-ex   { font-size:11.5px; color:var(--text); line-height:1.5; background:rgba(255,255,255,.7); border-radius:5px; padding:7px 10px; border:1px dashed var(--border); font-style:italic; }
+.qual-card.qd1 { background:#fef8e8; border-color:#e8d890; }  .qual-card.qd1 .qc-dim { color:#7a6010; }
+.qual-card.qd2 { background:#e8f5e8; border-color:#a8d8a8; }  .qual-card.qd2 .qc-dim { color:#2d6a2d; }
+.qual-card.qd3 { background:#e8eef8; border-color:#a8c0e8; }  .qual-card.qd3 .qc-dim { color:#1a3a7a; }
+.qual-card.qd4 { background:#f0eafa; border-color:#c0a8e8; }  .qual-card.qd4 .qc-dim { color:#4a2a7a; }
+.qual-card.qd5 { background:#fdeaea; border-color:#e8a8a8; }  .qual-card.qd5 .qc-dim { color:#7a1a1a; }
+.qual-card.qd6 { background:#fdf5e0; border-color:#e8d090; }  .qual-card.qd6 .qc-dim { color:#7a5010; }
+
+/* ── CODE / PROMPT BLOCKS ── */
+.sql-wrap { width:100%; max-width:760px; margin-bottom:24px; }
+.sql-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
+.sql-label { font-size:9px; letter-spacing:2.5px; text-transform:uppercase; font-weight:700; color:var(--muted); flex:1; display:flex; align-items:center; gap:10px; }
+.sql-label::after { content:''; flex:1; height:1px; background:var(--border); }
+.sql-block { background:#1e0808; border-radius:10px; padding:20px 24px; overflow-x:auto; }
+.sql-block code { font-family:'SF Mono','Fira Code','Consolas',monospace; font-size:12.5px; line-height:1.85; color:#f0e4e0; display:block; white-space:pre-wrap; }
+.copy-btn { font-size:10.5px; padding:5px 13px; border-radius:6px; border:1px solid var(--border); background:var(--s1); color:var(--muted); cursor:pointer; font-family:inherit; font-weight:600; letter-spacing:.3px; transition:all .18s; white-space:nowrap; flex-shrink:0; }
+.copy-btn:hover  { border-color:var(--c1); color:var(--c1); background:#fff; }
+.copy-btn.copied { border-color:#3a8a3a; color:#3a8a3a; background:rgba(58,138,58,.06); }
+
+/* ── SECTION TAG ── */
+.section-tag { font-size:9.5px; letter-spacing:2.5px; text-transform:uppercase; font-weight:700; color:var(--muted); margin-bottom:12px; width:100%; max-width:760px; }
+
+/* ── SCENARIO BADGE ── */
+.scenario-badge { display:inline-flex; align-items:center; gap:8px; font-size:10px; font-weight:800; letter-spacing:3px; text-transform:uppercase; padding:6px 14px; border-radius:20px; margin-bottom:20px; }
+.sc-a { background:#dce8f8; color:#1a3a7a; }
+.sc-b { background:var(--purple-bg); color:var(--purple); }
+.sc-c { background:var(--green-bg); color:var(--green); }
+.sc-d { background:var(--amber-bg); color:var(--amber); }
+
+/* ── RUBRIC ── */
+.rub-row { display:grid; grid-template-columns:2fr 1fr 4fr; gap:0; border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:10px; width:100%; max-width:760px; }
+.rub-cell { padding:12px 16px; font-size:12.5px; line-height:1.5; border-right:1px solid var(--border); }
+.rub-cell:last-child { border-right:none; }
+.rub-cell.label { background:var(--s1); font-weight:700; }
+.rub-cell.pts { background:var(--s2); font-weight:800; color:var(--c1); text-align:center; display:flex; align-items:center; justify-content:center; font-size:15px; }
+.rub-cell.crit { color:var(--muted); font-size:12px; }
+
+/* ── PREV / NEXT ── */
+.pg-nav { display:flex; justify-content:space-between; align-items:center; width:100%; max-width:760px; margin-top:40px; padding-top:24px; border-top:1px solid var(--border); gap:12px; }
+.pn-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:8px; border:1.5px solid var(--border); background:none; color:var(--muted); font-size:13px; font-weight:500; cursor:pointer; transition:all .2s; font-family:inherit; }
+.pn-btn:hover { border-color:var(--c1); color:var(--c1); background:rgba(122,26,26,.04); }
+.pn-fwd { margin-left:auto; }
+
+/* ── SKILL CHIPS ── */
+.skill-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:28px; width:100%; max-width:760px; }
+.skill-card { background:#fff; border:1px solid var(--border); border-radius:10px; padding:18px; }
+.skill-level { font-size:9.5px; letter-spacing:2px; text-transform:uppercase; font-weight:700; margin-bottom:6px; }
+.skill-level.l1 { color:#1a3a7a; } .skill-level.l2 { color:#1a5a2a; }
+.skill-level.l3 { color:#7a5a1a; } .skill-level.l4 { color:var(--c1); }
+.skill-text { font-size:13px; color:var(--muted); line-height:1.55; }
+
+/* ── DIVIDER between scenario sections ── */
+.scenario-divider { width:100%; max-width:760px; height:1px; background:var(--border); margin:36px 0; }
+
+@media (max-width:640px) {
+  .m-header { padding:48px 24px 32px; }
+  .m-grid { padding:0 24px 48px; grid-template-columns:1fr; }
+  .t-body { padding:40px 20px 52px; }
+  .t-title { font-size:28px; margin-bottom:36px; }
+  .rub-row { grid-template-columns:1fr; }
+  .qual-grid { grid-template-columns:1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ MENU ═══════════════════════════════════════ -->
+<div id="menu" class="page active">
+  <nav class="t-nav">
+    <a class="back" href="aula7.html">← Voltar à Aula 7</a>
+    <span class="t-label">ESPM · Gestão BD &amp; BI · Aula 7</span>
+  </nav>
+  <div class="m-header">
+    <div class="m-eyebrow">GBDBI · Atividade Avaliativa · Aula 7</div>
+    <div class="m-title">Guardiões<br>da SoundByte</div>
+    <div class="m-sub">RBAC · LGPD · Auditoria · Qualidade de Dados</div>
+  </div>
+  <div class="m-grid">
+    <button class="mcard" onclick="show('p1')">
+      <div class="mc-num">00</div>
+      <div class="mc-h">Contexto e Distribuição</div>
+      <p class="mc-p">O cenário da SoundByte, o que cada grupo faz e como a atividade está estruturada.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <!-- GRUPO 1 -->
+    <button class="mcard g1" onclick="show('p2')">
+      <div class="mc-group g1">Grupo 1 · Cenário A</div>
+      <div class="mc-h">🔐 Matriz RBAC</div>
+      <p class="mc-p">Quem pode ler, editar e excluir cada tipo de dado da SoundByte, por cargo.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard g1" onclick="show('p3')">
+      <div class="mc-group g1">Grupo 1 · Cenário C</div>
+      <div class="mc-h">🔍 Auditoria de Acessos</div>
+      <p class="mc-p">Processo de rastreamento, revisão e escalonamento de acessos a dados sensíveis.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <!-- GRUPO 2 -->
+    <button class="mcard g2" onclick="show('p4')">
+      <div class="mc-group g2">Grupo 2 · Cenário B</div>
+      <div class="mc-h">⚖️ Política LGPD</div>
+      <p class="mc-p">Política de uso de dados pessoais para campanhas de marketing da SoundByte.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard g2" onclick="show('p5')">
+      <div class="mc-group g2">Grupo 2 · Cenário D</div>
+      <div class="mc-h">📊 Qualidade de Dados</div>
+      <p class="mc-p">Avaliar as 6 dimensões de qualidade dos dados da SoundByte e propor um plano de melhoria.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p6')">
+      <div class="mc-num">05</div>
+      <div class="mc-h">Revisão por IA + Entrega</div>
+      <p class="mc-p">Prompts de revisão para cada cenário e critérios completos de avaliação.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ P1 · CONTEXTO ════════════════════════════════════ -->
+<div id="p1" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">00 · Contexto e Distribuição</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">A auditoria confirmou<br><em>o risco.</em></div>
+
+    <div class="callout" style="font-size:14px;line-height:1.75;">
+      <div class="callout-tag">O Cenário — SoundByte</div>
+      A SoundByte possui <strong>800 mil usuários ativos</strong>. Uma auditoria interna revelou que estagiários de marketing tinham acesso irrestrito a dados de pagamento, localização GPS e histórico de streaming. Um estagiário exportou dados pessoais para uma planilha particular. O incidente foi contido, mas a ANPD pode ser notificada. <strong>A empresa precisa de um plano de governança urgente — e cada grupo é responsável por uma parte dele.</strong>
+    </div>
+
+    <div class="section-tag">Distribuição dos Grupos</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:760px;margin-bottom:28px;">
+      <div style="background:var(--g1-bg);border:1.5px solid var(--g1);border-radius:12px;padding:20px 22px;">
+        <div style="font-size:9.5px;letter-spacing:2.5px;font-weight:800;text-transform:uppercase;color:var(--g1);margin-bottom:12px;">🔐 Grupo 1 — Segurança e Controle</div>
+        <div style="font-size:13.5px;font-weight:700;margin-bottom:6px;">Cenário A · Matriz RBAC</div>
+        <div style="font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:14px;">Definir quem pode acessar cada tipo de dado, por cargo.</div>
+        <div style="font-size:13.5px;font-weight:700;margin-bottom:6px;">Cenário C · Auditoria de Acessos</div>
+        <div style="font-size:12.5px;color:var(--muted);line-height:1.55;">Propor o processo de rastreamento, revisão e resposta a incidentes.</div>
+      </div>
+      <div style="background:var(--g2-bg);border:1.5px solid var(--g2);border-radius:12px;padding:20px 22px;">
+        <div style="font-size:9.5px;letter-spacing:2.5px;font-weight:800;text-transform:uppercase;color:var(--g2);margin-bottom:12px;">⚖️ Grupo 2 — Privacidade e Qualidade</div>
+        <div style="font-size:13.5px;font-weight:700;margin-bottom:6px;">Cenário B · Política LGPD</div>
+        <div style="font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:14px;">Criar a política de uso de dados pessoais em campanhas de marketing.</div>
+        <div style="font-size:13.5px;font-weight:700;margin-bottom:6px;">Cenário D · Qualidade de Dados</div>
+        <div style="font-size:12.5px;color:var(--muted);line-height:1.55;">Avaliar as 6 dimensões de qualidade e propor um plano de melhoria.</div>
+      </div>
+    </div>
+
+    <div class="section-tag">O que cada grupo vai praticar</div>
+    <div class="skill-grid">
+      <div class="skill-card">
+        <div class="skill-level l1">Compreender</div>
+        <p class="skill-text">Identificar os pilares do DAMA-DMBOK e os princípios da LGPD aplicáveis ao contexto da SoundByte</p>
+      </div>
+      <div class="skill-card">
+        <div class="skill-level l2">Aplicar</div>
+        <p class="skill-text">Usar frameworks reais (RBAC, políticas de privacidade, logs de auditoria, dimensões de qualidade) em um cenário concreto</p>
+      </div>
+      <div class="skill-card">
+        <div class="skill-level l3">Analisar</div>
+        <p class="skill-text">Identificar lacunas de segurança, conformidade e qualidade nos dados da SoundByte</p>
+      </div>
+      <div class="skill-card">
+        <div class="skill-level l4">Avaliar</div>
+        <p class="skill-text">Submeter a própria proposta à IA como auditora e refletir criticamente sobre os pontos levantados</p>
+      </div>
+    </div>
+
+    <div class="callout callout-green">
+      <div class="callout-tag">Dinâmica — Intra-grupo</div>
+      Cada grupo trabalha de forma <strong>independente</strong>, sem interação com o outro grupo. O foco é a consistência interna entre os dois cenários do grupo: a Matriz RBAC do Grupo 1 deve ser compatível com o processo de Auditoria; a Política LGPD do Grupo 2 deve ser compatível com o Plano de Qualidade. Ao final, cada grupo apresenta ao professor os dois cenários em <strong>8 minutos</strong>.
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn pn-fwd" onclick="show('p2')">Grupo 1 · Cenário A →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════ P2 · GRUPO 1 — CENÁRIO A: RBAC ════════════════════════ -->
+<div id="p2" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="group-stripe gs-1">Grupo 1</span>
+    <span class="t-label">Cenário A · Matriz RBAC</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Quem pode ver<br><em>o quê?</em></div>
+
+    <div class="group-banner g1">
+      <div class="gb-icon">🔐</div>
+      <div>
+        <div class="gb-label g1">Grupo 1 · Cenário A</div>
+        <div class="gb-title">Controle de Acesso Baseado em Cargo (RBAC)</div>
+        <div class="gb-sub">Este cenário é complementar ao Cenário C — os acessos que você define aqui serão monitorados pelo processo de auditoria.</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-tag">O Problema</div>
+      Atualmente, todos os cargos da equipe de marketing têm acesso irrestrito ao banco de dados da SoundByte. Um estagiário pôde exportar dados de localização GPS e histórico de pagamentos sem nenhum obstáculo. Seu grupo deve projetar uma Matriz RBAC que resolva isso — e que seu próprio Cenário C consiga auditar.
+    </div>
+
+    <div class="section-tag">Dados e Cargos da SoundByte</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:760px;margin-bottom:24px;">
+      <div class="callout callout-blue" style="margin-bottom:0;">
+        <div class="callout-tag">Tipos de Dado</div>
+        <strong>D1</strong> · Dados pessoais (nome, e-mail, CPF)<br>
+        <strong>D2</strong> · Dados de pagamento (cartão, histórico financeiro)<br>
+        <strong>D3</strong> · Histórico de streaming (músicas, playlists)<br>
+        <strong>D4</strong> · Dados de localização (GPS, cidade, bairro)<br>
+        <strong>D5</strong> · Relatórios e dados agregados de marketing
+      </div>
+      <div class="callout callout-blue" style="margin-bottom:0;">
+        <div class="callout-tag">Cargos</div>
+        <strong>C1</strong> · Estagiário de Marketing<br>
+        <strong>C2</strong> · Analista de Marketing<br>
+        <strong>C3</strong> · Gerente de Marketing<br>
+        <strong>C4</strong> · Analista de BI<br>
+        <strong>C5</strong> · DPO (Data Protection Officer)
+      </div>
+    </div>
+
+    <div class="section-tag">Template — Matriz RBAC (preencher)</div>
+    <div class="callout callout-blue" style="margin-bottom:16px;font-size:13px;">
+      <div class="callout-tag">Como preencher</div>
+      Para cada célula, defina o nível de acesso do cargo para aquele tipo de dado: <strong>L</strong> (Leitura), <strong>E</strong> (Edição), <strong>X</strong> (Exclusão), <strong>—</strong> (Sem acesso). Você pode combinar (ex.: L+E). Ao terminar, verifique: a matriz teria impedido o incidente original?
+    </div>
+    <div class="rbac-legend">
+      <span><span class="rbac-swatch" style="background:#dce8f8;border:1px solid #b8c8e8;"></span> L — Leitura</span>
+      <span><span class="rbac-swatch" style="background:#fce8d4;border:1px solid #e8c8a8;"></span> E — Edição</span>
+      <span><span class="rbac-swatch" style="background:#f8dcdc;border:1px solid #e8b8b8;"></span> X — Exclusão</span>
+      <span><span class="rbac-swatch" style="background:#efefef;border:1px solid #ccc;"></span> — Sem acesso</span>
+    </div>
+    <div class="rbac-wrap">
+      <table class="rbac-table">
+        <thead>
+          <tr>
+            <th class="col-data">Tipo de Dado</th>
+            <th>Estagiário<br>Mktg</th>
+            <th>Analista<br>Mktg</th>
+            <th>Gerente<br>Mktg</th>
+            <th>Analista<br>BI</th>
+            <th>DPO</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="data-type">D1 · Dados Pessoais</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td></tr>
+          <tr><td class="data-type">D2 · Pagamentos</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td></tr>
+          <tr><td class="data-type">D3 · Histórico Streaming</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td></tr>
+          <tr><td class="data-type">D4 · Localização GPS</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td></tr>
+          <tr><td class="data-type">D5 · Dados Agregados</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td><td class="cell-fill">preencher</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-tag">Questões (responder no documento de entrega)</div>
+    <div class="q-list">
+      <div class="q-item">
+        <div class="q-head">
+          <span class="q-num nblu">A1</span>
+          <div class="q-text">Qual princípio justifica por que estagiários <strong>não devem ter acesso a D2 (pagamentos)</strong>, mesmo trabalhando em campanhas de marketing?</div>
+        </div>
+        <div class="q-hint">
+          <strong>Conceito:</strong> Princípio do menor privilégio — o cargo tem acesso apenas ao mínimo necessário para a função.<br>
+          <strong>Entregue:</strong> Explicação em 3–5 linhas conectando o princípio ao cargo e ao tipo de dado.
+        </div>
+      </div>
+      <div class="q-item">
+        <div class="q-head">
+          <span class="q-num nblu">A2</span>
+          <div class="q-text">O Analista de BI precisa gerar relatórios de segmentação geográfica. Ele deve ter acesso a <strong>D4 (GPS raw) ou apenas a D5 (dados agregados)</strong>? Justifique considerando finalidade e minimização de dados.</div>
+        </div>
+        <div class="q-hint">
+          <strong>Conceito:</strong> LGPD Art. 6º, I (finalidade) e III (necessidade/minimização). O dado deve estar na forma mais agregada que ainda permita cumprir a finalidade.<br>
+          <strong>Entregue:</strong> Posição clara (GPS raw sim/não) + justificativa com base legal em 4–6 linhas.
+        </div>
+      </div>
+      <div class="q-item">
+        <div class="q-head">
+          <span class="q-num nivel2">A3</span>
+          <div class="q-text">Identifique <strong>duas configurações da sua matriz</strong> que teriam impedido diretamente o incidente descrito. Como cada uma agiria como barreira?</div>
+        </div>
+        <div class="q-hint">
+          <strong>Dica:</strong> Relacione os cargos e dados do incidente (Estagiário + D4 + D2) com as células da sua matriz e explique o que mudou.<br>
+          <strong>Entregue:</strong> Duas células específicas + explicação do impacto preventivo de cada uma.
+        </div>
+      </div>
+      <div class="q-item">
+        <div class="q-head">
+          <span class="q-num nivel3">A4</span>
+          <div class="q-text">Consistência interna: como a sua Matriz RBAC se conecta com o Cenário C? <strong>Que tipos de acessos definidos aqui deveriam gerar alertas automáticos no processo de auditoria</strong> do seu grupo?</div>
+        </div>
+        <div class="q-hint">
+          <strong>Dica:</strong> Pense em acessos que, mesmo sendo permitidos, representam risco maior (ex.: Gerente de Marketing lendo D2, DPO exportando dados). Esses devem aparecer como regras de alerta no Cenário C.<br>
+          <strong>Entregue:</strong> Lista de 3–5 situações com "quem acessa o quê" que devem ser monitoradas no Cenário C.
+        </div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p1')">← Contexto</button>
+      <button class="pn-btn pn-fwd" onclick="show('p3')">Grupo 1 · Cenário C →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════ P3 · GRUPO 1 — CENÁRIO C: AUDITORIA ════════════════════════ -->
+<div id="p3" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="group-stripe gs-1">Grupo 1</span>
+    <span class="t-label">Cenário C · Auditoria de Acessos</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Quem acessou,<br><em>quando e por quê?</em></div>
+
+    <div class="group-banner g1">
+      <div class="gb-icon">🔍</div>
+      <div>
+        <div class="gb-label g1">Grupo 1 · Cenário C</div>
+        <div class="gb-title">Processo de Auditoria de Acessos</div>
+        <div class="gb-sub">Este cenário monitora os acessos definidos no Cenário A — use sua própria Matriz RBAC como referência ao criar as regras de alerta.</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-tag">O Problema</div>
+      Quando o incidente foi descoberto, a SoundByte não tinha nenhum log que indicasse há quanto tempo o estagiário tinha acesso, quantas vezes os dados foram acessados ou se já tinham sido exportados antes. Sem rastreabilidade, é impossível dimensionar o risco e demonstrar conformidade para a ANPD. Seu grupo deve projetar esse processo do zero — incluindo as regras que correspondem à matriz do Cenário A.
+    </div>
+
+    <div class="section-tag">Template — Processo de Auditoria (preencher)</div>
+
+    <div class="audit-block">
+      <div class="audit-head green">
+        <div class="audit-head-num green">1</div>
+        <div class="audit-head-title">O que registrar — Estrutura do Log</div>
+      </div>
+      <div class="audit-body">
+        <div class="audit-field-label">Campos obrigatórios no log de acesso</div>
+        <div class="audit-field-hint">Liste os campos que todo evento de acesso deve registrar. Considere: identificação do usuário, dado acessado (D1–D5), tipo de operação (leitura / edição / exclusão / exportação), timestamp, IP de origem, sistema utilizado. Que outros campos você adicionaria?</div>
+        <div class="audit-field-label">Eventos que sempre devem gerar log</div>
+        <div class="audit-field-hint">Liste os tipos de evento que devem ser registrados mesmo quando o acesso é autorizado (ex.: exportação de dados pessoais, acesso a D2 por qualquer cargo, tentativa de acesso negada). Conecte esta lista com os dados da sua Matriz RBAC.</div>
+        <div class="audit-field-label">Retenção dos logs</div>
+        <div class="audit-field-hint">Por quanto tempo os logs devem ser armazenados? Considere obrigações legais e o tempo médio de investigação de incidentes.</div>
+      </div>
+    </div>
+
+    <div class="audit-block">
+      <div class="audit-head blue">
+        <div class="audit-head-num blue">2</div>
+        <div class="audit-head-title">Frequência e Responsabilidade — Revisão Periódica</div>
+      </div>
+      <div class="audit-body">
+        <div class="audit-field-label">Frequência de revisão por tipo de dado</div>
+        <div class="audit-field-hint">Defina a periodicidade mínima de revisão manual dos logs, diferenciada por tipo de dado (D1–D5). Justifique com base no nível de sensibilidade de cada um. Dados de pagamento (D2) e GPS (D4) exigem frequência diferente de relatórios agregados (D5)?</div>
+        <div class="audit-field-label">Responsável pela revisão</div>
+        <div class="audit-field-hint">Para cada tipo de dado, quem no organograma da SoundByte é responsável pela revisão dos logs? Use os cargos do Cenário A (C1–C5). O DPO (C5) revisa tudo, ou há responsabilidades distribuídas?</div>
+        <div class="audit-field-label">Registro de que a revisão foi feita</div>
+        <div class="audit-field-hint">Como fica documentado que a revisão ocorreu? (ex.: planilha assinada, ticket no sistema, ata com o DPO). Quem valida o registro?</div>
+      </div>
+    </div>
+
+    <div class="audit-block">
+      <div class="audit-head red">
+        <div class="audit-head-num red">3</div>
+        <div class="audit-head-title">Escalonamento — Fluxo de Resposta a Incidentes</div>
+      </div>
+      <div class="audit-body">
+        <div class="audit-field-label">Critérios objetivos de escalonamento imediato</div>
+        <div class="audit-field-hint">Defina os critérios quantitativos que disparam escalonamento sem necessidade de julgamento humano (ex.: exportação de mais de X registros por sessão; acesso a D2 por C1 ou C2; acesso fora do horário comercial a D4). Seja específico — inclua números onde possível.</div>
+        <div class="audit-field-label">Fluxo de escalonamento com prazos</div>
+        <div class="audit-field-hint">Descreva o caminho do incidente: quem detecta → quem é notificado (prazo) → quem revoga o acesso (prazo) → quem notifica o DPO (prazo) → quem decide se notifica a ANPD (prazo). Inclua prazos em horas para cada etapa.</div>
+        <div class="audit-field-label">Ações técnicas imediatas</div>
+        <div class="audit-field-hint">Quais ações técnicas devem ser executadas nos primeiros 30 minutos após confirmar um acesso indevido? (ex.: revogar sessão ativa, bloquear conta, preservar snapshot do log como evidência).</div>
+      </div>
+    </div>
+
+    <div class="audit-block">
+      <div class="audit-head amber">
+        <div class="audit-head-num amber">4</div>
+        <div class="audit-head-title">Alertas Automáticos — Monitoramento Contínuo</div>
+      </div>
+      <div class="audit-body">
+        <div class="audit-field-label">Regras de alerta (mínimo 4)</div>
+        <div class="audit-field-hint">Para cada regra, use o formato: <em>"Se [condição], então [alerta] → notificar [responsável] em [prazo]."</em><br>
+        Inclua pelo menos uma regra derivada diretamente da sua Matriz RBAC (ex.: se C1 tenta acessar D2, que está bloqueado, gerar alerta de tentativa de acesso não autorizado).</div>
+        <div class="audit-field-label">Canal e prioridade dos alertas</div>
+        <div class="audit-field-hint">Como o alerta chega ao responsável? Diferencie canal e prazo para alertas críticos (acesso não autorizado a D2/D4) vs. alertas de baixa prioridade (volume alto de consultas a D5 durante horário de trabalho).</div>
+      </div>
+    </div>
+
+    <div class="section-tag">Questões (responder no documento de entrega)</div>
+    <div class="q-list">
+      <div class="q-item">
+        <div class="q-head">
+          <span class="q-num ngrn">C1</span>
+          <div class="q-text">Quais informações deveriam estar no log para que fosse possível <strong>determinar o impacto real da exportação feita pelo estagiário</strong> — quantos usuários afetados, quais dados, para onde foram?</div>
+        </div>
+        <div class="q-hint">
+          <strong>Entregue:</strong> Lista de campos do log + explicação de como cada um responderia às perguntas de impacto.
+        </div>
+      </div>
+      <div class="q-item">
+        <div class="q-head">
+          <span class="q-num ngrn">C2</span>
+          <div class="q-text">Seu processo de auditoria conseguiria notificar a ANPD dentro do prazo orientado de <strong>72 horas</strong> após a detecção do incidente? Trace o caminho e some os prazos.</div>
+        </div>
+        <div class="q-hint">
+          <strong>Dica:</strong> Some os prazos de cada etapa do seu fluxo (C3 → notificação → DPO → decisão → ANPD). Se ultrapassar 72h, revise alguma etapa.<br>
+          <strong>Entregue:</strong> Somatório de prazos + conclusão se atende ou não + ajuste necessário, se houver.
+        </div>
+      </div>
+      <div class="q-item">
+        <div class="q-head">
+          <span class="q-num nivel3">C3</span>
+          <div class="q-text">Consistência interna: <strong>as regras de alerta do Cenário C cobrem os acessos de maior risco definidos na Matriz RBAC do Cenário A</strong>? Identifique pelo menos um acesso que deveria ter alerta mas que você pode ter deixado de fora.</div>
+        </div>
+        <div class="q-hint">
+          <strong>Dica:</strong> Revise as permissões que concedem acesso a D2 e D4 — todos esses acessos estão cobertos por alguma regra de alerta?<br>
+          <strong>Entregue:</strong> Análise de cobertura + gap identificado + proposta de regra para cobri-lo.
+        </div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p2')">← Cenário A</button>
+      <button class="pn-btn pn-fwd" onclick="show('p4')">Grupo 2 · Cenário B →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════ P4 · GRUPO 2 — CENÁRIO B: LGPD ════════════════════════ -->
+<div id="p4" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="group-stripe gs-2">Grupo 2</span>
+    <span class="t-label">Cenário B · Política LGPD</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Esse uso do dado<br><em>é legal?</em></div>
+
+    <div class="group-banner g2">
+      <div class="gb-icon">⚖️</div>
+      <div>
+        <div class="gb-label g2">Grupo 2 · Cenário B</div>
+        <div class="gb-title">Política de Uso de Dados Pessoais (LGPD)</div>
+        <div class="gb-sub">Este cenário é complementar ao Cenário D — a política define quais dados podem ser usados; o plano de qualidade garante que esses dados são confiáveis.</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-tag">O Problema</div>
+      A equipe de marketing usa dados pessoais de usuários para segmentar campanhas, mas não existe nenhuma política que documente a base legal, a finalidade, o prazo de retenção ou o processo de revogação de consentimento. Sem isso, qualquer uso de dados de marketing pode ser questionado pela ANPD como tratamento sem base legal.
+    </div>
+
+    <div class="section-tag">Dados Usados em Campanhas de Marketing</div>
+    <table class="info-table" style="margin-bottom:28px;">
+      <thead>
+        <tr><th>Dado</th><th>Uso Atual</th><th>Classificação LGPD</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Nome e e-mail</strong></td><td>Notificações, newsletters</td><td><span class="badge badge-e">Pessoal</span></td></tr>
+        <tr><td><strong>Histórico de streaming</strong></td><td>Segmentação por gênero musical</td><td><span class="badge badge-e">Pessoal</span></td></tr>
+        <tr><td><strong>Localização (cidade/bairro)</strong></td><td>Campanhas regionais, eventos locais</td><td><span class="badge badge-e">Pessoal</span></td></tr>
+        <tr><td><strong>Plano de assinatura</strong></td><td>Ofertas de upgrade, retenção</td><td><span class="badge badge-e">Pessoal</span></td></tr>
+        <tr><td><strong>Dados de pagamento</strong></td><td><em>Não deve ser usado em marketing</em></td><td><span class="badge badge-r">Financeiro — restrito</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-tag">Template — Política de Uso de Dados Pessoais (preencher)</div>
+    <div class="callout callout-purple" style="margin-bottom:20px;font-size:13px;">
+      <div class="callout-tag">Como preencher</div>
+      Complete cada seção com a política proposta para a SoundByte. Os campos em itálico são orientações. Cite artigos da LGPD onde pertinente. Ao finalizar, verifique: sua política cobre todos os tipos de dado da tabela acima?
+    </div>
+
+    <div class="policy-block">
+      <div class="policy-head">
+        <span class="policy-head-icon">📋</span>
+        <span class="policy-head-title">Seção 1 — Base Legal para Tratamento</span>
+        <span class="policy-head-tag">LGPD Art. 7º</span>
+      </div>
+      <div class="policy-body">
+        <div class="policy-field">
+          <div class="policy-field-label">Base legal por tipo de dado</div>
+          <div class="policy-field-hint">Para cada dado da tabela, indique qual inciso do Art. 7º da LGPD justifica o tratamento para fins de marketing (ex.: consentimento — inciso I; legítimo interesse — inciso IX; execução de contrato — inciso V). Explique por que essa base é adequada para a SoundByte.</div>
+        </div>
+        <div class="policy-field">
+          <div class="policy-field-label">Dados proibidos para uso em marketing</div>
+          <div class="policy-field-hint">Liste quais tipos de dado nunca podem ser usados em campanhas de marketing, com justificativa baseada na LGPD. Conecte esta lista com o Cenário D: esses são dados que, mesmo que de boa qualidade, não têm base legal para esse uso.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="policy-block">
+      <div class="policy-head">
+        <span class="policy-head-icon">🎯</span>
+        <span class="policy-head-title">Seção 2 — Finalidade e Limitação de Uso</span>
+        <span class="policy-head-tag">LGPD Art. 6º, I</span>
+      </div>
+      <div class="policy-body">
+        <div class="policy-field">
+          <div class="policy-field-label">Finalidades permitidas</div>
+          <div class="policy-field-hint">Descreva de forma específica para que fins os dados podem ser usados em marketing (ex.: "segmentação de campanhas de upgrade para usuários gratuitos com base no plano de assinatura"). Quanto mais específico, mais conforme com o princípio de finalidade.</div>
+        </div>
+        <div class="policy-field">
+          <div class="policy-field-label">Usos explicitamente proibidos</div>
+          <div class="policy-field-hint">Liste pelo menos 3 usos proibidos pelo princípio de finalidade (ex.: compartilhamento com parceiros de publicidade sem consentimento específico, uso de histórico de streaming para análise de saúde ou humor do usuário).</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="policy-block">
+      <div class="policy-head">
+        <span class="policy-head-icon">🕐</span>
+        <span class="policy-head-title">Seção 3 — Retenção e Descarte</span>
+        <span class="policy-head-tag">LGPD Art. 15–16</span>
+      </div>
+      <div class="policy-body">
+        <div class="policy-field">
+          <div class="policy-field-label">Prazo de retenção por tipo de dado</div>
+          <div class="policy-field-hint">Para cada tipo de dado da tabela, defina por quanto tempo pode ser armazenado para fins de marketing. Considere que após o término da finalidade ou encerramento do contrato, o dado deve ser eliminado ou anonimizado (Art. 15). Conecte com o Cenário D: dado retido além do prazo é um problema de Tempestividade.</div>
+        </div>
+        <div class="policy-field">
+          <div class="policy-field-label">Processo de descarte</div>
+          <div class="policy-field-hint">Quem executa o descarte, como é verificado e onde é registrado? O processo de descarte deve ser auditável.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="policy-block">
+      <div class="policy-head">
+        <span class="policy-head-icon">🔄</span>
+        <span class="policy-head-title">Seção 4 — Revogação de Consentimento</span>
+        <span class="policy-head-tag">LGPD Art. 8º, §5º</span>
+      </div>
+      <div class="policy-body">
+        <div class="policy-field">
+          <div class="policy-field-label">Canal de revogação</div>
+          <div class="policy-field-hint">Descreva o canal e o processo pelo qual o usuário pode revogar o consentimento ao uso dos seus dados em marketing. O processo deve ser "tão fácil quanto dar o consentimento".</div>
+        </div>
+        <div class="policy-field">
+          <div class="policy-field-label">O que acontece após a revogação</div>
+          <div class="policy-field-hint">Defina o prazo máximo para o dado parar de ser usado em campanhas após a revogação, e o destino dos dados já coletados (eliminação, anonimização ou retenção por obrigação legal).</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="policy-block">
+      <div class="policy-head">
+        <span class="policy-head-icon">🚨</span>
+        <span class="policy-head-title">Seção 5 — Resposta a Incidentes</span>
+        <span class="policy-head-tag">LGPD Art. 48</span>
+      </div>
+      <div class="policy-body">
+        <div class="policy-field">
+          <div class="policy-field-label">O que configura incidente notificável</div>
+          <div class="policy-field-hint">Descreva o que caracteriza um incidente que exige notificação à ANPD (ex.: acesso não autorizado a dados pessoais de mais de X usuários, exportação de dados para ambiente externo não controlado).</div>
+        </div>
+        <div class="policy-field">
+          <div class="policy-field-label">Fluxo de notificação à ANPD</div>
+          <div class="policy-field-hint">Descreva o fluxo: quem detecta → quem escalona → quem notifica a ANPD e os titulares → prazo máximo. A ANPD orienta notificação em até 72h para casos graves.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-tag">Questões (responder no documento de entrega)</div>
+    <div class="q-list">
+      <div class="q-item">
+        <div class="q-head">
+          <span class="q-num npur">B1</span>
+          <div class="q-text">Para usar o histórico de streaming em segmentação de campanhas, qual base legal é mais adequada — <strong>consentimento (Art. 7º, I) ou legítimo interesse (Art. 7º, IX)</strong>? Justifique considerando os riscos de cada escolha para a SoundByte.</div>
+        </div>
+        <div class="q-hint">
+          <strong>Dica:</strong> Consentimento pode ser revogado a qualquer momento, interrompendo campanhas ativas. Legítimo interesse exige que o tratamento não sobreponha direitos fundamentais e que seja proporcional ao benefício.<br>
+          <strong>Entregue:</strong> Escolha com justificativa + identificação do risco da alternativa não escolhida.
+        </div>
+      </div>
+      <div class="q-item">
+        <div class="q-head">
+          <span class="q-num npur">B2</span>
+          <div class="q-text">Um usuário com assinatura ativa solicita a <strong>exclusão de todos os seus dados pessoais</strong>. A SoundByte pode se recusar com base no contrato vigente? Em que condições e para quais tipos de dado?</div>
+        </div>
+        <div class="q-hint">
+          <strong>Conceito:</strong> O direito de exclusão (Art. 18, VI) pode ser restringido para dados necessários à execução do contrato (Art. 16, I) ou cumprimento de obrigação legal — mas não para dados de marketing.<br>
+          <strong>Entregue:</strong> Distinção entre dados contratuais (pode reter) e dados de marketing (deve excluir), com base legal para cada caso.
+        </div>
+      </div>
+      <div class="q-item">
+        <div class="q-head">
+          <span class="q-num nivel3">B3</span>
+          <div class="q-text">Consistência interna: como sua política de <strong>retenção de dados (Seção 3) se conecta com o Plano de Qualidade do Cenário D</strong>? Dado retido além do prazo gera qual problema de qualidade?</div>
+        </div>
+        <div class="q-hint">
+          <strong>Dica:</strong> Dado retido além do prazo torna-se obsoleto — isso é um problema de Tempestividade. Dado duplicado no processo de retenção é um problema de Unicidade. Dado com campos incompletos no momento do descarte é Completude.<br>
+          <strong>Entregue:</strong> Mapeamento de pelo menos 2 conexões entre a política de retenção e as dimensões de qualidade do Cenário D.
+        </div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p3')">← Cenário C</button>
+      <button class="pn-btn pn-fwd" onclick="show('p5')">Grupo 2 · Cenário D →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════ P5 · GRUPO 2 — CENÁRIO D: QUALIDADE ════════════════════════ -->
+<div id="p5" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="group-stripe gs-2">Grupo 2</span>
+    <span class="t-label">Cenário D · Qualidade de Dados</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Dado correto,<br><em>completo e confiável?</em></div>
+
+    <div class="group-banner g2">
+      <div class="gb-icon">📊</div>
+      <div>
+        <div class="gb-label g2">Grupo 2 · Cenário D</div>
+        <div class="gb-title">Plano de Qualidade de Dados</div>
+        <div class="gb-sub">Este cenário complementa o Cenário B — a política define quais dados podem ser usados; este plano garante que esses dados são confiáveis o suficiente para o uso autorizado.</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-tag">O Problema</div>
+      Após o incidente, a SoundByte revisou a planilha exportada pelo estagiário. Encontrou: registros duplicados de usuários, campos de e-mail em branco, datas de última sessão incoerentes (futuras), CPFs com formato variado (com e sem pontuação) e usuários marcados como "premium" em uma tabela mas "gratuito" em outra. <strong>Os dados de marketing estão comprometidos em múltiplas dimensões de qualidade.</strong>
+    </div>
+
+    <div class="section-tag">As 6 Dimensões de Qualidade — Referência</div>
+    <div class="qual-grid" style="margin-bottom:28px;">
+      <div class="qual-card qd1">
+        <div class="qc-dim">Acurácia</div>
+        <div class="qc-def">O dado reflete corretamente a realidade</div>
+        <div class="qc-ex">Ex. SoundByte: usuário marcado como "premium" numa tabela e "gratuito" em outra</div>
+      </div>
+      <div class="qual-card qd2">
+        <div class="qc-dim">Completude</div>
+        <div class="qc-def">Todos os campos obrigatórios estão preenchidos</div>
+        <div class="qc-ex">Ex. SoundByte: e-mails em branco em 12% dos registros de usuários</div>
+      </div>
+      <div class="qual-card qd3">
+        <div class="qc-dim">Unicidade</div>
+        <div class="qc-def">Cada entidade aparece apenas uma vez</div>
+        <div class="qc-ex">Ex. SoundByte: registros duplicados de usuários com CPFs iguais mas IDs diferentes</div>
+      </div>
+      <div class="qual-card qd4">
+        <div class="qc-dim">Tempestividade</div>
+        <div class="qc-def">O dado está atualizado quando necessário</div>
+        <div class="qc-ex">Ex. SoundByte: datas de última sessão incoerentes — algumas no futuro</div>
+      </div>
+      <div class="qual-card qd5">
+        <div class="qc-dim">Validade</div>
+        <div class="qc-def">O dado segue o formato e domínio esperados</div>
+        <div class="qc-ex">Ex. SoundByte: CPFs com formatação variada (com e sem pontuação, tamanhos diferentes)</div>
+      </div>
+      <div class="qual-card qd6">
+        <div class="qc-dim">Consistência</div>
+        <div class="qc-def">O mesmo dado tem o mesmo valor em diferentes fontes</div>
+        <div class="qc-ex">Ex. SoundByte: plano do usuário divergente entre banco de usuários e banco de faturamento</div>
+      </div>
+    </div>
+
+    <div class="section-tag">Template — Plano de Qualidade de Dados (preencher)</div>
+
+    <div class="audit-block">
+      <div class="audit-head green">
+        <div class="audit-head-num green">1</div>
+        <div class="audit-head-title">Diagnóstico — Avaliação Atual dos Dados da SoundByte</div>
+      </div>
+      <div class="audit-body">
+        <div class="audit-field-label">Mapeamento de problemas por dimensão</div>
+        <div class="audit-field-hint">Para cada uma das 6 dimensões, descreva o problema específico identificado nos dados da SoundByte (use os exemplos do cenário e adicione outros que seu grupo imaginar). Classifique cada problema como <strong>Crítico</strong> (impede uso do dado), <strong>Relevante</strong> (afeta confiabilidade) ou <strong>Leve</strong> (impacto limitado).</div>
+        <div class="audit-field-label">As 2 dimensões mais críticas para marketing</div>
+        <div class="audit-field-hint">Indique quais 2 dimensões representam o maior risco para campanhas de marketing da SoundByte e justifique. Conecte com o Cenário B: esses problemas afetam dados que sua política LGPD autoriza a usar?</div>
+      </div>
+    </div>
+
+    <div class="audit-block">
+      <div class="audit-head blue">
+        <div class="audit-head-num blue">2</div>
+        <div class="audit-head-title">Regras de Qualidade — O que Deve Ser Verdade</div>
+      </div>
+      <div class="audit-body">
+        <div class="audit-field-label">Regras por dimensão (mínimo 6 — uma por dimensão)</div>
+        <div class="audit-field-hint">Para cada dimensão, defina ao menos uma regra de qualidade no formato: <em>"O campo [X] deve [condição]."</em><br>
+        Exemplos: "O campo e-mail deve seguir o padrão usuario@dominio.com e não pode estar em branco." / "Nenhum CPF pode aparecer mais de uma vez na tabela de usuários." / "A data de última sessão não pode ser posterior à data atual."</div>
+        <div class="audit-field-label">Impacto no uso em marketing</div>
+        <div class="audit-field-hint">Para pelo menos 3 das regras acima, explique o que acontece em uma campanha de marketing quando a regra é violada (ex.: e-mail em branco → campanha de e-mail não chegará ao usuário → taxa de entrega inflada artificialmente).</div>
+      </div>
+    </div>
+
+    <div class="audit-block">
+      <div class="audit-head red">
+        <div class="audit-head-num red">3</div>
+        <div class="audit-head-title">Plano de Melhoria — Como Corrigir e Prevenir</div>
+      </div>
+      <div class="audit-body">
+        <div class="audit-field-label">Ações de correção imediata (Quick wins)</div>
+        <div class="audit-field-hint">Liste 3 ações que poderiam ser executadas em menos de 2 semanas para resolver os problemas mais críticos. Seja concreto: qual dado, qual ação (deduplicar, padronizar, remover, atualizar), quem executa.</div>
+        <div class="audit-field-label">Processos de prevenção (Longo prazo)</div>
+        <div class="audit-field-hint">Liste 3 processos ou validações que, se implementados no sistema, impediriam que esses problemas se repetissem. Exemplos: validação de formato ao cadastrar CPF, alert automático para registros duplicados, rotina semanal de verificação de datas inconsistentes.</div>
+        <div class="audit-field-label">Responsável pela governança de qualidade</div>
+        <div class="audit-field-hint">Quem na SoundByte deve ser responsável por monitorar a qualidade dos dados de marketing continuamente? O DPO? Um Analista de BI? Um comitê? Justifique.</div>
+      </div>
+    </div>
+
+    <div class="audit-block">
+      <div class="audit-head amber">
+        <div class="audit-head-num amber">4</div>
+        <div class="audit-head-title">Métricas — Como Medir a Melhoria</div>
+      </div>
+      <div class="audit-body">
+        <div class="audit-field-label">KPIs de qualidade de dados (mínimo 4)</div>
+        <div class="audit-field-hint">Defina pelo menos 4 indicadores mensuráveis de qualidade dos dados de marketing da SoundByte. Use o formato: <em>"[Nome do KPI]: [Como calcular] · [Meta] · [Frequência de medição]."</em><br>
+        Exemplos: "Taxa de Completude de E-mail: % de registros com e-mail válido · Meta: ≥ 98% · Mensal." / "Taxa de Duplicidade de CPF: % de CPFs duplicados no total de cadastros · Meta: 0% · Semanal."</div>
+        <div class="audit-field-label">Conexão com a Política LGPD</div>
+        <div class="audit-field-hint">Explique como um dos KPIs acima serviria como evidência de conformidade com a LGPD (ex.: baixa completude de campos obrigatórios pode ser evidência de descuido no tratamento de dados pessoais).</div>
+      </div>
+    </div>
+
+    <div class="section-tag">Questões (responder no documento de entrega)</div>
+    <div class="q-list">
+      <div class="q-item">
+        <div class="q-head">
+          <span class="q-num namb">D1</span>
+          <div class="q-text">A planilha exportada pelo estagiário continha registros duplicados. Além do problema de <strong>Unicidade</strong>, que outras dimensões de qualidade podem ter sido comprometidas pela exportação e pelo armazenamento externo?</div>
+        </div>
+        <div class="q-hint">
+          <strong>Dica:</strong> Pense no que acontece com um dado quando sai do ambiente controlado: ele pode ficar desatualizado (Tempestividade), pode ser editado de forma inconsistente (Consistência, Acurácia), pode ter campos corrompidos (Validade).<br>
+          <strong>Entregue:</strong> Pelo menos 3 dimensões afetadas + explicação do mecanismo de degradação de cada uma.
+        </div>
+      </div>
+      <div class="q-item">
+        <div class="q-head">
+          <span class="q-num namb">D2</span>
+          <div class="q-text">O usuário que aparece como "premium" em uma tabela e "gratuito" em outra é um problema de <strong>Consistência</strong>. O que isso significa concretamente para uma <strong>campanha de retenção de usuários premium</strong>?</div>
+        </div>
+        <div class="q-hint">
+          <strong>Dica:</strong> A campanha pode enviar e-mail de "não cancele seu plano premium" para um usuário que nunca foi premium — ou deixar de enviar para um usuário premium real. Calcule o impacto em taxa de entrega, conversão e custo.<br>
+          <strong>Entregue:</strong> Descrição do impacto operacional em 4–6 linhas.
+        </div>
+      </div>
+      <div class="q-item">
+        <div class="q-head">
+          <span class="q-num nivel3">D3</span>
+          <div class="q-text">Consistência interna: como o <strong>Plano de Qualidade do Cenário D se conecta com a Política LGPD do Cenário B</strong>? Um dado de alta qualidade, mas sem base legal para uso em marketing, pode ser usado? E um dado com base legal, mas de baixa qualidade, deve ser usado?</div>
+        </div>
+        <div class="q-hint">
+          <strong>Dica:</strong> Qualidade e conformidade são dimensões independentes — um dado pode ser preciso e completo, mas não ter base legal para aquela finalidade; ou ter base legal e estar tão desatualizado que seu uso geraria decisões erradas.<br>
+          <strong>Entregue:</strong> Análise dos dois casos + conclusão sobre a relação entre qualidade e conformidade para a SoundByte.
+        </div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p4')">← Cenário B</button>
+      <button class="pn-btn pn-fwd" onclick="show('p6')">Revisão por IA + Entrega →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════ P6 · REVISÃO POR IA + ENTREGA ════════════════════════ -->
+<div id="p6" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">05 · Revisão por IA + Entrega</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">A IA revisa,<br><em>você decide.</em></div>
+
+    <div class="callout" style="font-size:13.5px;line-height:1.7;">
+      <div class="callout-tag">Como usar os prompts</div>
+      Cada grupo deve usar <strong>os dois prompts correspondentes aos seus cenários</strong> (Grupo 1: prompts A + C; Grupo 2: prompts B + D). Cole o texto do prompt, substitua os campos indicados com o conteúdo da sua entrega e envie à IA. A resposta completa deve compor o <strong>Apêndice — Revisão por IA</strong> no documento de entrega.
+    </div>
+
+    <!-- GRUPO 1 -->
+    <div class="section-tag">Grupo 1 — Prompt para o Cenário A (Matriz RBAC)</div>
+    <div class="sql-wrap">
+      <div class="sql-header">
+        <span class="sql-label">IA como Auditora de Controle de Acesso</span>
+        <button class="copy-btn" onclick="copyCode(this,'prompt-a')">Copiar</button>
+      </div>
+      <div class="sql-block">
+        <code id="prompt-a">Você é uma auditora sênior de segurança da informação e controle de acesso. Vou submeter uma Matriz RBAC proposta para a SoundByte, um serviço de streaming com 800 mil usuários.
+
+Contexto: estagiários de marketing tinham acesso irrestrito a dados de pagamento e GPS de usuários. Um estagiário exportou dados pessoais para planilha particular.
+
+Dados sensíveis: D1 (pessoais), D2 (pagamentos), D3 (streaming), D4 (GPS), D5 (agregados).
+Cargos: C1 (Estagiário Mktg), C2 (Analista Mktg), C3 (Gerente Mktg), C4 (Analista BI), C5 (DPO).
+
+A Matriz RBAC proposta é:
+[COLE AQUI A TABELA DE PERMISSÕES]
+
+Por favor:
+1. Identifique as 3 maiores falhas ou permissões excessivas na matriz
+2. Verifique se a matriz teria impedido o incidente descrito — e o que faltou
+3. Aponte pelo menos uma célula que deveria gerar alerta automático no processo de auditoria, mesmo sendo um acesso permitido
+4. Dê uma recomendação prioritária de melhoria imediata
+
+Responda como em um relatório de auditoria real: direto e técnico.</code>
+      </div>
+    </div>
+
+    <div class="section-tag">Grupo 1 — Prompt para o Cenário C (Auditoria de Acessos)</div>
+    <div class="sql-wrap">
+      <div class="sql-header">
+        <span class="sql-label">IA como Auditora de Riscos de Dados</span>
+        <button class="copy-btn" onclick="copyCode(this,'prompt-c')">Copiar</button>
+      </div>
+      <div class="sql-block">
+        <code id="prompt-c">Você é uma auditora de riscos de dados com experiência em conformidade LGPD e segurança da informação. Vou submeter um processo de auditoria de acessos proposto para a SoundByte.
+
+O processo cobre: estrutura do log, frequência de revisão, responsabilidades, fluxo de escalonamento e alertas automáticos.
+
+O processo proposto é:
+[COLE AQUI A DESCRIÇÃO COMPLETA DO PROCESSO]
+
+Por favor:
+1. Identifique os 3 maiores pontos cegos — situações que o processo não detectaria
+2. Avalie se os alertas propostos cobrem os acessos de maior risco definidos na Matriz RBAC do grupo (mencione qualquer gap)
+3. Some os prazos do fluxo de escalonamento: o processo consegue notificar a ANPD em 72h?
+4. Sugira a melhoria de maior impacto para tornar o processo mais robusto
+
+Seja direta, como em um relatório de auditoria de segurança.</code>
+      </div>
+    </div>
+
+    <div class="scenario-divider"></div>
+
+    <!-- GRUPO 2 -->
+    <div class="section-tag">Grupo 2 — Prompt para o Cenário B (Política LGPD)</div>
+    <div class="sql-wrap">
+      <div class="sql-header">
+        <span class="sql-label">IA como DPO Externo Revisando a Política</span>
+        <button class="copy-btn" onclick="copyCode(this,'prompt-b')">Copiar</button>
+      </div>
+      <div class="sql-block">
+        <code id="prompt-b">Você é um DPO (Data Protection Officer) externo, especialista em LGPD (Lei 13.709/2018). Vou submeter uma política de uso de dados pessoais elaborada para a SoundByte, um serviço de streaming com 800 mil usuários.
+
+A política cobre: base legal para tratamento de dados em marketing, finalidades permitidas, retenção, revogação de consentimento e resposta a incidentes.
+
+A política proposta é:
+[COLE AQUI O TEXTO COMPLETO DA POLÍTICA]
+
+Por favor:
+1. Aponte as 3 principais lacunas ou inconsistências com a LGPD, citando os artigos não cobertos
+2. A base legal escolhida para cada tipo de dado é adequada? Sugira alternativa onde não for
+3. O plano de resposta a incidentes atende ao prazo e ao processo orientado pela ANPD?
+4. Dê uma nota de maturidade em conformidade (1–5) com justificativa
+
+Responda como um parecer jurídico objetivo, sem eufemismos.</code>
+      </div>
+    </div>
+
+    <div class="section-tag">Grupo 2 — Prompt para o Cenário D (Qualidade de Dados)</div>
+    <div class="sql-wrap">
+      <div class="sql-header">
+        <span class="sql-label">IA como Especialista em Governança de Qualidade</span>
+        <button class="copy-btn" onclick="copyCode(this,'prompt-d')">Copiar</button>
+      </div>
+      <div class="sql-block">
+        <code id="prompt-d">Você é uma especialista em governança de dados e qualidade, com experiência em DAMA-DMBOK. Vou submeter um Plano de Qualidade de Dados elaborado para a SoundByte, um serviço de streaming com 800 mil usuários.
+
+O plano cobre: diagnóstico das 6 dimensões de qualidade, regras de qualidade por dimensão, ações de correção e prevenção, e KPIs de monitoramento.
+
+O plano proposto é:
+[COLE AQUI O TEXTO COMPLETO DO PLANO]
+
+Por favor:
+1. Identifique as 3 dimensões de qualidade com maior impacto no contexto de marketing da SoundByte que o plano pode ter subestimado
+2. As regras de qualidade propostas são mensuráveis e verificáveis? Aponte as que precisam ser mais específicas
+3. Os KPIs propostos permitem detectar degradação de qualidade antes que ela afete campanhas? O que falta?
+4. Como o plano de qualidade se conecta com a conformidade LGPD do grupo? Há algum problema de qualidade que também é uma violação legal?
+
+Responda como em um relatório de consultoria de dados, com recomendações práticas.</code>
+      </div>
+    </div>
+
+    <div class="callout callout-green" style="margin-bottom:36px;">
+      <div class="callout-tag">O que incluir no Apêndice — Revisão por IA</div>
+      Para cada prompt utilizado, inclua no documento de entrega:<br><br>
+      1. O prompt exato utilizado (com sua proposta colada)<br>
+      2. A resposta completa gerada pela IA<br>
+      3. Um parágrafo de <strong>3–5 linhas</strong>: <em>"Com base na análise da IA, o que seu grupo revisaria na proposta? Vocês concordam com os pontos levantados? Por quê?"</em>
+    </div>
+
+    <!-- PONTUAÇÃO E CRITÉRIOS -->
+    <div class="section-tag">Pontuação</div>
+    <table class="info-table" style="margin-bottom:28px;">
+      <thead>
+        <tr><th>Componente</th><th>Entregável</th><th>Pts</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Templates preenchidos</strong> (×2)</td>
+          <td>Matriz + Auditoria (G1) ou Política + Qualidade (G2) — completos</td>
+          <td><strong>4,0</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Questões de apoio</strong></td>
+          <td>Respostas fundamentadas com base legal ou técnica (6–7 questões no total)</td>
+          <td><strong>3,0</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Apêndice — Revisão por IA</strong></td>
+          <td>2 prompts + 2 respostas da IA + 2 reflexões críticas do grupo</td>
+          <td><strong>2,0</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Consistência interna</strong></td>
+          <td>Os dois cenários do grupo são compatíveis entre si (questões A4/C3 e B3/D3)</td>
+          <td><strong>1,0</strong></td>
+        </tr>
+        <tr style="background:var(--s2);">
+          <td colspan="2"><strong>Total</strong></td>
+          <td><strong>10,0</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-tag">Rubrica Detalhada — Templates (4,0 pts)</div>
+    <div style="width:100%;max-width:760px;margin-bottom:28px;display:flex;flex-direction:column;gap:8px;">
+      <div class="rub-row">
+        <div class="rub-cell label">Grupo 1 · Cenário A — RBAC</div>
+        <div class="rub-cell pts">2,0</div>
+        <div class="rub-cell crit">Todas as 25 células preenchidas; nível de acesso diferenciado por cargo; D2 bloqueado para C1 e C2; DPO com leitura ampla; pelo menos uma justificativa para diferença entre Analista Mktg e Gerente Mktg.</div>
+      </div>
+      <div class="rub-row">
+        <div class="rub-cell label">Grupo 1 · Cenário C — Auditoria</div>
+        <div class="rub-cell pts">2,0</div>
+        <div class="rub-cell crit">4 componentes completos; log com campos suficientes para rastrear o incidente original; frequência diferenciada por tipo de dado; fluxo de escalonamento com prazos somando ≤ 72h até notificação ANPD; mínimo 4 regras de alerta com condição, ação e responsável.</div>
+      </div>
+      <div class="rub-row">
+        <div class="rub-cell label">Grupo 2 · Cenário B — LGPD</div>
+        <div class="rub-cell pts">2,0</div>
+        <div class="rub-cell crit">5 seções completas; base legal identificada com artigo da LGPD para cada tipo de dado; prazo de retenção definido por tipo; fluxo de notificação ANPD com prazos; processo de revogação acessível e com prazo.</div>
+      </div>
+      <div class="rub-row">
+        <div class="rub-cell label">Grupo 2 · Cenário D — Qualidade</div>
+        <div class="rub-cell pts">2,0</div>
+        <div class="rub-cell crit">Diagnóstico das 6 dimensões com problema específico da SoundByte; ≥ 6 regras de qualidade mensuráveis; ≥ 3 ações de correção concretas (dado + ação + responsável); ≥ 4 KPIs no formato completo (nome + cálculo + meta + frequência).</div>
+      </div>
+    </div>
+
+    <div class="section-tag">Formato de Entrega</div>
+    <div class="callout" style="margin-bottom:16px;">
+      <div class="callout-tag">Documento único por grupo (PDF ou Word)</div>
+      <strong>1. Identificação:</strong> Nomes, RAs e grupo (G1 ou G2).<br><br>
+      <strong>2. Cenário 1 do grupo:</strong> Template preenchido + questões respondidas.<br><br>
+      <strong>3. Cenário 2 do grupo:</strong> Template preenchido + questões respondidas.<br><br>
+      <strong>4. Apêndice — Revisão por IA:</strong> Dois prompts com respostas + reflexão crítica do grupo para cada um.<br><br>
+      <strong>5. Reflexão Final (obrigatória):</strong> Ver abaixo.
+    </div>
+
+    <div class="callout callout-blue" style="margin-bottom:16px;">
+      <div class="callout-tag">Uso de IA — Política</div>
+      Você <strong>pode e deve</strong> usar IA para estruturar templates, pesquisar artigos da LGPD e gerar a revisão oficial. O que será avaliado é sua <strong>capacidade de adaptar, justificar e criticar</strong> o que foi produzido. Se usar IA além dos prompts oficiais, indique quais partes foram assistidas e o que o grupo modificou.
+    </div>
+
+    <div class="callout callout-green">
+      <div class="callout-tag">Reflexão Final — Inclua ao final do documento</div>
+      Cada grupo responde em <strong>6–10 linhas</strong>, conectando os dois cenários entregues:<br><br>
+      <strong>Grupo 1:</strong> <em>"Como a Matriz RBAC e o Processo de Auditoria se reforçam mutuamente? Qual dos dois seria mais urgente implementar primeiro na SoundByte, e o que acontece se você implementar um sem o outro?"</em><br><br>
+      <strong>Grupo 2:</strong> <em>"Como a Política LGPD e o Plano de Qualidade se reforçam mutuamente? É possível estar em conformidade com a LGPD usando dados de baixa qualidade — ou ter dados de alta qualidade sem base legal para usá-los? Ilustre com o caso da SoundByte."</em>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p5')">← Cenário D</button>
+      <button class="pn-btn pn-fwd" onclick="show('menu')">← Menu Principal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) { el.classList.add('active'); window.scrollTo(0, 0); }
+}
+
+function copyCode(btn, codeId) {
+  const code = document.getElementById(codeId);
+  if (!code) return;
+  const text = code.innerText || code.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    btn.textContent = 'Erro';
+    setTimeout(() => { btn.textContent = 'Copiar'; }, 2000);
+  });
+}
+</script>
+</body>
+</html>

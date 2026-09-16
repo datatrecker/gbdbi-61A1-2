@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GBDBI · Aula 7 — O Guardião dos Ativos</title>
+<style>
+:root {
+  --bg:     #fdf8f6;
+  --s1:     #f5ecea;
+  --s2:     #ecdeda;
+  --border: #dfc9c0;
+  --c1:     #7a1a1a;
+  --c2:     #b83030;
+  --text:   #1a0d0d;
+  --muted:  #8a6060;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+.page { display: none; min-height: 100vh; flex-direction: column; }
+.page.active { display: flex; animation: fadeUp .3s ease both; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── MENU ── */
+.m-header { padding: 72px 56px 48px; }
+.m-eyebrow { font-size: 10.5px; letter-spacing: 4px; text-transform: uppercase; color: var(--c1); font-weight: 600; margin-bottom: 18px; }
+.m-title { font-size: 50px; font-weight: 800; line-height: 1.08; background: linear-gradient(140deg, #1a0d0d 30%, #7a1a1a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.m-sub { margin-top: 14px; font-size: 15px; color: var(--muted); }
+.m-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(265px, 1fr)); gap: 14px; padding: 0 56px 72px; }
+.mcard { background: var(--s1); border: 1px solid var(--border); border-radius: 14px; padding: 28px 26px 32px; cursor: pointer; transition: border-color .2s, transform .2s, box-shadow .2s; position: relative; overflow: hidden; appearance: none; -webkit-appearance: none; width: 100%; text-align: left; font-family: inherit; font-size: inherit; color: inherit; }
+.mcard:hover { border-color: var(--c1); transform: translateY(-3px); box-shadow: 0 16px 48px rgba(122,26,26,.10); }
+.mcard::after { content: ''; position: absolute; inset: 0 0 auto 0; height: 2px; background: linear-gradient(90deg, var(--c1), var(--c2)); opacity: 0; transition: opacity .2s; }
+.mcard:hover::after { opacity: 1; }
+.mc-num { font-size: 10px; letter-spacing: 3px; font-weight: 700; color: var(--c1); margin-bottom: 14px; text-transform: uppercase; }
+.mc-h { font-size: 16px; font-weight: 700; line-height: 1.35; margin-bottom: 8px; }
+.mc-p { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+.mc-arrow { position: absolute; bottom: 22px; right: 22px; color: var(--muted); font-size: 18px; transition: color .2s, transform .2s; }
+.mcard:hover .mc-arrow { color: var(--c1); transform: translate(2px, -2px); }
+
+/* ── TOPIC PAGES ── */
+.t-nav { display: flex; align-items: center; gap: 14px; padding: 18px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(253,248,246,.92); backdrop-filter: blur(12px); z-index: 10; }
+.back { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--muted); cursor: pointer; padding: 7px 14px; border: 1px solid var(--border); border-radius: 8px; background: none; transition: all .2s; text-decoration: none; }
+.back:hover { color: var(--c1); border-color: var(--c1); }
+.t-label { font-size: 10.5px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+.t-body { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 56px 40px 64px; max-width: 900px; margin: 0 auto; width: 100%; }
+.t-title { font-size: 38px; font-weight: 800; text-align: center; margin-bottom: 52px; line-height: 1.18; }
+.t-title em { font-style: normal; color: var(--c1); }
+.diagram { width: 100%; max-width: 720px; margin-bottom: 44px; }
+
+/* ── PREV/NEXT ── */
+.pg-nav { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 720px; margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); gap: 12px; }
+.pn-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; border: 1.5px solid var(--border); background: none; color: var(--muted); font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; font-family: inherit; }
+.pn-btn:hover { border-color: var(--c1); color: var(--c1); background: rgba(122,26,26,.04); }
+.pn-fwd { margin-left: auto; }
+
+/* ── BLOOM ── */
+.bloom-card { width: 100%; max-width: 720px; background: var(--s1); border: 1px solid var(--border); border-left: 3px solid var(--c1); border-radius: 2px 10px 10px 2px; padding: 22px 24px; margin-bottom: 24px; }
+.bloom-eyebrow { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 16px; }
+.bloom-list { display: flex; flex-direction: column; gap: 11px; }
+.bloom-item { font-size: 13.5px; line-height: 1.55; color: var(--text); display: flex; align-items: baseline; gap: 12px; }
+.bloom-level { font-size: 8.5px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+.bloom-level.l1 { background: var(--s1); color: var(--c1); border: 1px solid var(--border); }
+.bloom-level.l2 { background: var(--s2); color: var(--c1); border: 1px solid var(--border); }
+.bloom-level.l3 { background: #e0cccc; color: var(--c1); border: 1px solid #c8aeaa; }
+.bloom-level.l4 { background: #cdb5b5; color: var(--c1); border: 1px solid #b89898; }
+.bloom-level.l5 { background: var(--c1); color: #fdf8f6; border: 1px solid var(--c1); }
+
+/* ── OVERVIEW ── */
+.ov-section-tag { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--muted); margin-bottom: 10px; width: 100%; max-width: 720px; }
+.ov-concepts { display: grid; grid-template-columns: repeat(auto-fit, minmax(196px, 1fr)); gap: 12px; width: 100%; max-width: 720px; margin-bottom: 16px; }
+.ov-concept { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+.ov-concept h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+.ov-concept p { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+/* ── CALLOUT ── */
+.callout { width: 100%; max-width: 720px; padding: 18px 20px; background: var(--s1); border-left: 3px solid var(--c1); border-radius: 2px 8px 8px 2px; font-size: 13.5px; line-height: 1.65; color: var(--text); margin-bottom: 28px; }
+.callout-tag { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 8px; }
+
+/* ── QUOTE ── */
+.quote-card { width: 100%; max-width: 720px; background: var(--s1); border: 1px solid var(--border); border-left: 3px solid var(--c1); border-radius: 2px 10px 10px 2px; padding: 22px 26px; margin-bottom: 28px; }
+.quote-text { font-size: 16px; line-height: 1.75; color: var(--text); font-style: italic; margin-bottom: 10px; }
+.quote-sub { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+/* ── COLLAPSIBLE DISC ── */
+.disc { width: 100%; max-width: 720px; margin-bottom: 14px; }
+.disc-trigger { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; background: var(--s1); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; transition: border-color .2s, background .2s; font-family: inherit; text-align: left; }
+.disc-trigger:hover { border-color: var(--c1); background: #fff; }
+.disc-title { font-size: 13.5px; font-weight: 700; color: var(--text); }
+.disc-icon { font-size: 15px; color: var(--c1); transition: transform .25s; flex-shrink: 0; }
+.disc.open .disc-icon { transform: rotate(90deg); }
+.disc-body { max-height: 0; overflow: hidden; transition: max-height .38s ease; }
+.disc.open .disc-body { max-height: 2400px; }
+.disc-inner { padding: 18px 0 6px; }
+
+/* ── COMPONENT CARDS ── */
+.comp-list { width: 100%; max-width: 720px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+.comp-item { display: flex; gap: 16px; align-items: flex-start; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+.comp-num { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fdf8f6; flex-shrink: 0; margin-top: 2px; }
+.comp-num.c1 { background: #3a60b0; }
+.comp-num.c2 { background: #5a3ab0; }
+.comp-num.c3 { background: #3a90a0; }
+.comp-num.c4 { background: #3a7a5a; }
+.comp-title { font-size: 14.5px; font-weight: 700; margin-bottom: 4px; }
+.comp-desc { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+/* ── PILLAR CARDS ── */
+.pillar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; width: 100%; max-width: 720px; margin-bottom: 28px; }
+.pillar { border-radius: 12px; padding: 22px 20px; border: 1px solid var(--border); }
+.pillar.qual  { background: #e8f4e8; border-color: #a0c8a0; }
+.pillar.rbac  { background: #e8eef8; border-color: #a0b8e0; }
+.pillar.lgpd  { background: #f8ece8; border-color: #e0b0a0; }
+.pillar-icon  { font-size: 28px; margin-bottom: 10px; }
+.pillar-title { font-size: 14px; font-weight: 800; margin-bottom: 6px; }
+.pillar.qual  .pillar-title { color: #2a6a2a; }
+.pillar.rbac  .pillar-title { color: #2a4ab0; }
+.pillar.lgpd  .pillar-title { color: #b03020; }
+.pillar-q     { font-size: 12.5px; font-style: italic; color: var(--text); margin-bottom: 8px; line-height: 1.5; }
+.pillar-desc  { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+/* ── QUALITY DIMENSIONS ── */
+.qual-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 720px; margin-bottom: 28px; }
+.qual-card { border-radius: 10px; padding: 18px; border: 1px solid var(--border); }
+.qual-card.q1 { background: #e8f0fa; border-color: #b0c8ec; }
+.qual-card.q2 { background: #eaf8ea; border-color: #a0d0a0; }
+.qual-card.q3 { background: #f8e8f8; border-color: #d0a8d0; }
+.qual-card.q4 { background: #faf0e0; border-color: #e0c880; }
+.qual-card.q5 { background: #f8eae8; border-color: #e0b0a0; }
+.qual-card.q6 { background: #eaf4f8; border-color: #a0c8d8; }
+.qual-name { font-size: 13px; font-weight: 800; margin-bottom: 5px; }
+.qual-card.q1 .qual-name { color: #2a5eb0; }
+.qual-card.q2 .qual-name { color: #3a8a3a; }
+.qual-card.q3 .qual-name { color: #8a3a9a; }
+.qual-card.q4 .qual-name { color: #c08a20; }
+.qual-card.q5 .qual-name { color: #b04030; }
+.qual-card.q6 .qual-name { color: #2a7a9a; }
+.qual-def { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+/* ── IMPACT CARDS ── */
+.impact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; width: 100%; max-width: 720px; margin-bottom: 28px; }
+.impact-card { border-radius: 10px; padding: 20px; text-align: center; }
+.impact-card.neg { background: rgba(184,48,48,.08); border: 1px solid rgba(184,48,48,.2); }
+.impact-card.pos { background: rgba(58,138,58,.08); border: 1px solid rgba(58,138,58,.2); }
+.impact-card.roi { background: rgba(58,100,180,.08); border: 1px solid rgba(58,100,180,.2); }
+.impact-pct { font-size: 36px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+.impact-card.neg .impact-pct { color: var(--c2); }
+.impact-card.pos .impact-pct { color: #3a8a3a; }
+.impact-card.roi .impact-pct { color: #2a5eb0; }
+.impact-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+.impact-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+/* ── METRICS SPECTRUM ── */
+.metric-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; width: 100%; max-width: 720px; margin-bottom: 28px; }
+.metric-card { border-radius: 10px; padding: 16px 18px; border: 1px solid var(--border); }
+.metric-card.custo  { background: rgba(184,48,48,.06); border-color: rgba(184,48,48,.2); }
+.metric-card.risco  { background: rgba(200,140,20,.08); border-color: rgba(200,140,20,.25); }
+.metric-card.utilid { background: rgba(58,138,58,.06); border-color: rgba(58,138,58,.2); }
+.metric-tag { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; margin-bottom: 6px; }
+.metric-card.custo  .metric-tag { color: var(--c2); }
+.metric-card.risco  .metric-tag { color: #c08a20; }
+.metric-card.utilid .metric-tag { color: #3a8a3a; }
+.metric-items { font-size: 12.5px; color: var(--text); line-height: 1.6; }
+
+/* ── JOURNEY SVG ── */
+.journey-wrap { width: 100%; max-width: 720px; margin-bottom: 28px; overflow-x: auto; }
+
+/* ── REQUIREMENT CARDS ── */
+.req-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 720px; margin-bottom: 28px; }
+.req-card { border-radius: 10px; padding: 20px; text-align: center; }
+.req-card.r1 { background: #f0e880; border: 1px solid #c8c040; }
+.req-card.r2 { background: #f0a050; border: 1px solid #c07830; color: #fff; }
+.req-card.r3 { background: #e85050; border: 1px solid #c02828; color: #fff; }
+.req-title { font-size: 13px; font-weight: 800; margin-bottom: 6px; }
+.req-card.r1 .req-title { color: #4a4000; }
+.req-desc { font-size: 12px; line-height: 1.5; opacity: .9; }
+
+/* ── ACTIVITY LINK ── */
+.activity-link { width: 100%; max-width: 720px; background: linear-gradient(135deg, var(--s1) 0%, var(--s2) 100%); border: 2px solid var(--c1); border-radius: 14px; padding: 28px 32px; display: flex; align-items: center; gap: 20px; text-decoration: none; color: var(--text); transition: transform .2s, box-shadow .2s; margin-bottom: 28px; }
+.activity-link:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(122,26,26,.12); }
+.activity-link-icon { font-size: 36px; flex-shrink: 0; }
+.activity-link-title { font-size: 17px; font-weight: 800; color: var(--c1); margin-bottom: 5px; }
+.activity-link-desc { font-size: 13px; color: var(--muted); line-height: 1.55; }
+.activity-link-arrow { font-size: 22px; color: var(--c1); margin-left: auto; flex-shrink: 0; }
+
+/* ── MENTI GAMIFICATION ── */
+.menti-block { width: 100%; max-width: 720px; background: linear-gradient(140deg, #120828 0%, #2e0f58 100%); border-radius: 14px; padding: 26px 28px 22px; margin-bottom: 28px; }
+.menti-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.menti-eyebrow { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; font-weight: 800; color: rgba(255,255,255,.4); }
+.menti-badge { display: inline-flex; align-items: center; gap: 7px; background: #e8a030; color: #1a0d0d; font-size: 10px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; padding: 5px 13px; border-radius: 20px; white-space: nowrap; }
+.menti-scenario { font-size: 13px; color: rgba(255,255,255,.68); line-height: 1.65; margin-bottom: 16px; padding: 14px 16px; background: rgba(255,255,255,.06); border-radius: 8px; border-left: 3px solid rgba(232,160,48,.5); }
+.menti-question { font-size: 15.5px; font-weight: 800; color: #fff; line-height: 1.45; margin-bottom: 18px; }
+.menti-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.menti-option { display: flex; align-items: flex-start; gap: 10px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 12px 14px; }
+.menti-opt-letter { width: 26px; height: 26px; border-radius: 6px; background: rgba(255,255,255,.15); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; }
+.menti-opt-text { font-size: 12.5px; color: rgba(255,255,255,.8); line-height: 1.5; }
+.menti-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.1); gap: 12px; flex-wrap: wrap; }
+.menti-lb { font-size: 11px; color: rgba(255,255,255,.42); display: flex; align-items: center; gap: 7px; }
+.menti-cta { display: inline-flex; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 700; color: #e8a030; text-decoration: none; background: rgba(232,160,48,.1); border: 1px solid rgba(232,160,48,.28); padding: 6px 14px; border-radius: 20px; transition: all .2s; }
+.menti-cta:hover { background: rgba(232,160,48,.2); color: #f0c060; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .m-header { padding: 48px 24px 32px; }
+  .m-grid { padding: 0 24px 48px; }
+  .t-body { padding: 40px 20px 52px; }
+  .t-title { font-size: 30px; margin-bottom: 36px; }
+  .qual-grid { grid-template-columns: repeat(2, 1fr); }
+  .req-grid { grid-template-columns: 1fr; }
+  .metric-row { grid-template-columns: 1fr; }
+  .menti-options { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     MENU
+══════════════════════════════════════ -->
+<div id="menu" class="page active">
+  <nav class="t-nav">
+    <a class="back" href="index.html">← Disciplina</a>
+  </nav>
+  <div class="m-header">
+    <div class="m-eyebrow">ESPM · Gestão BD &amp; BI · 08.06.2026</div>
+    <div class="m-title">Aula 7 — O Guardião<br>dos Ativos</div>
+    <div class="m-sub">DAMA-DMBOK · LGPD · Segurança · Conformidade</div>
+  </div>
+  <div class="m-grid">
+    <button class="mcard" onclick="show('p0')">
+      <div class="mc-num">00</div>
+      <div class="mc-h">Objetivos da Aula</div>
+      <p class="mc-p">Mapa de competências — o que você vai saber fazer ao final desta aula, segundo a Taxonomia de Bloom.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p1')">
+      <div class="mc-num">01</div>
+      <div class="mc-h">Visão Geral da Aula</div>
+      <p class="mc-p">Estagiários da SoundByte têm acesso a e-mails, pagamentos e GPS de 800 mil usuários. O risco ainda não virou vazamento — mas pode.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p2')">
+      <div class="mc-num">02</div>
+      <div class="mc-h">O que é Governança de Dados</div>
+      <p class="mc-p">A definição que cabe em uma frase — e tudo o que a governança não é, mesmo que pareça ser.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p3')">
+      <div class="mc-num">03</div>
+      <div class="mc-h">De Dispersos a Estratégicos</div>
+      <p class="mc-p">A jornada de dados não governados até ativo estratégico — e os cinco passos para implementar essa transição.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p4')">
+      <div class="mc-num">04</div>
+      <div class="mc-h">Os 4 Componentes da Governança</div>
+      <p class="mc-p">Organização · Regras · Processos · Ferramentas — os pilares que sustentam um programa de governança maduro.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p5')">
+      <div class="mc-num">05</div>
+      <div class="mc-h">Qualidade · Segurança · Privacidade</div>
+      <p class="mc-p">Os três pilares operacionais: dado correto, acesso controlado por cargo e uso legal conforme a LGPD.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p6')">
+      <div class="mc-num">06</div>
+      <div class="mc-h">As 6 Dimensões da Qualidade</div>
+      <p class="mc-p">Acurácia, Completude, Consistência, Tempestividade, Validade e Unicidade — como medir se um dado é confiável.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p7')">
+      <div class="mc-num">07</div>
+      <div class="mc-h">Métricas e Impacto nos Negócios</div>
+      <p class="mc-p">−52% em violações de compliance, +66% em segurança, +15–25% de ROI tecnológico. O que medir para saber se funciona.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p8')">
+      <div class="mc-num">08</div>
+      <div class="mc-h">Boas Práticas de Implementação</div>
+      <p class="mc-p">Modelos federados, gestão da mudança, governança evolutiva — governança não é um projeto, é um sistema operacional.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+    <button class="mcard" onclick="show('p9')">
+      <div class="mc-num">09</div>
+      <div class="mc-h">Atividade Avaliativa</div>
+      <p class="mc-p">Dois grupos, quatro cenários: RBAC + Auditoria (G1) e Política LGPD + Qualidade de Dados (G2). Cada grupo trabalha de forma independente.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P0 — OBJETIVOS
+══════════════════════════════════════ -->
+<div id="p0" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">00 · Objetivos da Aula</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">O que você vai<br><em>saber fazer.</em></div>
+    <div class="bloom-card">
+      <div class="bloom-eyebrow">Objetivos da Aula — Taxonomia de Bloom</div>
+      <div class="bloom-list">
+        <div class="bloom-item">
+          <span class="bloom-level l1">Lembrar</span>
+          Nomear os 4 componentes da governança de dados, as 6 dimensões de qualidade e os princípios básicos da LGPD aplicáveis a dados de usuários.
+        </div>
+        <div class="bloom-item">
+          <span class="bloom-level l2">Compreender</span>
+          Explicar a diferença entre governança como processo contínuo e projeto pontual — e por que a tecnologia é meio, não fim.
+        </div>
+        <div class="bloom-item">
+          <span class="bloom-level l3">Aplicar</span>
+          Construir uma matriz RBAC definindo níveis de acesso por cargo para um cenário real, diferenciando leitura, edição e exclusão por tipo de dado.
+        </div>
+        <div class="bloom-item">
+          <span class="bloom-level l4">Analisar</span>
+          Identificar as principais falhas de segurança e lacunas de conformidade com a LGPD em uma política de acesso a dados apresentada por outro grupo.
+        </div>
+        <div class="bloom-item">
+          <span class="bloom-level l5">Criar</span>
+          Propor uma política de governança de dados para a SoundByte, com papéis definidos, regras de acesso, processo de auditoria e análise de riscos validada por IA.
+        </div>
+      </div>
+    </div>
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('menu')">← Menu</button>
+      <button class="pn-btn pn-fwd" onclick="show('p1')">Visão Geral →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P1 — VISÃO GERAL
+══════════════════════════════════════ -->
+<div id="p1" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">01 · Visão Geral da Aula</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">O risco ainda não<br><em>virou vazamento.</em></div>
+
+    <div class="callout" style="margin-bottom:32px;">
+      <div class="callout-tag">O Problema Central</div>
+      <p style="font-size:14.5px;line-height:1.75;font-style:italic;">Uma auditoria interna da SoundByte descobriu que estagiários do time de marketing têm acesso direto à base de dados com e-mails, histórico de pagamentos e localização GPS de 800 mil usuários. Um desses estagiários exportou um relatório com dados pessoais para uma planilha pessoal para trabalhar de casa. A empresa pode ser multada em até 2% do faturamento anual. O vazamento ainda não aconteceu. Mas o risco é real.</p>
+    </div>
+
+    <div class="disc open" id="disc-importa">
+      <button class="disc-trigger" onclick="toggleDisc('disc-importa')">
+        <span class="disc-title">Por Que Esta Aula Importa</span>
+        <span class="disc-icon">▶</span>
+      </button>
+      <div class="disc-body">
+        <div class="disc-inner">
+          <p style="font-size:13.5px;line-height:1.75;color:var(--text);margin-bottom:16px;">A aula parte de dois casos reais de empresas que sofreram consequências por má governança. A pergunta para a turma: em qual desses casos o problema foi técnico? Em qual foi de processo e política? A turma quase sempre percebe que ambos eram <strong>problemas de processo disfarçados de problemas técnicos</strong>.</p>
+          <div class="ov-concepts">
+            <div class="ov-concept">
+              <h4>O erro que parece técnico</h4>
+              <p>Quando um estagiário acessa dados sensíveis, o problema não é o banco de dados — é que nunca ninguém definiu quem pode ver o quê. A falha é de política, não de tecnologia.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>A LGPD em vigor</h4>
+              <p>Desde 2021 a ANPD já aplicou sanções. Multas de até 2% do faturamento, limitadas a R$ 50 milhões por infração, não são hipótese — são realidade para empresas sem governança.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>Dado como ativo e passivo</h4>
+              <p>O mesmo dado que gera valor para recomendações pode gerar passivo se mal gerenciado. Governança é o que define se o dado é um ativo ou um risco.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="disc" id="disc-overview">
+      <button class="disc-trigger" onclick="toggleDisc('disc-overview')">
+        <span class="disc-title">Conteúdo, Atividade e IA</span>
+        <span class="disc-icon">▶</span>
+      </button>
+      <div class="disc-body">
+        <div class="disc-inner">
+          <div class="ov-concepts">
+            <div class="ov-concept">
+              <h4>Conteúdo Fundamental</h4>
+              <p>Princípios de governança de dados (DAMA-DMBOK), qualidade de dados, segurança, privacidade e conformidade com a LGPD.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>Atividade Avaliativa</h4>
+              <p>Em grupos, os alunos redigem uma política simplificada de acesso a dados para a SoundByte, definindo quem pode ler, editar ou excluir informações em cada nível hierárquico.</p>
+            </div>
+            <div class="ov-concept">
+              <h4>Integração com IA</h4>
+              <p>A IA atua como "Auditora de Riscos": o grupo submete sua política e recebe análise das três principais falhas de segurança ou lacunas de conformidade com a LGPD.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p0')">← Objetivos</button>
+      <button class="pn-btn pn-fwd" onclick="show('p2')">O que é Governança →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P2 — O QUE É GOVERNANÇA
+══════════════════════════════════════ -->
+<div id="p2" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">02 · O que é Governança de Dados</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Clareza no meio<br><em>da complexidade.</em></div>
+
+    <div class="quote-card">
+      <div class="quote-text">"Quem pode fazer <strong>o quê</strong> com <strong>quais</strong> dados, sob <strong>quais</strong> condições — escrito em regras, implementado em processos, incorporado em sistemas e continuamente auditado. Isso é governança de dados."</div>
+      <div class="quote-sub">Não se trata de tecnologia ou ferramentas — trata-se de criar clareza na complexidade.</div>
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">O que a governança <strong>não é</strong></div>
+    <div class="ov-concepts" style="margin-bottom:28px;">
+      <div class="ov-concept" style="border-left:3px solid var(--c2);">
+        <h4 style="color:var(--c2);">❌ Projeto pontual de limpeza</h4>
+        <p>A qualidade dos dados se degrada continuamente sem um processo permanente de gestão. Limpeza sem processo é obra sem manutenção.</p>
+      </div>
+      <div class="ov-concept" style="border-left:3px solid var(--c2);">
+        <h4 style="color:var(--c2);">❌ Apenas ferramentas de TI</h4>
+        <p>Soluções digitais são facilitadoras, não substitutas de processos bem definidos e engajamento organizacional. A ferramenta não governa — as pessoas governam.</p>
+      </div>
+      <div class="ov-concept" style="border-left:3px solid var(--c2);">
+        <h4 style="color:var(--c2);">❌ Responsabilidade só da TI</h4>
+        <p>Governança exige colaboração entre áreas de negócio e participação ativa de stakeholders. Se só a TI define padrões, marketing e finanças adotam métricas conflitantes.</p>
+      </div>
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">A governança como sistema operacional</div>
+    <div style="width:100%;max-width:720px;margin-bottom:28px;">
+      <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:22px 24px;">
+        <p style="font-size:13.5px;line-height:1.75;color:var(--text);margin-bottom:14px;">Quando bem implementada, a governança se torna quase invisível. Ela funciona como um <strong>sistema operacional</strong> que sustenta decisões estratégicas e impulsiona a inovação — sem que as equipes precisem pensar nela o tempo todo.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div style="background:var(--s1);border-radius:8px;padding:14px 16px;">
+            <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--c1);margin-bottom:6px;">Evita o Caos</div>
+            <div style="font-size:12.5px;color:var(--muted)">Decisões equivocadas por dados inconsistentes entre sistemas. Se vendas e financeiro reportam faturamentos diferentes, há um problema de governança.</div>
+          </div>
+          <div style="background:var(--s1);border-radius:8px;padding:14px 16px;">
+            <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--c1);margin-bottom:6px;">Garante Usabilidade</div>
+            <div style="font-size:12.5px;color:var(--muted)">Dados confiáveis, controlados e acessíveis para quem precisa — na hora certa e com o nível de permissão adequado ao cargo.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENTI P2 · resposta correta: C -->
+    <div class="menti-block">
+      <div class="menti-header">
+        <span class="menti-eyebrow">🎮 Quiz Mentimeter</span>
+        <span class="menti-badge">🏆 Quiz · Leaderboard</span>
+      </div>
+      <div class="menti-scenario">
+        A SoundByte opera três sistemas que reportam "usuários ativos" de forma diferente: o sistema de marketing aponta <strong style="color:#e8c080;">750 mil</strong>, o financeiro registra <strong style="color:#e8c080;">800 mil</strong> e o app indica <strong style="color:#e8c080;">820 mil</strong>. A diretoria quer um único número para o relatório trimestral.
+      </div>
+      <div class="menti-question">O que essa situação revela sobre a SoundByte?</div>
+      <div class="menti-options">
+        <div class="menti-option">
+          <div class="menti-opt-letter">A</div>
+          <div class="menti-opt-text">O sistema de marketing está desatualizado e precisa ser substituído</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">B</div>
+          <div class="menti-opt-text">A empresa precisa de mais analistas para reconciliar os números manualmente</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">C</div>
+          <div class="menti-opt-text">Falta uma política de governança com glossário corporativo e fonte única de verdade</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">D</div>
+          <div class="menti-opt-text">É normal que sistemas diferentes mostrem números ligeiramente diferentes</div>
+        </div>
+      </div>
+      <div class="menti-footer">
+        <span class="menti-lb">🏅 Exibir quadro de liderança após as respostas</span>
+        <a class="menti-cta" href="https://www.menti.com/al9hrkenwaqb" target="_blank" rel="noopener">Abrir no Mentimeter ↗</a>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p1')">← Visão Geral</button>
+      <button class="pn-btn pn-fwd" onclick="show('p3')">De Dispersos a Estratégicos →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P3 — DE DISPERSOS A ESTRATÉGICOS
+══════════════════════════════════════ -->
+<div id="p3" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">03 · De Dispersos a Estratégicos</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Dados dispersos hoje,<br><em>ativo estratégico amanhã.</em></div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">A Jornada — Transformando Dados em Ativo Estratégico</div>
+
+    <!-- Journey SVG -->
+    <div class="journey-wrap">
+      <svg viewBox="0 0 720 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;min-width:480px;">
+        <!-- Step 1: Dados Dispersos -->
+        <rect x="8" y="10" width="158" height="88" rx="10" fill="#e85050"/>
+        <text x="87" y="38" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#fff">Dados</text>
+        <text x="87" y="53" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#fff">Dispersos</text>
+        <text x="87" y="74" text-anchor="middle" font-family="system-ui" font-size="9.5" fill="rgba(255,255,255,.85)">Não estruturados</text>
+        <text x="87" y="88" text-anchor="middle" font-family="system-ui" font-size="9.5" fill="rgba(255,255,255,.85)">e desorganizados</text>
+        <!-- Arrow -->
+        <polygon points="171,55 179,49 179,61" fill="#888"/>
+
+        <!-- Step 2: Implementar Governança -->
+        <rect x="183" y="10" width="158" height="88" rx="10" fill="#e07a20"/>
+        <text x="262" y="38" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#fff">Implementar</text>
+        <text x="262" y="53" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#fff">Governança</text>
+        <text x="262" y="74" text-anchor="middle" font-family="system-ui" font-size="9.5" fill="rgba(255,255,255,.85)">Políticas e</text>
+        <text x="262" y="88" text-anchor="middle" font-family="system-ui" font-size="9.5" fill="rgba(255,255,255,.85)">procedimentos</text>
+        <!-- Arrow -->
+        <polygon points="346,55 354,49 354,61" fill="#888"/>
+
+        <!-- Step 3: Praticar Gestão -->
+        <rect x="358" y="10" width="158" height="88" rx="10" fill="#c0b020"/>
+        <text x="437" y="38" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#fff">Praticar Gestão</text>
+        <text x="437" y="53" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#fff">de Dados</text>
+        <text x="437" y="74" text-anchor="middle" font-family="system-ui" font-size="9.5" fill="rgba(255,255,255,.85)">Qualidade e</text>
+        <text x="437" y="88" text-anchor="middle" font-family="system-ui" font-size="9.5" fill="rgba(255,255,255,.85)">segurança</text>
+        <!-- Arrow -->
+        <polygon points="521,55 529,49 529,61" fill="#888"/>
+
+        <!-- Step 4: Ativo Estratégico -->
+        <rect x="533" y="10" width="179" height="88" rx="10" fill="#3a9a50"/>
+        <text x="622" y="38" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#fff">Ativo</text>
+        <text x="622" y="53" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#fff">Estratégico</text>
+        <text x="622" y="74" text-anchor="middle" font-family="system-ui" font-size="9.5" fill="rgba(255,255,255,.85)">Dados valiosos</text>
+        <text x="622" y="88" text-anchor="middle" font-family="system-ui" font-size="9.5" fill="rgba(255,255,255,.85)">e bem gerenciados</text>
+      </svg>
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">Os 5 Passos para Implementar Governança</div>
+
+    <div class="comp-list" style="margin-bottom:28px;">
+      <div class="comp-item">
+        <div class="comp-num" style="background:#e85050;">1</div>
+        <div>
+          <div class="comp-title">Dados Não Governados</div>
+          <div class="comp-desc">Ponto de partida: dados acessíveis sem controle, sem política definida de quem pode ver o quê. O risco existe mesmo que ainda não tenha virado incidente.</div>
+        </div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-num" style="background:#e07a20;">2</div>
+        <div>
+          <div class="comp-title">Definir Regras</div>
+          <div class="comp-desc">Estabelecer políticas de acesso a dados: classificação por sensibilidade, papéis e responsabilidades, glossário corporativo e regras de privacidade.</div>
+        </div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-num" style="background:#c0b020;">3</div>
+        <div>
+          <div class="comp-title">Implementar Processos</div>
+          <div class="comp-desc">Aplicar regras através de fluxos de trabalho: solicitação de acesso, gestão de mudanças, resposta a incidentes e monitoramento contínuo.</div>
+        </div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-num" style="background:#3a9a70;">4</div>
+        <div>
+          <div class="comp-title">Incorporar em Sistemas</div>
+          <div class="comp-desc">Integrar as regras em sistemas de dados: controles de acesso técnicos, catálogos de dados, rastreamento de linhagem e alertas automáticos.</div>
+        </div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-num" style="background:#3a7ab0;">5</div>
+        <div>
+          <div class="comp-title">Dados Governados</div>
+          <div class="comp-desc">Estado desejado: dados acessíveis sob controle, com rastreabilidade completa, qualidade monitorada e conformidade garantida continuamente.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENTI P3 · resposta correta: C -->
+    <div class="menti-block">
+      <div class="menti-header">
+        <span class="menti-eyebrow">🎮 Quiz Mentimeter</span>
+        <span class="menti-badge">🏆 Quiz · Leaderboard</span>
+      </div>
+      <div class="menti-scenario">
+        O time de TI da SoundByte já designou Data Stewards e documentou as políticas de acesso. Mas o time de marketing continua mandando e-mails diretamente aos engenheiros pedindo extrações de dados — sem usar o processo oficial de solicitação.
+      </div>
+      <div class="menti-question">Em qual das 5 etapas da jornada a SoundByte está travada?</div>
+      <div class="menti-options">
+        <div class="menti-option">
+          <div class="menti-opt-letter">A</div>
+          <div class="menti-opt-text">Etapa 1 — Dados Não Governados: as regras nunca foram definidas</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">B</div>
+          <div class="menti-opt-text">Etapa 2 — Definir Regras: faltam políticas de acesso documentadas</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">C</div>
+          <div class="menti-opt-text">Etapa 3 — Implementar Processos: as regras existem, mas os fluxos não são seguidos</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">D</div>
+          <div class="menti-opt-text">Etapa 5 — Dados Governados: a situação já está sob controle</div>
+        </div>
+      </div>
+      <div class="menti-footer">
+        <span class="menti-lb">🏅 Exibir quadro de liderança após as respostas</span>
+        <a class="menti-cta" href="https://www.menti.com/al9hrkenwaqb" target="_blank" rel="noopener">Abrir no Mentimeter ↗</a>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p2')">← O que é Governança</button>
+      <button class="pn-btn pn-fwd" onclick="show('p4')">Os 4 Componentes →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P4 — OS 4 COMPONENTES
+══════════════════════════════════════ -->
+<div id="p4" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">04 · Os 4 Componentes da Governança</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Os pilares que<br><em>sustentam a governança.</em></div>
+
+    <div class="comp-list">
+      <div class="comp-item">
+        <div class="comp-num c1">1</div>
+        <div>
+          <div class="comp-title">Organização e Responsabilidades</div>
+          <div class="comp-desc" style="margin-bottom:8px;">Data Owners definem a estratégia e tomam decisões sobre políticas de dados. Data Stewards cuidam da gestão operacional diária, assegurando qualidade e conformidade. Empresas com papéis bem definidos alcançam retornos significativamente maiores sobre investimentos em tecnologia.</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <span style="font-size:11px;background:#e8eef8;border:1px solid #b0c8ec;border-radius:20px;padding:3px 10px;color:#2a4ab0;font-weight:600;">Data Owner → estratégia</span>
+            <span style="font-size:11px;background:#e8eef8;border:1px solid #b0c8ec;border-radius:20px;padding:3px 10px;color:#2a4ab0;font-weight:600;">Data Steward → operação diária</span>
+          </div>
+        </div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-num c2">2</div>
+        <div>
+          <div class="comp-title">Regras e Padrões</div>
+          <div class="comp-desc">Políticas para classificação, retenção, privacidade, segurança e compartilhamento de dados. Glossários corporativos e padrões de metadados que estabelecem uma linguagem comum — evitando que "receita" seja interpretada de forma diferente por vendas e finanças.</div>
+        </div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-num c3">3</div>
+        <div>
+          <div class="comp-title">Processos e Monitoramento</div>
+          <div class="comp-desc">Fluxos de solicitação de acesso, gestão de mudanças e resposta a incidentes, acompanhados de mecanismos de monitoramento contínuo. Quando um analista solicita acesso a dados sensíveis, o processo registra a autorização e permite auditoria posterior.</div>
+        </div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-num c4">4</div>
+        <div>
+          <div class="comp-title">Ferramentas e Infraestrutura</div>
+          <div class="comp-desc">Catálogos de dados, gestão de metadados, controle de acesso e rastreamento de linhagem. A tecnologia deve apoiar a estratégia — não defini-la. Um catálogo de dados ajuda os usuários a localizar informações confiáveis rapidamente, mas só é útil se houver regras claras sobre quem pode atualizar ou excluir registros.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENTI P4 · resposta correta: B -->
+    <div class="menti-block">
+      <div class="menti-header">
+        <span class="menti-eyebrow">🎮 Quiz Mentimeter</span>
+        <span class="menti-badge">🏆 Quiz · Leaderboard</span>
+      </div>
+      <div class="menti-scenario">
+        A SoundByte investiu <strong style="color:#e8c080;">R$ 200 mil</strong> em uma ferramenta de catálogo de dados. Seis meses depois, a ferramenta está vazia — nenhum time documentou seus dados nela. O CEO quer saber por que o investimento não gerou resultado.
+      </div>
+      <div class="menti-question">Qual componente da governança foi negligenciado antes de comprar a ferramenta?</div>
+      <div class="menti-options">
+        <div class="menti-option">
+          <div class="menti-opt-letter">A</div>
+          <div class="menti-opt-text">Ferramentas e Infraestrutura — a ferramenta escolhida era tecnicamente inadequada</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">B</div>
+          <div class="menti-opt-text">Organização e Responsabilidades — nenhum Data Owner ou Steward foi designado para alimentar o catálogo</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">C</div>
+          <div class="menti-opt-text">Processos e Monitoramento — faltava um dashboard de qualidade integrado</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">D</div>
+          <div class="menti-opt-text">Regras e Padrões — o glossário corporativo estava incompleto</div>
+        </div>
+      </div>
+      <div class="menti-footer">
+        <span class="menti-lb">🏅 Exibir quadro de liderança após as respostas</span>
+        <a class="menti-cta" href="https://www.menti.com/al9hrkenwaqb" target="_blank" rel="noopener">Abrir no Mentimeter ↗</a>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p3')">← De Dispersos a Estratégicos</button>
+      <button class="pn-btn pn-fwd" onclick="show('p5')">Qualidade · Segurança · Privacidade →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P5 — OS TRÊS PILARES OPERACIONAIS
+══════════════════════════════════════ -->
+<div id="p5" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">05 · Qualidade · Segurança · Privacidade</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Os três pilares<br><em>operacionais.</em></div>
+
+    <div class="pillar-grid">
+      <div class="pillar qual">
+        <div class="pillar-icon">✅</div>
+        <div class="pillar-title">Qualidade</div>
+        <div class="pillar-q">"Esse dado está correto e completo?"</div>
+        <div class="pillar-desc">Dicionário de dados, validações e responsabilidades claras sobre quem mantém cada conjunto de dados. Sem qualidade, a análise não tem valor — garbage in, garbage out.</div>
+      </div>
+      <div class="pillar rbac">
+        <div class="pillar-icon">🔐</div>
+        <div class="pillar-title">Segurança e Acesso (RBAC)</div>
+        <div class="pillar-q">"Quem pode ver e editar o quê?"</div>
+        <div class="pillar-desc">O cargo define o acesso, não o indivíduo. Um estagiário de marketing não precisa ver o CPF de clientes para fazer uma campanha de e-mail. Role-Based Access Control.</div>
+      </div>
+      <div class="pillar lgpd">
+        <div class="pillar-icon">⚖️</div>
+        <div class="pillar-title">Privacidade e Conformidade (LGPD)</div>
+        <div class="pillar-q">"Esse uso do dado é legal e ético?"</div>
+        <div class="pillar-desc">A LGPD está em vigor desde 2021 e a ANPD já aplicou sanções. Multas podem chegar a 2% do faturamento, limitado a R$ 50 milhões por infração. Não é hipótese.</div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-bottom:28px;">
+      <div class="callout-tag">O Caso SoundByte — Qual Pilar Foi Violado?</div>
+      Estagiários com acesso a GPS e histórico de pagamentos de 800 mil usuários: violação do pilar de <strong>Segurança (RBAC)</strong> — o cargo não justifica o acesso. Exportar dados pessoais para planilha pessoal: violação do pilar de <strong>Privacidade (LGPD)</strong> — dado pessoal fora do ambiente controlado sem base legal. A qualidade do dado é irrelevante quando o acesso é indevido.
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">LGPD — O que o gestor de dados precisa saber</div>
+    <div class="ov-concepts" style="margin-bottom:28px;">
+      <div class="ov-concept">
+        <h4>Bases Legais de Tratamento</h4>
+        <p>Consentimento, legítimo interesse, execução de contrato, obrigação legal e proteção da vida. Cada operação com dados pessoais precisa de uma base legal documentada.</p>
+      </div>
+      <div class="ov-concept">
+        <h4>Dados Sensíveis</h4>
+        <p>Saúde, biometria, orientação sexual, convicção religiosa e política têm proteção reforçada. Localização GPS pode ser considerada dado pessoal sensível em certos contextos.</p>
+      </div>
+      <div class="ov-concept">
+        <h4>Direitos do Titular</h4>
+        <p>Acesso, correção, exclusão, portabilidade e revogação do consentimento. A empresa precisa ter processos para responder a essas solicitações dentro dos prazos legais.</p>
+      </div>
+      <div class="ov-concept">
+        <h4>DPO e ANPD</h4>
+        <p>O Data Protection Officer (Encarregado) é o elo entre a empresa, os titulares e a Autoridade Nacional de Proteção de Dados. Empresas de médio e grande porte devem designar um.</p>
+      </div>
+    </div>
+
+    <!-- MENTI P5 · resposta correta: C -->
+    <div class="menti-block">
+      <div class="menti-header">
+        <span class="menti-eyebrow">🎮 Quiz Mentimeter</span>
+        <span class="menti-badge">🏆 Quiz · Leaderboard</span>
+      </div>
+      <div class="menti-scenario">
+        Para uma campanha regional de São Paulo, uma analista de marketing acessa diretamente o banco de dados de produção da SoundByte e exporta nome, e-mail e CEP de <strong style="color:#e8c080;">430 mil usuários</strong> para uma planilha no seu computador pessoal.
+      </div>
+      <div class="menti-question">Quais pilares da governança foram violados nessa ação?</div>
+      <div class="menti-options">
+        <div class="menti-option">
+          <div class="menti-opt-letter">A</div>
+          <div class="menti-opt-text">Apenas Qualidade — os dados exportados podem estar desatualizados</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">B</div>
+          <div class="menti-opt-text">Apenas RBAC — a analista não deveria ter acesso direto ao banco de produção</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">C</div>
+          <div class="menti-opt-text">RBAC e LGPD — acesso excessivo ao banco de produção + dados pessoais fora do ambiente controlado sem base legal</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">D</div>
+          <div class="menti-opt-text">Nenhum — a analista estava apenas fazendo o trabalho dela</div>
+        </div>
+      </div>
+      <div class="menti-footer">
+        <span class="menti-lb">🏅 Exibir quadro de liderança após as respostas</span>
+        <a class="menti-cta" href="https://www.menti.com/al9hrkenwaqb" target="_blank" rel="noopener">Abrir no Mentimeter ↗</a>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p4')">← Os 4 Componentes</button>
+      <button class="pn-btn pn-fwd" onclick="show('p6')">As 6 Dimensões da Qualidade →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P6 — AS 6 DIMENSÕES DA QUALIDADE
+══════════════════════════════════════ -->
+<div id="p6" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">06 · As 6 Dimensões da Qualidade</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Um dado ruim é<br><em>pior que nenhum dado.</em></div>
+
+    <div class="callout" style="margin-bottom:32px;">
+      Um cadastro de clientes com endereços incompletos ou duplicados compromete campanhas de marketing e análises de mercado. A qualidade dos dados deve ser medida por dimensões mensuráveis — não por percepção.
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">As 6 Dimensões da Qualidade de Dados</div>
+    <div class="qual-grid">
+      <div class="qual-card q1">
+        <div class="qual-name">Acurácia</div>
+        <div class="qual-def">A precisão dos dados em refletir a realidade. O CPF registrado pertence ao cliente correto? O valor de venda bate com a nota fiscal?</div>
+      </div>
+      <div class="qual-card q2">
+        <div class="qual-name">Completude</div>
+        <div class="qual-def">A extensão em que todos os dados necessários estão presentes. Campos obrigatórios ausentes, como telefone sem DDD ou endereço sem CEP.</div>
+      </div>
+      <div class="qual-card q3">
+        <div class="qual-name">Unicidade</div>
+        <div class="qual-def">A ausência de dados duplicados. Um cliente cadastrado duas vezes com e-mails diferentes gera ruído nas análises e campanhas desnecessárias.</div>
+      </div>
+      <div class="qual-card q4">
+        <div class="qual-name">Tempestividade</div>
+        <div class="qual-def">A disponibilidade dos dados quando necessário. Dados atualizados na hora certa — um endereço desatualizado em um CRM é um dado incompleto no momento errado.</div>
+      </div>
+      <div class="qual-card q5">
+        <div class="qual-name">Validade</div>
+        <div class="qual-def">A conformidade dos dados com as regras e restrições definidas. Um CEP com 7 dígitos, uma data de nascimento no futuro — dados que passam pela entrada mas violam regras de negócio.</div>
+      </div>
+      <div class="qual-card q6">
+        <div class="qual-name">Consistência</div>
+        <div class="qual-def">A uniformidade dos dados em diferentes conjuntos. Se vendas reporta R$ 1,2 M e financeiro reporta R$ 1,1 M para o mesmo período, há inconsistência — e uma das fontes está errada.</div>
+      </div>
+    </div>
+
+    <div style="width:100%;max-width:720px;padding:18px 20px;background:var(--s1);border:1px solid var(--border);border-radius:10px;font-size:13.5px;line-height:1.7;margin-bottom:28px;">
+      <strong>Regra prática:</strong> para avaliar se a governança está funcionando, verifique as três perguntas: (1) a mesma métrica produz resultados idênticos em todos os sistemas? (2) consigo rastrear a origem e transformações de qualquer dado? (3) todo acesso é pré-autorizado e toda alteração pode ser auditada?
+    </div>
+
+    <!-- MENTI P6 · resposta correta: C -->
+    <div class="menti-block">
+      <div class="menti-header">
+        <span class="menti-eyebrow">🎮 Quiz Mentimeter</span>
+        <span class="menti-badge">🏆 Quiz · Leaderboard</span>
+      </div>
+      <div class="menti-scenario">
+        O time de BI da SoundByte descobre três problemas nos dados antes de uma apresentação à diretoria: <strong style="color:#e8c080;">(1)</strong> o mesmo CPF aparece com dois cadastros diferentes; <strong style="color:#e8c080;">(2)</strong> 9% dos CEPs têm apenas 7 dígitos; <strong style="color:#e8c080;">(3)</strong> o plano do usuário consta como "premium" no CRM e "standard" no sistema de faturamento.
+      </div>
+      <div class="menti-question">Quais dimensões de qualidade estão comprometidas nesse cenário?</div>
+      <div class="menti-options">
+        <div class="menti-option">
+          <div class="menti-opt-letter">A</div>
+          <div class="menti-opt-text">Apenas Validade — os CEPs com 7 dígitos estão no formato errado</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">B</div>
+          <div class="menti-opt-text">Acurácia e Completude — os dados não refletem a realidade e têm campos incompletos</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">C</div>
+          <div class="menti-opt-text">Unicidade, Validade e Consistência — CPF duplicado, CEP inválido e dados conflitantes entre sistemas</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">D</div>
+          <div class="menti-opt-text">Todas as 6 dimensões são igualmente afetadas</div>
+        </div>
+      </div>
+      <div class="menti-footer">
+        <span class="menti-lb">🏅 Exibir quadro de liderança após as respostas</span>
+        <a class="menti-cta" href="https://www.mentimeter.com" target="_blank" rel="noopener">Abrir no Mentimeter ↗</a>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p5')">← Qualidade · Segurança · Privacidade</button>
+      <button class="pn-btn pn-fwd" onclick="show('p7')">Métricas e Impacto →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P7 — MÉTRICAS E IMPACTO
+══════════════════════════════════════ -->
+<div id="p7" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">07 · Métricas e Impacto nos Negócios</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">O que medir para<br><em>saber se funciona.</em></div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">3 Requisitos para Verificar a Efetividade</div>
+    <div class="req-grid" style="margin-bottom:28px;">
+      <div class="req-card r1">
+        <div class="req-title">Consistência entre Domínios</div>
+        <div class="req-desc">Métricas iguais em todos os sistemas. Se vendas e financeiro reportam faturamentos diferentes para o mesmo período, há falha de governança.</div>
+      </div>
+      <div class="req-card r2">
+        <div class="req-title">Rastreabilidade Completa</div>
+        <div class="req-desc">Explicar a origem e transformações de qualquer dado. Essencial em auditorias: a empresa deve mostrar de onde vieram os números de um relatório.</div>
+      </div>
+      <div class="req-card r3">
+        <div class="req-title">Autorização &amp; Auditoria</div>
+        <div class="req-desc">Todo acesso pré-autorizado e toda alteração auditável. Em setores regulados (saúde, finanças), prática obrigatória para evitar fraudes.</div>
+      </div>
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">Espectro de Métricas de Efetividade</div>
+    <div class="metric-row" style="margin-bottom:32px;">
+      <div class="metric-card custo">
+        <div class="metric-tag">Custo</div>
+        <div class="metric-items">Tempo para entrega de dados<br>Custo por ativo governado<br>Horas de trabalho retrabalho</div>
+      </div>
+      <div class="metric-card risco">
+        <div class="metric-tag">Risco</div>
+        <div class="metric-items">Frequência de acessos não autorizados<br>Nº de incidentes de privacidade<br>Score de conformidade LGPD</div>
+      </div>
+      <div class="metric-card utilid">
+        <div class="metric-tag">Utilidade</div>
+        <div class="metric-items">Tempo para encontrar dados<br>Taxa de reutilização<br>Satisfação dos usuários de dados</div>
+      </div>
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">Impacto de uma Governança Madura</div>
+    <div class="impact-grid">
+      <div class="impact-card neg">
+        <div class="impact-pct">−52%</div>
+        <div class="impact-label">Violações de Compliance</div>
+        <div class="impact-desc">Redução significativa nas violações de compliance em organizações com governança estruturada.</div>
+      </div>
+      <div class="impact-card pos">
+        <div class="impact-pct">+66%</div>
+        <div class="impact-label">Segurança de Dados</div>
+        <div class="impact-desc">Aumento na segurança dos dados com políticas de acesso e monitoramento contínuo implementados.</div>
+      </div>
+      <div class="impact-card roi">
+        <div class="impact-pct">+15–25%</div>
+        <div class="impact-label">ROI Tecnológico</div>
+        <div class="impact-desc">Aumento no retorno sobre investimento tecnológico. Dados de qualidade aceleram projetos de IA e BI.</div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:4px;">
+      <div class="callout-tag">Além do Compliance</div>
+      Governança matura se torna vantagem competitiva: acelera projetos de IA (modelos treinados com dados confiáveis), permite expansão segura para novos mercados e reduz riscos sem comprometer a inovação. Uma empresa que governa bem seus dados consegue treinar modelos de IA com informações confiáveis, evitando vieses e erros que poderiam comprometer resultados.
+    </div>
+
+    <!-- MENTI P7 · resposta correta: A -->
+    <div class="menti-block">
+      <div class="menti-header">
+        <span class="menti-eyebrow">🎮 Quiz Mentimeter</span>
+        <span class="menti-badge">🏆 Quiz · Leaderboard</span>
+      </div>
+      <div class="menti-scenario">
+        O gerente de governança apresenta ao diretor financeiro três métricas do último trimestre: <strong style="color:#e8c080;">(1)</strong> número de ferramentas de governança adquiridas; <strong style="color:#e8c080;">(2)</strong> redução de 40% nos acessos não autorizados detectados; <strong style="color:#e8c080;">(3)</strong> tempo médio para localizar um dado no catálogo caiu de 3h para 25 min.
+      </div>
+      <div class="menti-question">Qual das três métricas NÃO mede efetividade da governança?</div>
+      <div class="menti-options">
+        <div class="menti-option">
+          <div class="menti-opt-letter">A</div>
+          <div class="menti-opt-text">Número de ferramentas adquiridas — mede gasto, não resultado</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">B</div>
+          <div class="menti-opt-text">Redução nos acessos não autorizados — é uma métrica de risco válida</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">C</div>
+          <div class="menti-opt-text">Tempo para localizar dados — é uma métrica de utilidade válida</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">D</div>
+          <div class="menti-opt-text">Todas as três são métricas válidas de efetividade da governança</div>
+        </div>
+      </div>
+      <div class="menti-footer">
+        <span class="menti-lb">🏅 Exibir quadro de liderança após as respostas</span>
+        <a class="menti-cta" href="https://www.menti.com/al9hrkenwaqb" target="_blank" rel="noopener">Abrir no Mentimeter ↗</a>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p6')">← As 6 Dimensões da Qualidade</button>
+      <button class="pn-btn pn-fwd" onclick="show('p8')">Boas Práticas →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P8 — BOAS PRÁTICAS DE IMPLEMENTAÇÃO
+══════════════════════════════════════ -->
+<div id="p8" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">08 · Boas Práticas de Implementação</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Governança não é um projeto.<br><em>É um sistema.</em></div>
+
+    <div class="quote-card">
+      <div class="quote-text">"A governança de dados não é um projeto com início e fim definidos, mas um modelo operacional contínuo. Quando bem implementada, ela se torna quase invisível, funcionando como um sistema operacional que sustenta decisões estratégicas."</div>
+      <div class="quote-sub">Adaptado de: <em>Beyond the Buzzwords: Data Governance as Your Organization's Data Operating System</em> — <a href="https://medium.com/@jinlow/beyond-the-buzzwords-data-governance-as-your-organizations-data-operating-system-890cb77dcd5e" target="_blank" rel="noopener" style="color:var(--c1)">Medium, @jinlow</a></div>
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">Princípios de Implementação Bem-Sucedida</div>
+    <div class="comp-list" style="margin-bottom:28px;">
+      <div class="comp-item">
+        <div class="comp-num" style="background:#c08a20;">1</div>
+        <div>
+          <div class="comp-title">Comece pelo Valor de Negócio</div>
+          <div class="comp-desc">Não comece pela tecnologia. Identifique onde a má qualidade ou o acesso indevido gera custo ou risco para o negócio — e resolva isso primeiro. O valor justifica o investimento.</div>
+        </div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-num" style="background:#3a7ab0;">2</div>
+        <div>
+          <div class="comp-title">Adote Modelos Federados</div>
+          <div class="comp-desc">Equilibre padronização central com autonomia local. Cada área tem suas particularidades — um modelo muito centralizado gera resistência; muito descentralizado gera caos. Padronização + autonomia local é o equilíbrio certo.</div>
+        </div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-num" style="background:#5a3ab0;">3</div>
+        <div>
+          <div class="comp-title">Invista em Gestão da Mudança</div>
+          <div class="comp-desc">Resistências internas são o maior obstáculo. Comunicação interna, capacitação e exemplos de sucesso rápidos são cruciais para superar a inércia organizacional.</div>
+        </div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-num" style="background:#3a9a50;">4</div>
+        <div>
+          <div class="comp-title">Automatize Processos</div>
+          <div class="comp-desc">Processos manuais de governança falham por inconsistência humana. Automação de alertas de acesso, validações de qualidade e revisões periódicas reduz o custo operacional e aumenta a confiabilidade.</div>
+        </div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-num" style="background:#3a9ab0;">5</div>
+        <div>
+          <div class="comp-title">Trate a Governança como Produto Evolutivo</div>
+          <div class="comp-desc">Medir e ajustar continuamente. Um comitê de governança que revisa periodicamente indicadores de qualidade e ajusta políticas conforme novas regulamentações ou mudanças no mercado é o modelo maduro.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-tag">O Iceberg da Governança</div>
+      O que aparece acima da superfície — políticas visíveis, catálogos, dashboards de qualidade — é apenas a ponta. Abaixo estão os processos contínuos de monitoramento, a cultura organizacional de responsabilidade sobre dados e a competitividade que a governança madura gera. <strong>Dados como passivo são o risco de quem ignora o que está embaixo.</strong>
+    </div>
+
+    <!-- MENTI P8 · resposta correta: C -->
+    <div class="menti-block">
+      <div class="menti-header">
+        <span class="menti-eyebrow">🎮 Quiz Mentimeter</span>
+        <span class="menti-badge">🏆 Quiz · Leaderboard</span>
+      </div>
+      <div class="menti-scenario">
+        O DPO da SoundByte monta um cronograma ambicioso: no mês 1, criar todas as políticas + catálogo completo + controles de acesso + auditoria + treinamento de todos os <strong style="color:#e8c080;">200 funcionários</strong>. Três meses depois, apenas 20% do plano foi executado e a equipe está desmotivada.
+      </div>
+      <div class="menti-question">Qual princípio de implementação esse projeto contrariou desde o início?</div>
+      <div class="menti-options">
+        <div class="menti-option">
+          <div class="menti-opt-letter">A</div>
+          <div class="menti-opt-text">Automatizar Processos — os controles foram configurados manualmente</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">B</div>
+          <div class="menti-opt-text">Adotar Modelos Federados — centralizou tudo sem dar autonomia às áreas</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">C</div>
+          <div class="menti-opt-text">Começar pelo Valor de Negócio — tentou resolver tudo de uma vez em vez de priorizar o maior risco primeiro</div>
+        </div>
+        <div class="menti-option">
+          <div class="menti-opt-letter">D</div>
+          <div class="menti-opt-text">Investir em Gestão da Mudança — esqueceu de comunicar o propósito às equipes</div>
+        </div>
+      </div>
+      <div class="menti-footer">
+        <span class="menti-lb">🏅 Exibir quadro de liderança após as respostas · 🥇 Campeão da aula revelado aqui!</span>
+        <a class="menti-cta" href="https://www.menti.com/al9hrkenwaqb" target="_blank" rel="noopener">Abrir no Mentimeter ↗</a>
+      </div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p7')">← Métricas e Impacto</button>
+      <button class="pn-btn pn-fwd" onclick="show('p9')">Atividade Avaliativa →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P9 — ATIVIDADE AVALIATIVA
+══════════════════════════════════════ -->
+<div id="p9" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">09 · Atividade Avaliativa</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Guardiões<br><em>da SoundByte.</em></div>
+
+    <div class="callout" style="margin-bottom:32px;font-size:14px;line-height:1.75;">
+      <div class="callout-tag">O Cenário</div>
+      A auditoria da SoundByte confirmou o risco. A empresa precisa urgentemente de um plano de governança. Cada grupo atuará como <strong>consultores de dados</strong> e é responsável por <strong>dois cenários complementares</strong> — trabalhando de forma independente, sem interação entre grupos. Ao final, cada grupo apresenta os dois cenários ao professor em 8 minutos.
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">Grupo 1 — Segurança e Controle</div>
+    <div class="comp-list" style="margin-bottom:28px;">
+      <div class="comp-item" style="border-left:3px solid #3a60b0;">
+        <div class="comp-num c1">A</div>
+        <div>
+          <div class="comp-title">🔐 Matriz RBAC — Níveis de Acesso por Cargo</div>
+          <div class="comp-desc">Definir quem pode <strong>ler</strong>, <strong>editar</strong> e <strong>excluir</strong> cada tipo de dado da SoundByte (pagamentos, dados pessoais, histórico de streaming, GPS) para cada cargo: Estagiário de Marketing, Analista de Marketing, Gerente de Marketing, Analista de BI, DPO.</div>
+        </div>
+      </div>
+      <div class="comp-item" style="border-left:3px solid #3a60b0;">
+        <div class="comp-num c1">C</div>
+        <div>
+          <div class="comp-title">🔍 Processo de Auditoria de Acessos</div>
+          <div class="comp-desc">Propor o processo de rastreamento de quem acessou quais dados e quando: estrutura do log, frequência de revisão, responsáveis, fluxo de escalonamento de incidentes e alertas automáticos — alinhados à Matriz RBAC do mesmo grupo.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:16px;">Grupo 2 — Privacidade e Qualidade</div>
+    <div class="comp-list" style="margin-bottom:32px;">
+      <div class="comp-item" style="border-left:3px solid #5a3ab0;">
+        <div class="comp-num c2">B</div>
+        <div>
+          <div class="comp-title">⚖️ Política de Uso de Dados Pessoais (LGPD)</div>
+          <div class="comp-desc">Criar a política de uso de dados pessoais para campanhas de marketing da SoundByte: base legal para cada tipo de dado, finalidade permitida, período de retenção, processo de revogação de consentimento e plano de resposta a incidentes.</div>
+        </div>
+      </div>
+      <div class="comp-item" style="border-left:3px solid #5a3ab0;">
+        <div class="comp-num c2">D</div>
+        <div>
+          <div class="comp-title">📊 Plano de Qualidade de Dados</div>
+          <div class="comp-desc">Avaliar os dados da SoundByte nas 6 dimensões de qualidade (Acurácia, Completude, Unicidade, Tempestividade, Validade, Consistência), propor regras de qualidade, ações de melhoria e KPIs de monitoramento — conectados à Política LGPD do mesmo grupo.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ov-section-tag" style="margin-bottom:12px;">Atividade Avaliativa</div>
+    <a class="activity-link" href="atividade_avaliativa_7_governanca.html" target="_blank" rel="noopener">
+      <div class="activity-link-icon">🛡️</div>
+      <div>
+        <div class="activity-link-title">Atividade Avaliativa 7 — Guardiões da SoundByte</div>
+        <div class="activity-link-desc">Instruções, templates e critérios para os dois grupos. Grupo 1: Cenários A + C · Grupo 2: Cenários B + D. Inclui prompts de revisão por IA para cada cenário.</div>
+      </div>
+      <div class="activity-link-arrow">↗</div>
+    </a>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p8')">← Boas Práticas</button>
+      <button class="pn-btn pn-fwd" onclick="show('menu')">← Menu Principal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) { el.classList.add('active'); window.scrollTo(0, 0); }
+}
+function toggleDisc(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+</script>
+</body>
+</html>
