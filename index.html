@@ -1,115 +1,202 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gestão de Banco de Dados e BI · ESPM</title>
-<meta name="description" content="Site da disciplina Gestão de Banco de Dados e BI — Pós-Graduação em Data Analytics e Marketing, ESPM. Plano de ensino, 8 aulas, atividades e recursos.">
-<meta name="color-scheme" content="dark light">
-<meta name="theme-color" content="#0D0D0D">
+<meta name="description" content="Site da disciplina Gestão de Banco de Dados e BI — Pós-Graduação em Data Analytics e Marketing, ESPM. Oito aulas e oito atividades avaliativas.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%237a1a1a'/><text x='16' y='22' font-family='monospace' font-size='15' font-weight='700' fill='%23fff' text-anchor='middle'>BD</text></svg>">
+<style>
+:root {
+  --bg:     #fdf8f6;
+  --s1:     #f5ecea;
+  --s2:     #ecdeda;
+  --border: #dfc9c0;
+  --c1:     #7a1a1a;
+  --c2:     #b83030;
+  --text:   #1a0d0d;
+  --muted:  #8a6060;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
 
-<!-- Defesa em profundidade contra XSS: só permite script dos arquivos locais mais os
-     dois scripts inline da página (autorizados por hash). Se o conteúdo de QUALQUER
-     script inline mudar, os hashes precisam ser recalculados, senão o navegador passa
-     a bloquear esse script (ver site/README.md, seção "Convenção de segurança"). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-X6n4Av90RwqaxA/XiYKrpkD6hD3it20NGkINfaaR/sA=' 'sha256-QSbHxbsW/dYu4OYOpXE8awyBiIBsB+7c51Ojr9dnHeI='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'">
+/* ── HERO ── */
+.m-header { padding: 88px 56px 56px; }
+.m-eyebrow { font-size: 10.5px; letter-spacing: 4px; text-transform: uppercase; color: var(--c1); font-weight: 600; margin-bottom: 18px; }
+.m-title { font-size: 56px; font-weight: 800; line-height: 1.06; background: linear-gradient(140deg, #1a0d0d 30%, #7a1a1a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.m-sub { margin-top: 16px; font-size: 15px; color: var(--muted); max-width: 640px; line-height: 1.6; }
 
-<!-- Tema aplicado antes da renderização: evita FOUC -->
-<script>
-  (function () {
-    try {
-      var t = localStorage.getItem('gbdbi:tema');
-      if (t !== 'light' && t !== 'dark') t = 'dark';
-      document.documentElement.setAttribute('data-theme', t);
-      document.querySelector('meta[name="theme-color"]')
-        .setAttribute('content', t === 'light' ? '#F7F7F5' : '#0D0D0D');
-    } catch (e) {}
-  })();
-</script>
+/* ── SECTIONS ── */
+.section { padding: 0 56px 16px; }
+.section-label { display: flex; align-items: center; gap: 14px; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin: 40px 0 18px; }
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="assets/css/base.css">
-<link rel="stylesheet" href="assets/css/components.css">
-<link rel="stylesheet" href="assets/css/pages.css">
-<link rel="stylesheet" href="assets/css/theme.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%234A9EFF'/><text x='16' y='22' font-family='monospace' font-size='15' font-weight='700' fill='%23fff' text-anchor='middle'>BD</text></svg>">
+.m-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; padding: 0 56px 8px; }
+.mcard { background: var(--s1); border: 1px solid var(--border); border-radius: 14px; padding: 26px 24px 30px; cursor: pointer; transition: border-color .2s, transform .2s, box-shadow .2s; position: relative; overflow: hidden; display: block; text-decoration: none; color: inherit; }
+.mcard:hover { border-color: var(--c1); transform: translateY(-3px); box-shadow: 0 16px 48px rgba(122,26,26,.10); }
+.mcard::after { content: ''; position: absolute; inset: 0 0 auto 0; height: 2px; background: linear-gradient(90deg, var(--c1), var(--c2)); opacity: 0; transition: opacity .2s; }
+.mcard:hover::after { opacity: 1; }
+.mc-num { font-size: 10px; letter-spacing: 3px; font-weight: 700; color: var(--c1); margin-bottom: 12px; text-transform: uppercase; }
+.mc-date { font-size: 10px; color: var(--muted); font-weight: 600; float: right; }
+.mc-h { font-size: 16px; font-weight: 700; line-height: 1.35; margin-bottom: 8px; }
+.mc-p { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+.mc-arrow { position: absolute; bottom: 20px; right: 22px; color: var(--muted); font-size: 18px; transition: color .2s, transform .2s; }
+.mcard:hover .mc-arrow { color: var(--c1); transform: translate(2px, -2px); }
+.mcard.atividade { background: #fff; }
+
+/* ── FOOTER ── */
+.site-footer { margin-top: 64px; padding: 32px 56px 56px; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--muted); line-height: 1.8; }
+.site-footer strong { color: var(--text); }
+
+@media (max-width: 640px) {
+  .m-header { padding: 56px 24px 40px; }
+  .m-title { font-size: 36px; }
+  .section, .m-grid { padding-left: 24px; padding-right: 24px; }
+  .site-footer { padding: 28px 24px 40px; }
+}
+</style>
 </head>
-
 <body>
 
-<a class="skip-link" href="#view">Ir para o conteúdo</a>
-
-<div class="layout">
-
-  <!-- ─────────── SIDEBAR ─────────── -->
-  <aside class="sidebar" id="sidebar" aria-label="Navegação da disciplina">
-    <div class="sidebar-header">
-      <a class="sidebar-brand" href="#/" aria-label="Início da disciplina">
-        <span class="sidebar-brand-abbr">BD</span>
-        <span class="sidebar-brand-name">GBD&amp;BI</span>
-      </a>
-      <button class="sidebar-close" id="sidebar-close" type="button" aria-label="Fechar menu">&#10005;</button>
-    </div>
-    <nav id="sidebar-nav" aria-label="Seções"></nav>
-  </aside>
-  <div class="sidebar-overlay" id="sidebar-overlay" hidden></div>
-
-  <!-- ─────────── CONTEÚDO ─────────── -->
-  <main class="main-content">
-    <div class="main-inner">
-
-      <header class="site-header">
-        <button class="header-hamburger" id="hamburger" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="sidebar">&#9776;</button>
-        <nav class="header-breadcrumb" id="breadcrumb" aria-label="Trilha de navegação"></nav>
-        <div class="header-actions">
-          <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Alternar tema claro/escuro" title="Alternar tema">
-            <span class="icon-moon" aria-hidden="true">&#9789;</span>
-            <span class="icon-sun" aria-hidden="true">&#9788;</span>
-          </button>
-        </div>
-      </header>
-
-      <div id="view" tabindex="-1">
-        <div class="loading">Carregando…</div>
-      </div>
-
-      <footer class="site-footer">
-        <div>
-          <div class="footer-col-title">Gestão de Banco de Dados e BI</div>
-          <span class="footer-link">Pós-Graduação em Data Analytics e Marketing</span>
-          <span class="footer-link">ESPM · Turma 61A1-2 · Noturno · 24 h</span>
-          <span class="footer-link">Prof. Deoclides Francisco de Souza Filho</span>
-          <p class="footer-copy">Conteúdo alinhado ao PEA atualizado em 30/03/2026.</p>
-        </div>
-        <div>
-          <div class="footer-col-title">Navegação</div>
-          <a class="footer-link" href="#/">Início</a>
-          <a class="footer-link" href="#/plano">Plano de ensino (PEA)</a>
-          <a class="footer-link" href="#/avaliacao">Avaliação</a>
-          <a class="footer-link" href="#/recursos">Recursos</a>
-        </div>
-      </footer>
-
-    </div>
-  </main>
-
+<div class="m-header">
+  <div class="m-eyebrow">ESPM · Pós-Graduação em Data Analytics e Marketing</div>
+  <div class="m-title">Gestão de Banco<br>de Dados e <em style="font-style:normal;color:#7a1a1a;">BI</em></div>
+  <div class="m-sub">Turma 61A1-2 · Noturno · 24 h — do dado bruto à decisão de negócio: modelagem, SQL, data warehouse, NoSQL, governança e visualização.</div>
 </div>
 
-<!-- namespace + dados -->
-<script>var GBDBI = { data: {}, content: {} };</script>
-<script src="data/curso.js"></script>
-<script src="data/aulas.js"></script>
-<script src="data/atividades.js"></script>
+<div class="section">
+  <div class="section-label">Aulas</div>
+</div>
+<div class="m-grid">
+  <a class="mcard" href="content/aula-01.html">
+    <span class="mc-date">11.05</span>
+    <div class="mc-num">Aula 01</div>
+    <div class="mc-h">Fundamentos de Dados</div>
+    <p class="mc-p">Dado como Ativo · Informação · Decisão · Estrutura de Dados</p>
+    <span class="mc-arrow">↗</span>
+  </a>
+  <a class="mcard" href="content/aula-02.html">
+    <span class="mc-date">16.05</span>
+    <div class="mc-num">Aula 02</div>
+    <div class="mc-h">A Arquitetura do Caos</div>
+    <p class="mc-p">Entidades · Atributos · Cardinalidade · Chaves · 1FN · 2FN · 3FN</p>
+    <span class="mc-arrow">↗</span>
+  </a>
+  <a class="mcard" href="content/aula-03.html">
+    <span class="mc-date">16.05</span>
+    <div class="mc-num">Aula 03</div>
+    <div class="mc-h">A Linguagem das Respostas</div>
+    <p class="mc-p">DDL · DML · SELECT · FROM · WHERE · JOIN · GROUP BY</p>
+    <span class="mc-arrow">↗</span>
+  </a>
+  <a class="mcard" href="content/aula-04.html">
+    <span class="mc-date">18.05</span>
+    <div class="mc-num">Aula 04</div>
+    <div class="mc-h">O Refino Analítico</div>
+    <p class="mc-p">OLTP · OLAP · ETL · Data Warehouse · Star Schema · SCD</p>
+    <span class="mc-arrow">↗</span>
+  </a>
+  <a class="mcard" href="content/aula-05.html">
+    <span class="mc-date">25.05</span>
+    <div class="mc-num">Aula 05</div>
+    <div class="mc-h">A Visualização do Sucesso</div>
+    <p class="mc-p">BI · Dashboard · KPIs · Métricas · Tableau · Storytelling com Dados</p>
+    <span class="mc-arrow">↗</span>
+  </a>
+  <a class="mcard" href="content/aula-06.html">
+    <span class="mc-date">01.06</span>
+    <div class="mc-num">Aula 06</div>
+    <div class="mc-h">A Escala do Big Data</div>
+    <p class="mc-p">Big Data · NoSQL · MongoDB · JSON</p>
+    <span class="mc-arrow">↗</span>
+  </a>
+  <a class="mcard" href="content/aula-07.html">
+    <span class="mc-date">08.06</span>
+    <div class="mc-num">Aula 07</div>
+    <div class="mc-h">O Guardião dos Ativos</div>
+    <p class="mc-p">DAMA-DMBOK · LGPD · Segurança · Conformidade</p>
+    <span class="mc-arrow">↗</span>
+  </a>
+  <a class="mcard" href="content/aula-08.html">
+    <span class="mc-date">22.06</span>
+    <div class="mc-num">Aula 08</div>
+    <div class="mc-h">Projeto Final Integrador</div>
+    <p class="mc-p">Modelo de Dados · Arquitetura · Governança · Narrativa Estratégica</p>
+    <span class="mc-arrow">↗</span>
+  </a>
+</div>
 
-<!-- aplicação -->
-<script src="assets/js/theme.js"></script>
-<script src="assets/js/progress.js"></script>
-<script src="assets/js/content.js"></script>
-<script src="assets/js/render.js"></script>
-<script src="assets/js/nav.js"></script>
-<script src="assets/js/router.js"></script>
-<script src="assets/js/app.js"></script>
+<div class="section">
+  <div class="section-label">Atividades</div>
+</div>
+<div class="m-grid">
+  <a class="mcard atividade" href="content/atividade-01.html">
+    <span class="mc-date">21.09</span>
+    <div class="mc-num">Atividade 01</div>
+    <div class="mc-h">Os Números que Mentem sem Mentir</div>
+    <p class="mc-p">Dashboard operacional vs. decisão de negócio — o paradoxo da SoundByte.</p>
+    <span class="mc-arrow">↗</span>
+  </a>
+  <a class="mcard atividade" href="content/atividade-02.html">
+    <span class="mc-date">26.09</span>
+    <div class="mc-num">Atividade 02</div>
+    <div class="mc-h">Sistema de Controle de Voos</div>
+    <p class="mc-p">Modelagem entidade-relacionamento para uma companhia aérea.</p>
+    <span class="mc-arrow">↗</span>
+  </a>
+  <a class="mcard atividade" href="content/atividade-03.html">
+    <span class="mc-date">04.10</span>
+    <div class="mc-num">Atividade 03</div>
+    <div class="mc-h">Chinook — SQL que Responde ao Negócio</div>
+    <p class="mc-p">Quatro perguntas de negócio obrigatórias e três que você formula.</p>
+    <span class="mc-arrow">↗</span>
+  </a>
+  <a class="mcard atividade" href="content/atividade-04.html">
+    <span class="mc-date">04.10</span>
+    <div class="mc-num">Atividade 04</div>
+    <div class="mc-h">Do Operacional ao Star Schema</div>
+    <p class="mc-p">Processo de negócio, granularidade, fato, dimensões e SCD tipo 2.</p>
+    <span class="mc-arrow">↗</span>
+  </a>
+  <a class="mcard atividade" href="content/atividade-05.html">
+    <span class="mc-date">18.10</span>
+    <div class="mc-num">Atividade 05</div>
+    <div class="mc-h">Dashboard Analítico no Tableau</div>
+    <p class="mc-p">Seis visualizações obrigatórias, dois KPIs e quatro filtros interativos.</p>
+    <span class="mc-arrow">↗</span>
+  </a>
+  <a class="mcard atividade" href="content/atividade-06.html">
+    <div class="mc-num">Atividade 06</div>
+    <div class="mc-h">SQL para MongoDB</div>
+    <p class="mc-p">Modelagem NoSQL · JSON · Consultas Analíticas · MongoDB Atlas</p>
+    <span class="mc-arrow">↗</span>
+  </a>
+  <a class="mcard atividade" href="content/atividade-07.html">
+    <div class="mc-num">Atividade 07</div>
+    <div class="mc-h">Guardiões da SoundByte</div>
+    <p class="mc-p">RBAC · LGPD · Auditoria · Qualidade de Dados</p>
+    <span class="mc-arrow">↗</span>
+  </a>
+  <a class="mcard atividade" href="content/atividade-08.html">
+    <div class="mc-num">Atividade 08</div>
+    <div class="mc-h">Projeto Final — SoundByte Series B</div>
+    <p class="mc-p">Modelo de Dados · Arquitetura · Governança · Narrativa Estratégica</p>
+    <span class="mc-arrow">↗</span>
+  </a>
+</div>
+
+<footer class="site-footer">
+  <strong>Gestão de Banco de Dados e BI</strong> — Pós-Graduação em Data Analytics e Marketing<br>
+  ESPM · Turma 61A1-2 · Noturno · 24 h<br>
+  Prof. Deoclides Francisco de Souza Filho
+</footer>
 
 </body>
 </html>
