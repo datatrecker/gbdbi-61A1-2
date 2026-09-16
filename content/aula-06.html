@@ -225,6 +225,14 @@ body {
   .nosql-type-body { grid-template-columns: 1fr; }
   .nosql-type-desc { border-right: none; border-bottom: 1px solid var(--border); }
 }
+
+.lesson-nav { display: flex; justify-content: space-between; gap: 14px; width: 100%; max-width: 760px; margin: 0 auto 56px; padding: 0 56px; flex-wrap: wrap; }
+.lesson-nav-btn { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; color: var(--text); font-size: 13px; transition: all .2s; flex: 1; min-width: 220px; }
+.lesson-nav-btn:hover { border-color: var(--c1); background: var(--s1); }
+.lesson-nav-btn > span:first-child { color: var(--c1); font-size: 16px; }
+.lesson-nav-label { font-size: 9.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+.lesson-nav-title { font-size: 13px; font-weight: 700; }
+@media (max-width: 640px) { .lesson-nav { padding: 0 24px; } }
 </style>
 </head>
 <body>
@@ -303,6 +311,20 @@ body {
       <span class="mc-arrow">↗</span>
     </button>
   </div>
+  <nav class="lesson-nav">
+    <a class="lesson-nav-btn" href="aula-05.html">
+      <span>←</span>
+      <div><div class="lesson-nav-label">Aula Anterior</div><div class="lesson-nav-title">Aula 5 — A Visualização do Sucesso</div></div>
+    </a>
+    <a class="lesson-nav-btn" href="atividade-06.html">
+      <span>↓</span>
+      <div><div class="lesson-nav-label">Atividade desta aula</div><div class="lesson-nav-title">Atividade 6 — SQL para MongoDB</div></div>
+    </a>
+    <a class="lesson-nav-btn" href="aula-07.html">
+      <div style="text-align:right;flex:1;"><div class="lesson-nav-label">Próxima Aula</div><div class="lesson-nav-title">Aula 7 — O Guardião dos Ativos</div></div>
+      <span>→</span>
+    </a>
+  </nav>
 </div>
 
 <!-- ══════════════════════════════════════

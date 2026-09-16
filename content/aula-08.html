@@ -30,6 +30,13 @@ body {
 .t-nav { display:flex; align-items:center; gap:14px; padding:18px 40px; border-bottom:1px solid var(--border); position:sticky; top:0; background:rgba(253,248,246,.92); backdrop-filter:blur(12px); z-index:10; }
 .back { display:inline-flex; align-items:center; gap:7px; font-size:12.5px; color:var(--muted); cursor:pointer; padding:7px 14px; border:1px solid var(--border); border-radius:8px; background:none; transition:all .2s; text-decoration:none; font-family:inherit; }
 .back:hover { color:var(--c1); border-color:var(--c1); }
+.lesson-nav { display: flex; justify-content: space-between; gap: 14px; width: 100%; max-width: 760px; margin: 0 auto 56px; padding: 0 56px; flex-wrap: wrap; }
+.lesson-nav-btn { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; color: var(--text); font-size: 13px; transition: all .2s; flex: 1; min-width: 220px; }
+.lesson-nav-btn:hover { border-color: var(--c1); background: var(--s1); }
+.lesson-nav-btn > span:first-child { color: var(--c1); font-size: 16px; }
+.lesson-nav-label { font-size: 9.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+.lesson-nav-title { font-size: 13px; font-weight: 700; }
+@media (max-width: 640px) { .lesson-nav { padding: 0 24px; } }
 .t-label { font-size:10.5px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); }
 
 /* ── BODY ── */
@@ -172,6 +179,9 @@ body {
      MENU
 ══════════════════════════════════════ -->
 <div id="menu" class="page active">
+  <nav class="t-nav">
+    <a class="back" href="index.html">← Disciplina</a>
+  </nav>
   <div class="m-hero">
     <div class="m-eyebrow">ESPM · Gestão BD &amp; BI · 22.06.2026</div>
     <div class="m-title">Aula 8 — O Projeto<br><span>Final Integrador</span></div>
@@ -216,6 +226,16 @@ body {
       <span class="mc-arrow">↗</span>
     </button>
   </div>
+  <nav class="lesson-nav">
+    <a class="lesson-nav-btn" href="aula-07.html">
+      <span>←</span>
+      <div><div class="lesson-nav-label">Aula Anterior</div><div class="lesson-nav-title">Aula 7 — O Guardião dos Ativos</div></div>
+    </a>
+    <a class="lesson-nav-btn" href="atividade-08.html">
+      <div style="text-align:right;flex:1;"><div class="lesson-nav-label">Atividade desta aula</div><div class="lesson-nav-title">Atividade 8 — Projeto Final</div></div>
+      <span>↓</span>
+    </a>
+  </nav>
 </div>
 
 <!-- ══════════════════════════════════════
@@ -578,7 +598,7 @@ body {
 
     <div class="ov-section-tag" style="margin-bottom:16px;">Download</div>
     <div style="display:flex;gap:12px;flex-wrap:wrap;width:100%;max-width:720px;margin-bottom:28px;">
-      <a href="soundbyte_projeto_final.sql" download style="display:inline-flex;align-items:center;gap:10px;padding:12px 20px;background:#fff;border:1.5px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);font-size:13px;font-weight:600;transition:all .2s;" onmouseover="this.style.borderColor='#2a6a2a';this.style.color='#2a6a2a'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">
+      <a href="../recursos/soundbyte_projeto_final.sql" download style="display:inline-flex;align-items:center;gap:10px;padding:12px 20px;background:#fff;border:1.5px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);font-size:13px;font-weight:600;transition:all .2s;" onmouseover="this.style.borderColor='#2a6a2a';this.style.color='#2a6a2a'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">
         <span style="font-size:20px;">🗄️</span>
         <span>soundbyte_projeto_final.sql</span>
         <span style="font-size:10px;background:#e8f5e8;color:#2a6a2a;padding:2px 8px;border-radius:12px;font-weight:700;">PostgreSQL</span>
