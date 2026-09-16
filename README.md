@@ -12,28 +12,20 @@ A proposta didática valoriza a aprendizagem ativa por meio de problemas reais o
 
 ## Objetivo deste site
 
-Este site funciona como material de apoio do curso: ele centraliza o plano de ensino, as aulas, as atividades, os recursos didáticos e os materiais complementares em uma interface simples e navegável.
+Este site funciona como material de apoio do curso: ele centraliza as aulas e as atividades avaliativas em uma interface simples e navegável.
 
 A ideia não é repetir em excesso o conteúdo do curso, mas sim organizar a disciplina em uma estrutura prática para consulta rápida, acompanhamento das atividades e acesso aos materiais relevantes. O site foi pensado para facilitar:
 
 - a visualização do percurso da disciplina;
 - o acesso às aulas e aos materiais de cada unidade;
 - a leitura das atividades avaliativas e do fluxo de entrega;
-- o uso de arquivos e datasets usados em aula;
-- a revisão de conceitos sem depender de um canal de comunicação exclusivo.
+- o uso de arquivos e datasets usados em aula.
 
 ## Como navegar no site
 
-Ao abrir a página inicial, é possível acessar as seções principais por meio do menu lateral e da navegação do topo:
+A página inicial (`index.html`) é um hub estático com duas grades de cartões — Aulas e Atividades — que linkam diretamente para a página de cada unidade em `content/`. Não há roteamento nem carregamento dinâmico: cada aula e cada atividade é um arquivo HTML autocontido, com sua própria navegação interna por telas (menu → tópicos → menu).
 
-- Início: visão geral da disciplina e acesso rápido às principais áreas;
-- Plano de ensino: visão do PEA, objetivos, organização do curso e referências;
-- Avaliação: critérios, pesos e regras das atividades;
-- Recursos: materiais, datasets, ferramentas e links úteis para as aulas;
-- Aulas: cada unidade do curso pode ser acessada separadamente, com conteúdo e materiais ligados à respectiva semana;
-- Atividades: cada tarefa possui apoio e contexto, permitindo acompanhar o desenvolvimento de cada exercício.
-
-No menu de cada aula, a navegação pode variar entre conteúdo principal e plano da aula, dependendo da estrutura da unidade. Em algumas páginas, o sistema também permite saltos internos por âncoras, o que ajuda a localizar partes específicas do material sem necessidade de rolar muito.
+Dentro de cada aula ou atividade, um rodapé de navegação lateral leva à aula anterior/seguinte e à atividade correspondente daquela semana.
 
 ## Execução local
 
@@ -51,11 +43,11 @@ http://localhost:8000
 
 ## Estrutura do projeto
 
-- index.html: ponto de entrada da interface do site;
-- assets/: folhas de estilo, scripts e lógica de renderização da aplicação;
-- data/: arquivos que organizam os dados do curso, aulas, atividades e informações gerais;
-- content/: textos e materiais estruturados por aula e atividade;
+- index.html: hub estático com os links para todas as aulas e atividades;
+- content/: uma página HTML autocontida por aula (`aula-01.html`…`aula-08.html`) e por atividade (`atividade-01.html`…`atividade-08.html`);
 - recursos/: datasets, arquivos de apoio e recursos utilizados na disciplina;
+- docs/adr/: decisões de arquitetura registradas ao longo do projeto;
+- CONTEXT.md: glossário dos termos usados no repositório;
 - README.md: documentação do projeto e orientação geral.
 
 ## Observações
