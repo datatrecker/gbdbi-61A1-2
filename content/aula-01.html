@@ -208,6 +208,21 @@ body {
 .bloom-level.l3 { background: #e0cccc; color: var(--c1); border: 1px solid #c8aeaa; }
 .bloom-level.l4 { background: #cdb5b5; color: var(--c1); border: 1px solid #b89898; }
 .bloom-level.l5 { background: var(--c1); color: #fdf8f6; border: 1px solid var(--c1); }
+
+/* ── CALLOUT ── */
+.callout { width: 100%; max-width: 720px; padding: 18px 20px; background: var(--s1); border-left: 3px solid var(--c1); border-radius: 2px 8px 8px 2px; font-size: 13.5px; line-height: 1.65; color: var(--text); margin-bottom: 28px; }
+.callout-tag { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 8px; }
+.callout-green { border-left-color: #2d6a2d; background: #e8f5e8; }
+.callout-green .callout-tag { color: #2d6a2d; }
+
+/* ── LESSON NAV ── */
+.lesson-nav { display: flex; justify-content: space-between; gap: 14px; width: 100%; max-width: 760px; margin: 0 auto 56px; padding: 0 56px; flex-wrap: wrap; }
+.lesson-nav-btn { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; color: var(--text); font-size: 13px; transition: all .2s; flex: 1; min-width: 220px; }
+.lesson-nav-btn:hover { border-color: var(--c1); background: var(--s1); }
+.lesson-nav-btn > span:first-child { color: var(--c1); font-size: 16px; }
+.lesson-nav-label { font-size: 9.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+.lesson-nav-title { font-size: 13px; font-weight: 700; }
+@media (max-width: 640px) { .lesson-nav { padding: 0 24px; } }
 </style>
 </head>
 <body>
@@ -273,7 +288,23 @@ body {
       <p class="mc-p">Como a arquitetura do BD limita as perguntas possíveis de negócio.</p>
       <span class="mc-arrow">↗</span>
     </button>
+    <button class="mcard" onclick="show('p8')">
+      <div class="mc-num">08</div>
+      <div class="mc-h">Vaidade vs. Acionável</div>
+      <p class="mc-p">O teste que separa a métrica que impressiona da que muda uma decisão.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
   </div>
+  <nav class="lesson-nav">
+    <a class="lesson-nav-btn" href="atividade-01.html">
+      <span>↓</span>
+      <div><div class="lesson-nav-label">Atividade desta aula</div><div class="lesson-nav-title">Atividade 1 — Os Números que Mentem sem Mentir</div></div>
+    </a>
+    <a class="lesson-nav-btn" href="aula-02.html">
+      <div style="text-align:right;flex:1;"><div class="lesson-nav-label">Próxima Aula</div><div class="lesson-nav-title">Aula 2 — A Arquitetura do Caos</div></div>
+      <span>→</span>
+    </a>
+  </nav>
 </div>
 
 <!-- ══════════════════════════════════════
@@ -410,8 +441,12 @@ body {
         <div class="kp-text">Dado + contexto + significado. Responde "o quê" e "quando".</div>
       </div>
       <div class="kp">
+        <div class="kp-tag" style="color:#b83030">Conhecimento</div>
+        <div class="kp-text">Informação + padrão + experiência. Responde "por quê" e permite antecipar.</div>
+      </div>
+      <div class="kp">
         <div class="kp-tag">Decisão</div>
-        <div class="kp-text">Informação + pergunta certa = ação de negócio.</div>
+        <div class="kp-text">Conhecimento + pergunta certa = ação de negócio.</div>
       </div>
     </div>
     <div class="pg-nav">
@@ -888,7 +923,56 @@ body {
     </div>
     <div class="pg-nav">
       <button class="pn-btn" onclick="show('p6')">← Tipos de BD</button>
-      <button class="pn-btn pn-fwd" onclick="show('menu')">Início →</button>
+      <button class="pn-btn pn-fwd" onclick="show('p8')">Vaidade vs. Acionável →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P8 — MÉTRICAS DE VAIDADE vs. ACIONÁVEIS
+══════════════════════════════════════ -->
+<div id="p8" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">08 · Vaidade vs. Acionável</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Número que impressiona<br>não é número que <em>decide</em>.</div>
+
+    <div class="callout">
+      <div class="callout-tag">O critério</div>
+      Uma métrica só é <strong>acionável</strong> se a resposta a "e daí?" for uma ação concreta. Se ela apenas sobe e faz todo mundo se sentir bem, é <strong>métrica de vaidade</strong>. A diferença não está no número — está em o que ele permite decidir.
+    </div>
+
+    <div class="kps">
+      <div class="kp">
+        <div class="kp-tag">Métrica de vaidade</div>
+        <div class="kp-text"><strong>120 mil seguidores.</strong> Cresce sempre, nunca cai e não distingue quem compra de quem apenas observa. Nenhuma decisão de negócio muda em função dela.</div>
+      </div>
+      <div class="kp">
+        <div class="kp-tag" style="color:#b83030">Métrica acionável</div>
+        <div class="kp-text"><strong>Taxa de conversão por canal.</strong> Aponta onde investir e onde cortar verba. Uma queda tem causa rastreável e uma resposta possível.</div>
+      </div>
+    </div>
+
+    <table class="tbl">
+      <thead><tr><th>Pergunta de teste</th><th>Vaidade</th><th>Acionável</th></tr></thead>
+      <tbody>
+        <tr><td>Ela pode cair?</td><td style="color:#8a6060">Quase nunca</td><td>Sim, e isso é um alerta</td></tr>
+        <tr><td>Aponta uma causa?</td><td style="color:#8a6060">Não</td><td>Sim, é segmentável</td></tr>
+        <tr><td>Muda alguma decisão?</td><td style="color:#8a6060">Não</td><td>Sim, define onde agir</td></tr>
+        <tr><td>Tem dono?</td><td style="color:#8a6060">Ninguém responde por ela</td><td>Uma área responde</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-green">
+      <div class="callout-tag">Onde isso encontra a arquitetura</div>
+      Transformar uma métrica de vaidade em acionável quase sempre exige <strong>dados que o banco ainda não guarda</strong> — origem do cadastro, data do primeiro pedido, canal de aquisição. É por isso que a estrutura de dados vem antes do dashboard: sem o campo armazenado, a pergunta não tem resposta.
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p7')">← Estrutura e Perguntas</button>
+      <button class="pn-btn pn-fwd" onclick="show('menu')">← Menu Principal</button>
     </div>
   </div>
 </div>

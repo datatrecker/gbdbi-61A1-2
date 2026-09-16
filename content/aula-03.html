@@ -191,6 +191,17 @@ body {
   .compare, .ai-compare { grid-template-columns: 1fr; }
   .sql-block code, .broken-block code { font-size: 11.5px; }
 }
+
+/* ── LESSON NAV ── */
+.lesson-nav { display: flex; justify-content: space-between; gap: 14px; width: 100%; max-width: 760px; margin: 0 auto 56px; padding: 0 56px; flex-wrap: wrap; }
+.lesson-nav-btn { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; color: var(--text); font-size: 13px; transition: all .2s; flex: 1; min-width: 220px; }
+.lesson-nav-btn:hover { border-color: var(--c1); background: var(--s1); }
+.lesson-nav-btn > span:first-child { color: var(--c1); font-size: 16px; }
+.lesson-nav-label { font-size: 9.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+.lesson-nav-title { font-size: 13px; font-weight: 700; }
+@media (max-width: 640px) {
+  .lesson-nav { padding: 0 24px; }
+}
 </style>
 </head>
 <body>
@@ -256,7 +267,27 @@ body {
       <p class="mc-p">A IA gera código correto sintaticamente. Quem valida se a resposta faz sentido de negócio ainda é o humano.</p>
       <span class="mc-arrow">↗</span>
     </button>
+    <button class="mcard" onclick="show('p8')">
+      <div class="mc-num">08</div>
+      <div class="mc-h">Exercício — Banco de Dados Netflix</div>
+      <p class="mc-p">Do diagrama à consulta: perguntas analíticas com auxílio da IA, respondidas em SQL.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
   </div>
+  <nav class="lesson-nav">
+    <a class="lesson-nav-btn" href="aula-02.html">
+      <span>←</span>
+      <div><div class="lesson-nav-label">Aula Anterior</div><div class="lesson-nav-title">Aula 2 — A Arquitetura do Caos</div></div>
+    </a>
+    <a class="lesson-nav-btn" href="atividade-03.html">
+      <span>↓</span>
+      <div><div class="lesson-nav-label">Atividade desta aula</div><div class="lesson-nav-title">Atividade 3 — Chinook</div></div>
+    </a>
+    <a class="lesson-nav-btn" href="aula-04.html">
+      <div style="text-align:right;flex:1;"><div class="lesson-nav-label">Próxima Aula</div><div class="lesson-nav-title">Aula 4 — O Refino Analítico</div></div>
+      <span>→</span>
+    </a>
+  </nav>
 </div>
 
 <!-- ══════════════════════════════════════
@@ -1229,7 +1260,74 @@ cadastrado. Ordene do maior para o menor.</span></code></div>
 
     <div class="pg-nav">
       <button class="pn-btn" onclick="show('p5')">← GROUP BY</button>
-      <button class="pn-btn pn-fwd" onclick="show('menu')">Início →</button>
+      <button class="pn-btn pn-fwd" onclick="show('p8')">Exercício: Netflix →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P8 — EXERCÍCIO: BANCO DE DADOS NETFLIX
+══════════════════════════════════════ -->
+<div id="p8" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <span class="t-label">08 · Exercício — Banco de Dados Netflix</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">Da IA ao<br><em>insight.</em></div>
+
+    <div class="bloom-card">
+      <div class="bloom-eyebrow">Exercício 1 — Banco de Dados Netflix</div>
+      <div style="font-size:13.5px;line-height:1.6;color:var(--text);">Com a ajuda da IA, formule perguntas analíticas sobre um banco de dados real e responda com SQL — do diagrama à consulta.</div>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px;width:100%;max-width:720px;">
+      <a class="ext-link" href="../recursos/netflixdb-postgres.sql" download>↓ netflixdb-postgres.sql</a>
+      <a class="ext-link" href="https://sqliteonline.com/" target="_blank" rel="noopener">SQLite Online ↗</a>
+      <a class="ext-link" href="https://dbdiagram.io/home" target="_blank" rel="noopener">dbdiagram ↗</a>
+    </div>
+
+    <div class="step-list">
+      <div class="step"><div class="step-num">1</div><div><div class="step-title">Acesse o SQLite Online</div><div class="step-text">Abra o navegador e acesse o ambiente de consulta em sqliteonline.com. Nenhuma instalação necessária.</div></div></div>
+      <div class="step"><div class="step-num">2</div><div><div class="step-title">Carregue o banco de dados Netflix</div><div class="step-text">Importe o arquivo <code>netflixdb-postgres.sql</code>. Selecione o motor <strong>PGLite</strong> antes de carregar.</div></div></div>
+      <div class="step"><div class="step-num">3</div><div><div class="step-title">Crie perguntas analíticas com auxílio da IA</div><div class="step-text">Crie pelo menos <strong>3 perguntas analíticas</strong> focadas na tomada de decisão sobre este banco de dados, e diga por que cada uma é relevante. Responda cada uma com SQL.</div></div></div>
+      <div class="step"><div class="step-num">4</div><div><div class="step-title">Rode o script e salve os arquivos</div><div class="step-text">Execute o SQL gerado no SQLite Online e salve dois arquivos: um <code>.sql</code> com as consultas de todas as perguntas, e um <code>.xlsx</code> com todas as respostas.</div></div></div>
+    </div>
+
+    <div class="ov-section-tag" style="margin-top:8px;">Caminho sugerido — ERD com a IA</div>
+    <div class="disc" id="disc-netflix">
+      <button class="disc-trigger" onclick="toggleDisc('disc-netflix')">
+        <span class="disc-title">Como gerar o script a partir de um diagrama</span>
+        <span class="disc-icon">▸</span>
+      </button>
+      <div class="disc-body">
+        <div class="disc-inner">
+          <p style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:12px;"><strong>Passo 1 — Diagrama:</strong> crie um diagrama ERD do banco de dados usando o dbdiagram e salve o diagrama como figura PNG.</p>
+          <p style="font-size:13px;color:var(--text);line-height:1.6;"><strong>Passo 2 — Prompt:</strong> carregue o diagrama na IA e use o prompt abaixo.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sql-wrap" style="margin-top:16px;">
+      <div class="sql-header">
+        <div class="sql-label">Prompt sugerido</div>
+        <button class="copy-btn" onclick="copyCode(this,'c-p8')">Copiar</button>
+      </div>
+      <div class="sql-block"><code id="c-p8"><span class="cm">Eu tenho o banco de dados PostgreSQL da figura anexada.
+Proponha 3 perguntas analíticas e crie um script com
+consultas SQL para cada pergunta em um único arquivo,
+contendo as perguntas e seus insights nos comentários
+antes de cada consulta.</span></code></div>
+    </div>
+
+    <div class="kps">
+      <div class="kp"><div class="kp-tag">Entrega 1</div><div class="kp-text">Arquivo <code>.sql</code> contendo as consultas para todas as perguntas.</div></div>
+      <div class="kp"><div class="kp-tag" style="color:#b83030">Entrega 2</div><div class="kp-text">Arquivo <code>.xlsx</code> contendo todas as respostas.</div></div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('p6')">← O que a IA pode e não pode fazer</button>
+      <button class="pn-btn pn-fwd" onclick="show('menu')">← Menu Principal</button>
     </div>
   </div>
 </div>
