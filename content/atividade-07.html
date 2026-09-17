@@ -259,32 +259,30 @@ body {
   <div class="m-grid">
     <button class="mcard" onclick="show('p1')">
       <div class="mc-num">00</div>
-      <div class="mc-h">Contexto e Distribuição</div>
-      <p class="mc-p">O cenário da SoundByte, o que cada grupo faz e como a atividade está estruturada.</p>
+      <div class="mc-h">Contexto e Estrutura</div>
+      <p class="mc-p">O cenário da SoundByte e como a atividade está estruturada — todos os grupos entregam os quatro cenários.</p>
       <span class="mc-arrow">↗</span>
     </button>
-    <!-- GRUPO 1 -->
     <button class="mcard g1" onclick="show('p2')">
-      <div class="mc-group g1">Grupo 1 · Cenário A</div>
+      <div class="mc-group g1">Cenário A</div>
       <div class="mc-h">🔐 Matriz RBAC</div>
       <p class="mc-p">Quem pode ler, editar e excluir cada tipo de dado da SoundByte, por cargo.</p>
       <span class="mc-arrow">↗</span>
     </button>
-    <button class="mcard g1" onclick="show('p3')">
-      <div class="mc-group g1">Grupo 1 · Cenário C</div>
-      <div class="mc-h">🔍 Auditoria de Acessos</div>
-      <p class="mc-p">Processo de rastreamento, revisão e escalonamento de acessos a dados sensíveis.</p>
-      <span class="mc-arrow">↗</span>
-    </button>
-    <!-- GRUPO 2 -->
     <button class="mcard g2" onclick="show('p4')">
-      <div class="mc-group g2">Grupo 2 · Cenário B</div>
+      <div class="mc-group g2">Cenário B</div>
       <div class="mc-h">⚖️ Política LGPD</div>
       <p class="mc-p">Política de uso de dados pessoais para campanhas de marketing da SoundByte.</p>
       <span class="mc-arrow">↗</span>
     </button>
+    <button class="mcard g1" onclick="show('p3')">
+      <div class="mc-group g1">Cenário C</div>
+      <div class="mc-h">🔍 Auditoria de Acessos</div>
+      <p class="mc-p">Processo de rastreamento, revisão e escalonamento de acessos a dados sensíveis.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
     <button class="mcard g2" onclick="show('p5')">
-      <div class="mc-group g2">Grupo 2 · Cenário D</div>
+      <div class="mc-group g2">Cenário D</div>
       <div class="mc-h">📊 Qualidade de Dados</div>
       <p class="mc-p">Avaliar as 6 dimensões de qualidade dos dados da SoundByte e propor um plano de melhoria.</p>
       <span class="mc-arrow">↗</span>
@@ -313,27 +311,27 @@ body {
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
     <a class="back" href="../index.html">Disciplina</a>
-    <span class="t-label">00 · Contexto e Distribuição</span>
+    <span class="t-label">00 · Contexto e Estrutura</span>
   </nav>
   <div class="t-body">
     <div class="t-title">A auditoria confirmou<br><em>o risco.</em></div>
 
     <div class="callout" style="font-size:14px;line-height:1.75;">
       <div class="callout-tag">O Cenário — SoundByte</div>
-      A SoundByte possui <strong>800 mil usuários ativos</strong>. Uma auditoria interna revelou que estagiários de marketing tinham acesso irrestrito a dados de pagamento, localização GPS e histórico de streaming. Um estagiário exportou dados pessoais para uma planilha particular. O incidente foi contido, mas a ANPD pode ser notificada. <strong>A empresa precisa de um plano de governança urgente — e cada grupo é responsável por uma parte dele.</strong>
+      A SoundByte possui <strong>800 mil usuários ativos</strong>. Uma auditoria interna revelou que estagiários de marketing tinham acesso irrestrito a dados de pagamento, localização GPS e histórico de streaming. Um estagiário exportou dados pessoais para uma planilha particular. O incidente foi contido, mas a ANPD pode ser notificada. <strong>A empresa precisa de um plano de governança urgente — e cada grupo é responsável pelos quatro cenários a seguir.</strong>
     </div>
 
-    <div class="section-tag">Distribuição dos Grupos</div>
+    <div class="section-tag">Os Quatro Cenários</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:760px;margin-bottom:28px;">
       <div style="background:var(--g1-bg);border:1.5px solid var(--g1);border-radius:12px;padding:20px 22px;">
-        <div style="font-size:9.5px;letter-spacing:2.5px;font-weight:800;text-transform:uppercase;color:var(--g1);margin-bottom:12px;">🔐 Grupo 1 — Segurança e Controle</div>
+        <div style="font-size:9.5px;letter-spacing:2.5px;font-weight:800;text-transform:uppercase;color:var(--g1);margin-bottom:12px;">🔐 Segurança e Controle</div>
         <div style="font-size:13.5px;font-weight:700;margin-bottom:6px;">Cenário A · Matriz RBAC</div>
         <div style="font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:14px;">Definir quem pode acessar cada tipo de dado, por cargo.</div>
         <div style="font-size:13.5px;font-weight:700;margin-bottom:6px;">Cenário C · Auditoria de Acessos</div>
         <div style="font-size:12.5px;color:var(--muted);line-height:1.55;">Propor o processo de rastreamento, revisão e resposta a incidentes.</div>
       </div>
       <div style="background:var(--g2-bg);border:1.5px solid var(--g2);border-radius:12px;padding:20px 22px;">
-        <div style="font-size:9.5px;letter-spacing:2.5px;font-weight:800;text-transform:uppercase;color:var(--g2);margin-bottom:12px;">⚖️ Grupo 2 — Privacidade e Qualidade</div>
+        <div style="font-size:9.5px;letter-spacing:2.5px;font-weight:800;text-transform:uppercase;color:var(--g2);margin-bottom:12px;">⚖️ Privacidade e Qualidade</div>
         <div style="font-size:13.5px;font-weight:700;margin-bottom:6px;">Cenário B · Política LGPD</div>
         <div style="font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:14px;">Criar a política de uso de dados pessoais em campanhas de marketing.</div>
         <div style="font-size:13.5px;font-weight:700;margin-bottom:6px;">Cenário D · Qualidade de Dados</div>
@@ -362,12 +360,12 @@ body {
     </div>
 
     <div class="callout callout-green">
-      <div class="callout-tag">Dinâmica — Intra-grupo</div>
-      Cada grupo trabalha de forma <strong>independente</strong>, sem interação com o outro grupo. O foco é a consistência interna entre os dois cenários do grupo: a Matriz RBAC do Grupo 1 deve ser compatível com o processo de Auditoria; a Política LGPD do Grupo 2 deve ser compatível com o Plano de Qualidade. Ao final, cada grupo apresenta ao professor os dois cenários em <strong>8 minutos</strong>.
+      <div class="callout-tag">Dinâmica</div>
+      Cada grupo trabalha de forma <strong>independente</strong>, sem interação com os demais grupos, e entrega os <strong>quatro cenários</strong> (A, B, C e D). O foco é a consistência interna entre eles: a Matriz RBAC deve ser compatível com o processo de Auditoria; a Política LGPD deve ser compatível com o Plano de Qualidade. Não há apresentação em aula — a entrega é feita por documento.
     </div>
 
     <div class="pg-nav">
-      <button class="pn-btn pn-fwd" onclick="show('p2')">Grupo 1 · Cenário A →</button>
+      <button class="pn-btn pn-fwd" onclick="show('p2')">Cenário A →</button>
     </div>
   </div>
 </div>
@@ -377,7 +375,7 @@ body {
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
     <a class="back" href="../index.html">Disciplina</a>
-    <span class="group-stripe gs-1">Grupo 1</span>
+    <span class="group-stripe gs-1">Cenário A</span>
     <span class="t-label">Cenário A · Matriz RBAC</span>
   </nav>
   <div class="t-body">
@@ -386,7 +384,7 @@ body {
     <div class="group-banner g1">
       <div class="gb-icon">🔐</div>
       <div>
-        <div class="gb-label g1">Grupo 1 · Cenário A</div>
+        <div class="gb-label g1">Cenário A</div>
         <div class="gb-title">Controle de Acesso Baseado em Cargo (RBAC)</div>
         <div class="gb-sub">Este cenário é complementar ao Cenário C — os acessos que você define aqui serão monitorados pelo processo de auditoria.</div>
       </div>
@@ -496,7 +494,7 @@ body {
 
     <div class="pg-nav">
       <button class="pn-btn" onclick="show('p1')">← Contexto</button>
-      <button class="pn-btn pn-fwd" onclick="show('p3')">Grupo 1 · Cenário C →</button>
+      <button class="pn-btn pn-fwd" onclick="show('p3')">Cenário C →</button>
     </div>
   </div>
 </div>
@@ -506,7 +504,7 @@ body {
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
     <a class="back" href="../index.html">Disciplina</a>
-    <span class="group-stripe gs-1">Grupo 1</span>
+    <span class="group-stripe gs-1">Cenário C</span>
     <span class="t-label">Cenário C · Auditoria de Acessos</span>
   </nav>
   <div class="t-body">
@@ -515,7 +513,7 @@ body {
     <div class="group-banner g1">
       <div class="gb-icon">🔍</div>
       <div>
-        <div class="gb-label g1">Grupo 1 · Cenário C</div>
+        <div class="gb-label g1">Cenário C</div>
         <div class="gb-title">Processo de Auditoria de Acessos</div>
         <div class="gb-sub">Este cenário monitora os acessos definidos no Cenário A — use sua própria Matriz RBAC como referência ao criar as regras de alerta.</div>
       </div>
@@ -622,7 +620,7 @@ body {
 
     <div class="pg-nav">
       <button class="pn-btn" onclick="show('p2')">← Cenário A</button>
-      <button class="pn-btn pn-fwd" onclick="show('p4')">Grupo 2 · Cenário B →</button>
+      <button class="pn-btn pn-fwd" onclick="show('p4')">Cenário B →</button>
     </div>
   </div>
 </div>
@@ -632,7 +630,7 @@ body {
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
     <a class="back" href="../index.html">Disciplina</a>
-    <span class="group-stripe gs-2">Grupo 2</span>
+    <span class="group-stripe gs-2">Cenário B</span>
     <span class="t-label">Cenário B · Política LGPD</span>
   </nav>
   <div class="t-body">
@@ -641,7 +639,7 @@ body {
     <div class="group-banner g2">
       <div class="gb-icon">⚖️</div>
       <div>
-        <div class="gb-label g2">Grupo 2 · Cenário B</div>
+        <div class="gb-label g2">Cenário B</div>
         <div class="gb-title">Política de Uso de Dados Pessoais (LGPD)</div>
         <div class="gb-sub">Este cenário é complementar ao Cenário D — a política define quais dados podem ser usados; o plano de qualidade garante que esses dados são confiáveis.</div>
       </div>
@@ -798,7 +796,7 @@ body {
 
     <div class="pg-nav">
       <button class="pn-btn" onclick="show('p3')">← Cenário C</button>
-      <button class="pn-btn pn-fwd" onclick="show('p5')">Grupo 2 · Cenário D →</button>
+      <button class="pn-btn pn-fwd" onclick="show('p5')">Cenário D →</button>
     </div>
   </div>
 </div>
@@ -808,7 +806,7 @@ body {
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
     <a class="back" href="../index.html">Disciplina</a>
-    <span class="group-stripe gs-2">Grupo 2</span>
+    <span class="group-stripe gs-2">Cenário D</span>
     <span class="t-label">Cenário D · Qualidade de Dados</span>
   </nav>
   <div class="t-body">
@@ -817,7 +815,7 @@ body {
     <div class="group-banner g2">
       <div class="gb-icon">📊</div>
       <div>
-        <div class="gb-label g2">Grupo 2 · Cenário D</div>
+        <div class="gb-label g2">Cenário D</div>
         <div class="gb-title">Plano de Qualidade de Dados</div>
         <div class="gb-sub">Este cenário complementa o Cenário B — a política define quais dados podem ser usados; este plano garante que esses dados são confiáveis o suficiente para o uso autorizado.</div>
       </div>
@@ -973,11 +971,10 @@ body {
 
     <div class="callout" style="font-size:13.5px;line-height:1.7;">
       <div class="callout-tag">Como usar os prompts</div>
-      Cada grupo deve usar <strong>os dois prompts correspondentes aos seus cenários</strong> (Grupo 1: prompts A + C; Grupo 2: prompts B + D). Cole o texto do prompt, substitua os campos indicados com o conteúdo da sua entrega e envie à IA. A resposta completa deve compor o <strong>Apêndice — Revisão por IA</strong> no documento de entrega.
+      Cada grupo deve usar <strong>os quatro prompts</strong>, um para cada cenário (A, B, C e D). Cole o texto do prompt, substitua os campos indicados com o conteúdo da sua entrega e envie à IA. A resposta completa deve compor o <strong>Apêndice — Revisão por IA</strong> no documento de entrega.
     </div>
 
-    <!-- GRUPO 1 -->
-    <div class="section-tag">Grupo 1 — Prompt para o Cenário A (Matriz RBAC)</div>
+    <div class="section-tag">Prompt para o Cenário A (Matriz RBAC)</div>
     <div class="sql-wrap">
       <div class="sql-header">
         <span class="sql-label">IA como Auditora de Controle de Acesso</span>
@@ -1004,7 +1001,7 @@ Responda como em um relatório de auditoria real: direto e técnico.</code>
       </div>
     </div>
 
-    <div class="section-tag">Grupo 1 — Prompt para o Cenário C (Auditoria de Acessos)</div>
+    <div class="section-tag">Prompt para o Cenário C (Auditoria de Acessos)</div>
     <div class="sql-wrap">
       <div class="sql-header">
         <span class="sql-label">IA como Auditora de Riscos de Dados</span>
@@ -1030,8 +1027,7 @@ Seja direta, como em um relatório de auditoria de segurança.</code>
 
     <div class="scenario-divider"></div>
 
-    <!-- GRUPO 2 -->
-    <div class="section-tag">Grupo 2 — Prompt para o Cenário B (Política LGPD)</div>
+    <div class="section-tag">Prompt para o Cenário B (Política LGPD)</div>
     <div class="sql-wrap">
       <div class="sql-header">
         <span class="sql-label">IA como DPO Externo Revisando a Política</span>
@@ -1055,7 +1051,7 @@ Responda como um parecer jurídico objetivo, sem eufemismos.</code>
       </div>
     </div>
 
-    <div class="section-tag">Grupo 2 — Prompt para o Cenário D (Qualidade de Dados)</div>
+    <div class="section-tag">Prompt para o Cenário D (Qualidade de Dados)</div>
     <div class="sql-wrap">
       <div class="sql-header">
         <span class="sql-label">IA como Especialista em Governança de Qualidade</span>
@@ -1095,23 +1091,23 @@ Responda como em um relatório de consultoria de dados, com recomendações prá
       </thead>
       <tbody>
         <tr>
-          <td><strong>Templates preenchidos</strong> (×2)</td>
-          <td>Matriz + Auditoria (G1) ou Política + Qualidade (G2) — completos</td>
+          <td><strong>Templates preenchidos</strong> (×4)</td>
+          <td>Matriz RBAC + Política LGPD + Auditoria + Qualidade — todos completos</td>
           <td><strong>4,0</strong></td>
         </tr>
         <tr>
           <td><strong>Questões de apoio</strong></td>
-          <td>Respostas fundamentadas com base legal ou técnica (6–7 questões no total)</td>
+          <td>Respostas fundamentadas com base legal ou técnica (13 questões no total: A1–A4, B1–B3, C1–C3, D1–D3)</td>
           <td><strong>3,0</strong></td>
         </tr>
         <tr>
           <td><strong>Apêndice — Revisão por IA</strong></td>
-          <td>2 prompts + 2 respostas da IA + 2 reflexões críticas do grupo</td>
+          <td>4 prompts + 4 respostas da IA + 4 reflexões críticas do grupo</td>
           <td><strong>2,0</strong></td>
         </tr>
         <tr>
           <td><strong>Consistência interna</strong></td>
-          <td>Os dois cenários do grupo são compatíveis entre si (questões A4/C3 e B3/D3)</td>
+          <td>Os quatro cenários são compatíveis entre si (questões A4/C3 e B3/D3)</td>
           <td><strong>1,0</strong></td>
         </tr>
         <tr style="background:var(--s2);">
@@ -1124,23 +1120,23 @@ Responda como em um relatório de consultoria de dados, com recomendações prá
     <div class="section-tag">Rubrica Detalhada — Templates (4,0 pts)</div>
     <div style="width:100%;max-width:760px;margin-bottom:28px;display:flex;flex-direction:column;gap:8px;">
       <div class="rub-row">
-        <div class="rub-cell label">Grupo 1 · Cenário A — RBAC</div>
-        <div class="rub-cell pts">2,0</div>
+        <div class="rub-cell label">Cenário A — RBAC</div>
+        <div class="rub-cell pts">1,0</div>
         <div class="rub-cell crit">Todas as 25 células preenchidas; nível de acesso diferenciado por cargo; D2 bloqueado para C1 e C2; DPO com leitura ampla; pelo menos uma justificativa para diferença entre Analista Mktg e Gerente Mktg.</div>
       </div>
       <div class="rub-row">
-        <div class="rub-cell label">Grupo 1 · Cenário C — Auditoria</div>
-        <div class="rub-cell pts">2,0</div>
-        <div class="rub-cell crit">4 componentes completos; log com campos suficientes para rastrear o incidente original; frequência diferenciada por tipo de dado; fluxo de escalonamento com prazos somando ≤ 72h até notificação ANPD; mínimo 4 regras de alerta com condição, ação e responsável.</div>
-      </div>
-      <div class="rub-row">
-        <div class="rub-cell label">Grupo 2 · Cenário B — LGPD</div>
-        <div class="rub-cell pts">2,0</div>
+        <div class="rub-cell label">Cenário B — LGPD</div>
+        <div class="rub-cell pts">1,0</div>
         <div class="rub-cell crit">5 seções completas; base legal identificada com artigo da LGPD para cada tipo de dado; prazo de retenção definido por tipo; fluxo de notificação ANPD com prazos; processo de revogação acessível e com prazo.</div>
       </div>
       <div class="rub-row">
-        <div class="rub-cell label">Grupo 2 · Cenário D — Qualidade</div>
-        <div class="rub-cell pts">2,0</div>
+        <div class="rub-cell label">Cenário C — Auditoria</div>
+        <div class="rub-cell pts">1,0</div>
+        <div class="rub-cell crit">4 componentes completos; log com campos suficientes para rastrear o incidente original; frequência diferenciada por tipo de dado; fluxo de escalonamento com prazos somando ≤ 72h até notificação ANPD; mínimo 4 regras de alerta com condição, ação e responsável.</div>
+      </div>
+      <div class="rub-row">
+        <div class="rub-cell label">Cenário D — Qualidade</div>
+        <div class="rub-cell pts">1,0</div>
         <div class="rub-cell crit">Diagnóstico das 6 dimensões com problema específico da SoundByte; ≥ 6 regras de qualidade mensuráveis; ≥ 3 ações de correção concretas (dado + ação + responsável); ≥ 4 KPIs no formato completo (nome + cálculo + meta + frequência).</div>
       </div>
     </div>
@@ -1148,11 +1144,13 @@ Responda como em um relatório de consultoria de dados, com recomendações prá
     <div class="section-tag">Formato de Entrega</div>
     <div class="callout" style="margin-bottom:16px;">
       <div class="callout-tag">Documento único por grupo (PDF ou Word)</div>
-      <strong>1. Identificação:</strong> Nomes, RAs e grupo (G1 ou G2).<br><br>
-      <strong>2. Cenário 1 do grupo:</strong> Template preenchido + questões respondidas.<br><br>
-      <strong>3. Cenário 2 do grupo:</strong> Template preenchido + questões respondidas.<br><br>
-      <strong>4. Apêndice — Revisão por IA:</strong> Dois prompts com respostas + reflexão crítica do grupo para cada um.<br><br>
-      <strong>5. Reflexão Final (obrigatória):</strong> Ver abaixo.
+      <strong>1. Identificação:</strong> Nomes e RAs do grupo.<br><br>
+      <strong>2. Cenário A — RBAC:</strong> Template preenchido + questões respondidas.<br><br>
+      <strong>3. Cenário B — LGPD:</strong> Template preenchido + questões respondidas.<br><br>
+      <strong>4. Cenário C — Auditoria:</strong> Template preenchido + questões respondidas.<br><br>
+      <strong>5. Cenário D — Qualidade:</strong> Template preenchido + questões respondidas.<br><br>
+      <strong>6. Apêndice — Revisão por IA:</strong> Quatro prompts com respostas + reflexão crítica do grupo para cada um.<br><br>
+      <strong>7. Reflexão Final (obrigatória):</strong> Ver abaixo.
     </div>
 
     <div class="callout callout-blue" style="margin-bottom:16px;">
@@ -1162,9 +1160,9 @@ Responda como em um relatório de consultoria de dados, com recomendações prá
 
     <div class="callout callout-green">
       <div class="callout-tag">Reflexão Final — Inclua ao final do documento</div>
-      Cada grupo responde em <strong>6–10 linhas</strong>, conectando os dois cenários entregues:<br><br>
-      <strong>Grupo 1:</strong> <em>"Como a Matriz RBAC e o Processo de Auditoria se reforçam mutuamente? Qual dos dois seria mais urgente implementar primeiro na SoundByte, e o que acontece se você implementar um sem o outro?"</em><br><br>
-      <strong>Grupo 2:</strong> <em>"Como a Política LGPD e o Plano de Qualidade se reforçam mutuamente? É possível estar em conformidade com a LGPD usando dados de baixa qualidade — ou ter dados de alta qualidade sem base legal para usá-los? Ilustre com o caso da SoundByte."</em>
+      O grupo responde às duas perguntas abaixo, em <strong>6–10 linhas cada</strong>, conectando os quatro cenários entregues:<br><br>
+      <em>"Como a Matriz RBAC (A) e o Processo de Auditoria (C) se reforçam mutuamente? Qual dos dois seria mais urgente implementar primeiro na SoundByte, e o que acontece se você implementar um sem o outro?"</em><br><br>
+      <em>"Como a Política LGPD (B) e o Plano de Qualidade (D) se reforçam mutuamente? É possível estar em conformidade com a LGPD usando dados de baixa qualidade — ou ter dados de alta qualidade sem base legal para usá-los? Ilustre com o caso da SoundByte."</em>
     </div>
 
     <div class="pg-nav">
