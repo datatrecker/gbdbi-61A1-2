@@ -72,11 +72,23 @@ body {
 .ov-tag { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 10px; }
 .ov-tag.soft { color: var(--c2); }
 .ov-text { font-size: 14px; line-height: 1.65; color: var(--text); }
-.ov-concepts { display: grid; grid-template-columns: repeat(auto-fit, minmax(196px, 1fr)); gap: 12px; width: 100%; max-width: 720px; margin-bottom: 16px; }
+.ov-concepts { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; width: 100%; max-width: 720px; margin-bottom: 16px; }
 .ov-concept { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
 .ov-concept h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
 .ov-concept p { font-size: 13px; color: var(--muted); line-height: 1.55; }
+.ov-concept img { width: 100%; border-radius: 8px; border: 1px solid var(--border); margin-top: 12px; display: block; }
 .ov-section-tag { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--muted); margin-bottom: 10px; width: 100%; max-width: 720px; }
+
+/* ── CALLOUT / RESOURCE CARD (p1 preliminar) ── */
+.callout { width: 100%; max-width: 720px; padding: 18px 20px; background: var(--s1); border-left: 3px solid var(--c1); border-radius: 2px 8px 8px 2px; font-size: 13.5px; line-height: 1.65; color: var(--text); margin-bottom: 20px; }
+.callout-tag { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 8px; }
+.res-card { width: 100%; max-width: 720px; background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; margin-bottom: 28px; }
+.res-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--s1); display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 14px; }
+.res-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+.res-tag { font-size: 9.5px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 10px; }
+.res-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 18px; }
+.res-dl { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; border-radius: 8px; background: var(--c1); color: #fdf8f6; font-size: 13.5px; font-weight: 600; text-decoration: none; transition: background .2s; }
+.res-dl:hover { background: var(--c2); }
 
 /* ── ACCORDION (p5) ── */
 .acc-hint { width: 100%; max-width: 720px; font-size: 12px; color: var(--muted); margin-bottom: 20px; display: flex; align-items: center; gap: 6px; }
@@ -128,6 +140,28 @@ body {
 .an-text { font-size: 13px; line-height: 1.6; color: var(--text); }
 .an-text strong { color: var(--c1); }
 
+/* ── LUCID NOTE + EXTERNAL LINK (p7) ── */
+.ext-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--c1); text-decoration: none; margin-bottom: 28px; transition: color .15s; }
+.ext-link:hover { color: var(--c2); }
+.ext-link .mc-arrow { font-size: 13px; }
+
+/* ── EXERCISE CARDS (p7) ── */
+.ex-list-wrap { width: 100%; max-width: 720px; }
+.ex-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 14px; overflow: hidden; }
+.ex-trigger { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; cursor: pointer; gap: 16px; user-select: none; }
+.ex-trigger:hover .ex-title { color: var(--c1); }
+.ex-title { font-size: 14.5px; font-weight: 700; color: var(--text); transition: color .15s; }
+.ex-icon { font-size: 20px; font-weight: 300; color: var(--c1); line-height: 1; transition: transform .25s ease; flex-shrink: 0; }
+.ex-card.open .ex-icon { transform: rotate(45deg); }
+.ex-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+.ex-card.open .ex-body { max-height: 1200px; }
+.ex-body-inner { padding: 0 22px 22px; border-top: 1px solid var(--border); }
+.ex-tag { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin: 18px 0 8px; }
+.ex-text { font-size: 13px; line-height: 1.6; color: var(--text); }
+.ex-list { margin: 0; padding-left: 18px; }
+.ex-list li { font-size: 13px; line-height: 1.6; color: var(--text); margin-bottom: 5px; }
+.ex-list li strong { color: var(--text); }
+
 /* ── NORMAL FORMS ── */
 .nf-grid { display: flex; flex-direction: column; gap: 18px; width: 100%; max-width: 720px; }
 .nf-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
@@ -172,6 +206,12 @@ body {
     <div class="m-sub">Entidades · Atributos · Cardinalidade · Chaves · 1FN · 2FN · 3FN</div>
   </div>
   <div class="m-grid">
+    <button class="mcard" onclick="show('p0')">
+      <div class="mc-num">00</div>
+      <div class="mc-h">Objetivos da Aula</div>
+      <p class="mc-p">O que você vai saber fazer ao final desta aula.</p>
+      <span class="mc-arrow">↗</span>
+    </button>
     <button class="mcard" onclick="show('p1')">
       <div class="mc-num">01</div>
       <div class="mc-h">Visão Geral da Aula</div>
@@ -232,16 +272,16 @@ body {
 </div>
 
 <!-- ══════════════════════════════════════
-     P1 — VISÃO GERAL
+     P0 — OBJETIVOS DA AULA
 ══════════════════════════════════════ -->
-<div id="p1" class="page">
+<div id="p0" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
     <a class="back" href="../index.html">Disciplina</a>
-    <span class="t-label">01 · Visão Geral da Aula</span>
+    <span class="t-label">00 · Objetivos da Aula</span>
   </nav>
   <div class="t-body">
-    <div class="t-title">A arquitetura<br><em>do caos.</em></div>
+    <div class="t-title">O que você vai<br><em>saber fazer.</em></div>
 
     <div class="ov-block accent" style="margin-bottom:24px;">
       <div class="ov-tag">Objetivos da Aula</div>
@@ -255,15 +295,52 @@ body {
       </div>
     </div>
 
+    <div class="pg-nav">
+      <button class="pn-btn" onclick="show('menu')">← Menu</button>
+      <button class="pn-btn pn-fwd" onclick="show('p1')">Visão Geral →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     P1 — VISÃO GERAL
+══════════════════════════════════════ -->
+<div id="p1" class="page">
+  <nav class="t-nav">
+    <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
+    <span class="t-label">01 · Visão Geral da Aula</span>
+  </nav>
+  <div class="t-body">
+    <div class="t-title">A arquitetura<br><em>do caos.</em></div>
+
+    <div class="callout">
+      <div class="callout-tag">Antes de Começar</div>
+      Em grupos, abram o catálogo desnormalizado da SoundByte e identifiquem as inconsistências escondidas nele. Vocês têm 5 minutos. Depois, o professor libera a senha para desbloquear a aba com as respostas.
+    </div>
+
+    <div class="res-card">
+      <div class="res-icon">📊</div>
+      <div class="res-name">SoundByte_Catalogo_Desnormalizado.xlsx</div>
+      <div class="res-tag">Excel · Aba de respostas protegida por senha</div>
+      <div class="res-desc">Um único catálogo desnormalizado, com redundâncias e inconsistências propositais — o mesmo tipo de problema visto na tela de Normalização mais adiante.</div>
+      <a class="res-dl" href="../recursos/SoundByte_Catalogo_Desnormalizado.xlsx" download>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 1v9M3.5 6.5L7 10l3.5-3.5M2 12.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        SoundByte_Catalogo_Desnormalizado.xlsx
+      </a>
+    </div>
+
     <div class="ov-section-tag" style="margin-top:8px;">Conceitos Trabalhados</div>
     <div class="ov-concepts">
       <div class="ov-concept">
         <h4>Entidade e atributo</h4>
         <p>O que existe e merece uma tabela própria — e o que descreve essa entidade. Endereço começa como atributo de Cliente, mas se o cliente tem múltiplos endereços, precisa virar entidade.</p>
+        <img src="../recursos/fig-2-1-entidade-atributo.png" alt="Entidade, atributo, registro e coluna na tabela Clientes">
       </div>
       <div class="ov-concept">
         <h4>Relacionamento e cardinalidade</h4>
         <p>Como as entidades se conectam e quantos de um lado podem se relacionar com quantos do outro. Se Faixa e Álbum estão na mesma tabela, como armazenar uma faixa em dois álbuns?</p>
+        <img src="../recursos/fig-2-2-relacionamento-cardinalidade.png" alt="Relacionamento e cardinalidade entre Produtos e Categorias">
       </div>
       <div class="ov-concept">
         <h4>Modelagem aplicada</h4>
@@ -272,7 +349,7 @@ body {
     </div>
 
     <div class="pg-nav">
-      <button class="pn-btn" onclick="show('menu')">← Início</button>
+      <button class="pn-btn" onclick="show('p0')">← Objetivos</button>
       <button class="pn-btn pn-fwd" onclick="show('p2')">Modelo ER →</button>
     </div>
   </div>
@@ -1013,6 +1090,94 @@ body {
         <div class="kp-text">SQL, tipos de dados (INT, VARCHAR…), índices e otimizações para o BD específico.</div>
       </div>
     </div>
+
+    <div class="callout" style="margin-top:24px;">
+      <div class="callout-tag">Modelando no Lucid</div>
+      Os exercícios abaixo são feitos no Lucid, integrado ao Canvas da disciplina. Siga o passo a passo do link para conectar as duas ferramentas antes de começar.
+    </div>
+    <a class="ext-link" href="https://help.lucid.co/hc/pt/articles/14559937492756-Integrar-a-Lucid-ao-Canvas" target="_blank" rel="noopener">Integrar o Lucid ao Canvas <span class="mc-arrow">↗</span></a>
+
+    <div class="ov-section-tag">Exercícios — Modelagem de Dados com Lucid</div>
+    <p class="acc-hint">Clique em cada exercício para ver o cenário, as regras de negócio e a tarefa. Use a notação Crow's Foot.</p>
+
+    <div class="ex-list-wrap">
+      <div class="ex-card">
+        <div class="ex-trigger" onclick="toggleEx(this)">
+          <span class="ex-title">Exercício 1 — Catálogo de Filmes Animados</span>
+          <span class="ex-icon">+</span>
+        </div>
+        <div class="ex-body">
+          <div class="ex-body-inner">
+            <div class="ex-tag">Cenário</div>
+            <p class="ex-text">Uma plataforma de streaming deseja organizar seu catálogo de filmes animados e contratou você para projetar o modelo de dados relacional. Para cada filme são registrados um ID, o título, o ano de lançamento e a duração em minutos. Cada filme é dirigido por um único diretor e produzido por um único estúdio — mas um diretor pode ter dirigido vários filmes, assim como um estúdio pode ter produzido vários filmes diferentes. Diretores e estúdios possuem, cada um, um ID e um nome.</p>
+            <div class="ex-tag">Regras de Negócio</div>
+            <ul class="ex-list">
+              <li>Um filme está sempre associado a um único diretor e um único estúdio.</li>
+              <li>Um diretor pode ter dirigido vários filmes, mas um filme tem apenas um diretor.</li>
+              <li>Um estúdio pode ter produzido vários filmes, mas um filme pertence a apenas um estúdio.</li>
+            </ul>
+            <div class="ex-tag">Tarefa</div>
+            <ol class="ex-list">
+              <li>Identifique as entidades do problema.</li>
+              <li>Modele os relacionamentos entre as entidades, indicando as cardinalidades mínimas e máximas.</li>
+              <li>Crie os modelos conceitual, lógico e físico, utilizando a notação Crow's Foot.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-trigger" onclick="toggleEx(this)">
+          <span class="ex-title">Exercício 2 — Sistema Acadêmico Simplificado</span>
+          <span class="ex-icon">+</span>
+        </div>
+        <div class="ex-body">
+          <div class="ex-body-inner">
+            <div class="ex-tag">Cenário</div>
+            <p class="ex-text">Uma instituição de ensino contratou você para desenvolver o modelo conceitual de um sistema acadêmico para um curso oferecido por ela — organizando disciplinas, professores e estudantes, e os relacionamentos entre esses elementos.</p>
+            <div class="ex-tag">Regras de Negócio</div>
+            <ul class="ex-list">
+              <li>O curso é composto por várias disciplinas. Cada disciplina tem número de identificação, um nome, e é lecionada por apenas um professor.</li>
+              <li>Cada professor possui um número de identificação e um nome. Um professor pode lecionar várias disciplinas.</li>
+              <li>Cada estudante possui um número de identificação, um nome e uma turma. Um estudante pode se matricular em várias disciplinas, e uma disciplina pode ter vários estudantes matriculados. Cada matrícula deve registrar a data em que o estudante se matriculou na disciplina.</li>
+            </ul>
+            <div class="ex-tag">Tarefa</div>
+            <ol class="ex-list">
+              <li>Identifique e desenhe todas as entidades envolvidas no sistema.</li>
+              <li>Defina corretamente os relacionamentos entre as entidades e suas cardinalidades.</li>
+              <li>Crie os modelos conceitual, lógico e físico utilizando a notação Crow's Foot.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-trigger" onclick="toggleEx(this)">
+          <span class="ex-title">Exercício 3 — Sistema de Agendamento de Consultas em Clínica Médica</span>
+          <span class="ex-icon">+</span>
+        </div>
+        <div class="ex-body">
+          <div class="ex-body-inner">
+            <div class="ex-tag">Cenário</div>
+            <p class="ex-text">Uma clínica médica está desenvolvendo um sistema para gerenciar suas consultas, médicos, pacientes e faturamento. O corpo clínico é composto por diversos médicos, cada um podendo realizar várias consultas ao longo do tempo — ou nenhuma, em determinado momento. As consultas são marcadas com data, hora, duração e motivo, sempre com exatamente um médico e um paciente. Os pacientes são identificados por código, nome, sobrenome, endereço, cidade e estado, e podem agendar uma ou mais consultas. Cada consulta resulta na emissão de uma única fatura, identificada por número, valor, data de envio e status.</p>
+            <div class="ex-tag">Regras de Negócio</div>
+            <ul class="ex-list">
+              <li><strong>Médico</strong> — identificado por código, nome e sobrenome. Pode estar associado a muitas consultas, ou a nenhuma.</li>
+              <li><strong>Paciente</strong> — identificado por código, nome, sobrenome, endereço, cidade e estado. Pode ter várias consultas agendadas; cada consulta está associada a exatamente um paciente.</li>
+              <li><strong>Consulta</strong> — identificada por código, data, hora, duração e motivo. Associada a exatamente um médico e um paciente.</li>
+              <li><strong>Fatura</strong> — identificada por número, valor, data de envio e status. Associada a uma única consulta; cada consulta gera exatamente uma fatura.</li>
+            </ul>
+            <div class="ex-tag">Tarefa</div>
+            <ol class="ex-list">
+              <li>Identifique as entidades envolvidas no sistema.</li>
+              <li>Defina os relacionamentos entre as entidades, com suas respectivas cardinalidades.</li>
+              <li>Crie os modelos conceitual, lógico e físico utilizando a notação de Crow's Foot.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="pg-nav">
       <button class="pn-btn" onclick="show('p6')">← Integridade</button>
       <button class="pn-btn pn-fwd" onclick="show('menu')">Início →</button>
@@ -1031,6 +1196,12 @@ body {
     const wasOpen = item.classList.contains('open');
     document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
     if (!wasOpen) item.classList.add('open');
+  }
+  function toggleEx(trigger) {
+    const card = trigger.closest('.ex-card');
+    const wasOpen = card.classList.contains('open');
+    document.querySelectorAll('.ex-card.open').forEach(el => el.classList.remove('open'));
+    if (!wasOpen) card.classList.add('open');
   }
 </script>
 </body>
