@@ -50,6 +50,9 @@ body {
 .mc-arrow { position: absolute; bottom: 20px; right: 22px; color: var(--muted); font-size: 18px; transition: color .2s, transform .2s; }
 .mcard:hover .mc-arrow { color: var(--c1); transform: translate(2px, -2px); }
 .mcard.atividade { background: #fff; }
+.mc-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.mc-tag { font-size: 10.5px; font-weight: 600; padding: 4px 10px; border-radius: 20px; background: var(--s2); border: 1px solid var(--border); color: var(--c1); line-height: 1.4; }
+.mcard.atividade .mc-tag { background: var(--s1); }
 
 /* ── INFO CARD ── */
 .info-card { margin: 0 56px 8px; background: #fff; border: 3px solid var(--c1); border-radius: 14px; padding: 28px 32px 32px; }
@@ -88,56 +91,64 @@ body {
     <span class="mc-date">21.09</span>
     <div class="mc-num">Aula 01</div>
     <div class="mc-h">O Dado que Você Não Enxerga</div>
-    <p class="mc-p">Dado como Ativo · Informação · Decisão · Estrutura de Dados</p>
+    <p class="mc-p">Hierarquia dado-informação-conhecimento-decisão, dado operacional vs. analítico e como a arquitetura do banco de dados delimita as perguntas possíveis.</p>
+    <div class="mc-tags"><span class="mc-tag">Fundamentos</span><span class="mc-tag">OLTP · OLAP</span><span class="mc-tag">Dado como ativo</span></div>
     <span class="mc-arrow">↗</span>
   </a>
   <a class="mcard" href="content/aula-02.html">
     <span class="mc-date">26.09</span>
     <div class="mc-num">Aula 02</div>
     <div class="mc-h">A Arquitetura do Caos</div>
-    <p class="mc-p">Entidades · Atributos · Cardinalidade · Chaves · 1FN · 2FN · 3FN</p>
+    <p class="mc-p">Diagramas entidade-relacionamento, cardinalidades e chaves, integridade referencial e as três primeiras formas normais.</p>
+    <div class="mc-tags"><span class="mc-tag">Modelagem ER</span><span class="mc-tag">Normalização</span><span class="mc-tag">Chaves</span></div>
     <span class="mc-arrow">↗</span>
   </a>
   <a class="mcard" href="content/aula-03.html">
     <span class="mc-date">26.09</span>
     <div class="mc-num">Aula 03</div>
     <div class="mc-h">A Linguagem das Respostas</div>
-    <p class="mc-p">DDL · DML · SELECT · FROM · WHERE · JOIN · GROUP BY</p>
+    <p class="mc-p">SQL de ponta a ponta — DDL, DML, consultas, junções e agregações que respondem a perguntas do negócio.</p>
+    <div class="mc-tags"><span class="mc-tag">SQL</span><span class="mc-tag">JOIN</span><span class="mc-tag">GROUP BY</span></div>
     <span class="mc-arrow">↗</span>
   </a>
   <a class="mcard" href="content/aula-04.html">
     <span class="mc-date">28.09</span>
     <div class="mc-num">Aula 04</div>
     <div class="mc-h">O Refino Analítico</div>
-    <p class="mc-p">OLTP · OLAP · ETL · Data Warehouse · Star Schema · SCD</p>
+    <p class="mc-p">Data Warehouse, modelagem dimensional, tabela fato, dimensões e Slowly Changing Dimensions.</p>
+    <div class="mc-tags"><span class="mc-tag">Data Warehouse</span><span class="mc-tag">Star Schema</span><span class="mc-tag">SCD</span></div>
     <span class="mc-arrow">↗</span>
   </a>
   <a class="mcard" href="content/aula-05.html">
     <span class="mc-date">05.10</span>
     <div class="mc-num">Aula 05</div>
     <div class="mc-h">A Visualização do Sucesso</div>
-    <p class="mc-p">BI · Dashboard · KPIs · Métricas · Tableau · Storytelling com Dados</p>
+    <p class="mc-p">Ciclo de BI, KPIs vs. métricas de vaidade, escolha de visualizações e storytelling com dados no Tableau.</p>
+    <div class="mc-tags"><span class="mc-tag">Business Intelligence</span><span class="mc-tag">Dashboard</span><span class="mc-tag">KPIs</span></div>
     <span class="mc-arrow">↗</span>
   </a>
   <a class="mcard" href="content/aula-06.html">
     <span class="mc-date">19.10</span>
     <div class="mc-num">Aula 06</div>
     <div class="mc-h">A Escala do Big Data</div>
-    <p class="mc-p">Big Data · NoSQL · MongoDB · JSON</p>
+    <p class="mc-p">Os Vs do Big Data, limites do relacional em alta escala, tipos de NoSQL e prática com MongoDB.</p>
+    <div class="mc-tags"><span class="mc-tag">Big Data</span><span class="mc-tag">NoSQL</span><span class="mc-tag">MongoDB</span></div>
     <span class="mc-arrow">↗</span>
   </a>
   <a class="mcard" href="content/aula-07.html">
     <span class="mc-date">26.10</span>
     <div class="mc-num">Aula 07</div>
     <div class="mc-h">O Guardião dos Ativos</div>
-    <p class="mc-p">DAMA-DMBOK · LGPD · Segurança · Conformidade</p>
+    <p class="mc-p">DAMA-DMBOK, qualidade de dados, segurança e privacidade, LGPD e os papéis de Data Owner, Data Steward e DPO.</p>
+    <div class="mc-tags"><span class="mc-tag">Governança</span><span class="mc-tag">LGPD</span><span class="mc-tag">Qualidade de dados</span></div>
     <span class="mc-arrow">↗</span>
   </a>
   <a class="mcard" href="content/aula-08.html">
     <span class="mc-date">09.11</span>
     <div class="mc-num">Aula 08</div>
     <div class="mc-h">Projeto Final Integrador</div>
-    <p class="mc-p">Modelo de Dados · Arquitetura · Governança · Narrativa Estratégica</p>
+    <p class="mc-p">Revisão integradora e apresentação em grupo conectando modelagem, SQL, BI e governança em um único projeto.</p>
+    <div class="mc-tags"><span class="mc-tag">Projeto Integrador</span><span class="mc-tag">Apresentação</span><span class="mc-tag">Avaliação</span></div>
     <span class="mc-arrow">↗</span>
   </a>
 </div>
@@ -150,56 +161,64 @@ body {
     <span class="mc-date">21.09</span>
     <div class="mc-num">Atividade 01</div>
     <div class="mc-h">Os Números que Mentem sem Mentir</div>
-    <p class="mc-p">Dashboard operacional vs. decisão de negócio — o paradoxo da SoundByte.</p>
+    <p class="mc-p">Decidir com a visão operacional, listar as perguntas que ela não responde e revisar a decisão com os dados analíticos corretos.</p>
+    <div class="mc-tags"><span class="mc-tag">Aula 01 · O Dado que Você Não Enxerga</span></div>
     <span class="mc-arrow">↗</span>
   </a>
   <a class="mcard atividade" href="content/atividade-02.html">
     <span class="mc-date">26.09</span>
     <div class="mc-num">Atividade 02</div>
     <div class="mc-h">Sistema de Controle de Voos</div>
-    <p class="mc-p">Modelagem entidade-relacionamento para uma companhia aérea.</p>
+    <p class="mc-p">Modelar voos, aeronaves e tripulação em diagramas ER conceitual, lógico e físico, com notação Crow's Foot.</p>
+    <div class="mc-tags"><span class="mc-tag">Aula 02 · A Arquitetura do Caos</span></div>
     <span class="mc-arrow">↗</span>
   </a>
   <a class="mcard atividade" href="content/atividade-03.html">
     <span class="mc-date">26.09</span>
     <div class="mc-num">Atividade 03</div>
     <div class="mc-h">Chinook — SQL que Responde ao Negócio</div>
-    <p class="mc-p">Quatro perguntas de negócio obrigatórias e três que você formula.</p>
+    <p class="mc-p">Carregar o banco Chinook e responder quatro perguntas de negócio em SQL, mais três formuladas com auxílio da IA.</p>
+    <div class="mc-tags"><span class="mc-tag">Aula 03 · A Linguagem das Respostas</span></div>
     <span class="mc-arrow">↗</span>
   </a>
   <a class="mcard atividade" href="content/atividade-04.html">
     <span class="mc-date">28.09</span>
     <div class="mc-num">Atividade 04</div>
     <div class="mc-h">Do Operacional ao Star Schema</div>
-    <p class="mc-p">Processo de negócio, granularidade, fato, dimensões e SCD tipo 2.</p>
+    <p class="mc-p">Transformar o modelo da Atividade 2 em um Data Warehouse dimensional, com granularidade declarada e SCD tipo 2.</p>
+    <div class="mc-tags"><span class="mc-tag">Aula 04 · O Refino Analítico</span></div>
     <span class="mc-arrow">↗</span>
   </a>
   <a class="mcard atividade" href="content/atividade-05.html">
     <span class="mc-date">05.10</span>
     <div class="mc-num">Atividade 05</div>
     <div class="mc-h">Dashboard Analítico no Tableau</div>
-    <p class="mc-p">Seis visualizações obrigatórias, dois KPIs e quatro filtros interativos.</p>
+    <p class="mc-p">Construir um dashboard executivo interativo sobre o Data Warehouse de SoundByte: seis visualizações, dois KPIs e filtros em uma única tela.</p>
+    <div class="mc-tags"><span class="mc-tag">Aula 05 · A Visualização do Sucesso</span></div>
     <span class="mc-arrow">↗</span>
   </a>
   <a class="mcard atividade" href="content/atividade-06.html">
     <span class="mc-date">19.10</span>
     <div class="mc-num">Atividade 06</div>
     <div class="mc-h">SQL para MongoDB</div>
-    <p class="mc-p">Modelagem NoSQL · JSON · Consultas Analíticas · MongoDB Atlas</p>
+    <p class="mc-p">Converter um schema relacional em documentos JSON, inserir a coleção no MongoDB Atlas e escrever consultas e agregações.</p>
+    <div class="mc-tags"><span class="mc-tag">Aula 06 · A Escala do Big Data</span></div>
     <span class="mc-arrow">↗</span>
   </a>
   <a class="mcard atividade" href="content/atividade-07.html">
     <span class="mc-date">26.10</span>
     <div class="mc-num">Atividade 07</div>
     <div class="mc-h">Guardiões da SoundByte</div>
-    <p class="mc-p">RBAC · LGPD · Auditoria · Qualidade de Dados</p>
+    <p class="mc-p">Redigir uma política simplificada de acesso (RBAC), avaliar riscos de conformidade com a LGPD e propor métricas de qualidade.</p>
+    <div class="mc-tags"><span class="mc-tag">Aula 07 · O Guardião dos Ativos</span></div>
     <span class="mc-arrow">↗</span>
   </a>
   <a class="mcard atividade" href="content/atividade-08.html">
     <span class="mc-date">09.11</span>
     <div class="mc-num">Atividade 08</div>
     <div class="mc-h">Projeto Final — SoundByte Series B</div>
-    <p class="mc-p">Modelo de Dados · Arquitetura · Governança · Narrativa Estratégica</p>
+    <p class="mc-p">Entrega final em grupo: modelagem, script SQL comentado, dashboard de BI, justificativa SQL/NoSQL e a política de acesso com mapa de riscos LGPD.</p>
+    <div class="mc-tags"><span class="mc-tag">Aula 08 · O Projeto Final Integrador</span></div>
     <span class="mc-arrow">↗</span>
   </a>
 </div>
