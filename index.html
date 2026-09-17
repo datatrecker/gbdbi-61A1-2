@@ -51,6 +51,14 @@ body {
 .mcard:hover .mc-arrow { color: var(--c1); transform: translate(2px, -2px); }
 .mcard.atividade { background: #fff; }
 
+/* ── INFO CARD ── */
+.info-card { margin: 0 56px 8px; background: #fff; border: 3px solid var(--c1); border-radius: 14px; padding: 28px 32px 32px; }
+.info-card h3 { font-size: 19px; font-weight: 800; color: var(--c1); margin-bottom: 6px; }
+.info-card h4 { font-size: 14.5px; font-weight: 700; color: var(--text); margin-bottom: 14px; line-height: 1.5; }
+.info-card ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.info-card li { font-size: 13.5px; color: var(--muted); line-height: 1.6; padding-left: 20px; position: relative; }
+.info-card li::before { content: '—'; position: absolute; left: 0; color: var(--c1); font-weight: 700; }
+
 /* ── FOOTER ── */
 .site-footer { margin-top: 64px; padding: 32px 56px 56px; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--muted); line-height: 1.8; }
 .site-footer strong { color: var(--text); }
@@ -59,6 +67,7 @@ body {
   .m-header { padding: 56px 24px 40px; }
   .m-title { font-size: 36px; }
   .section, .m-grid { padding-left: 24px; padding-right: 24px; }
+  .info-card { margin-left: 24px; margin-right: 24px; padding-left: 24px; padding-right: 24px; }
   .site-footer { padding: 28px 24px 40px; }
 }
 </style>
@@ -193,6 +202,21 @@ body {
     <p class="mc-p">Modelo de Dados · Arquitetura · Governança · Narrativa Estratégica</p>
     <span class="mc-arrow">↗</span>
   </a>
+</div>
+
+<div class="info-card">
+  <h3>Como funcionam as atividades em grupo</h3>
+  <h4>As atividades avaliativas (Aulas 1 a 8) são feitas em grupo, com as seguintes regras básicas:</h4>
+  <ul>
+    <li>Os grupos podem ser os mesmos das outras disciplinas.</li>
+    <li>Não haverá sorteio de participantes.</li>
+    <li>Pode haver grupo de 1 aluno.</li>
+    <li>Os grupos serão preenchidos no Canvas para cada atividade.</li>
+    <li>Os alunos que faltarem na aula não poderão fazer parte do grupo.</li>
+    <li>Os alunos que faltaram poderão fazer as atividades posteriormente, com dedução de 20% na nota.</li>
+    <li>Os grupos para a atividade de Projeto Final (Aula 8) não estão sujeitos à regra de falta de aluno.</li>
+    <li>A entrega com atraso de qualquer uma das atividades terá a nota deduzida em 20%.</li>
+  </ul>
 </div>
 
 <footer class="site-footer">
