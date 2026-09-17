@@ -106,14 +106,8 @@ body {
 
 /* ── BLOOM OBJECTIVES ── */
 .bloom-list { display: flex; flex-direction: column; gap: 11px; margin-top: 6px; }
-.bloom-item { font-size: 13.5px; line-height: 1.55; color: var(--text); display: flex; align-items: baseline; gap: 12px; }
-.bloom-level { font-size: 8.5px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
-.bloom-level.l1 { background: var(--s1); color: var(--c1); border: 1px solid var(--border); }
-.bloom-level.l2 { background: var(--s2); color: var(--c1); border: 1px solid var(--border); }
-.bloom-level.l3 { background: #e0cccc; color: var(--c1); border: 1px solid #c8aeaa; }
-.bloom-level.l4 { background: #cdb5b5; color: var(--c1); border: 1px solid #b89898; }
-.bloom-level.l5 { background: var(--c1); color: #fdf8f6; border: 1px solid var(--c1); }
-.bloom-level.l6 { background: #3a0808; color: #fdf8f6; border: 1px solid #3a0808; }
+.bloom-item { font-size: 13.5px; line-height: 1.55; color: var(--text); position: relative; padding-left: 18px; }
+.bloom-item::before { content: "•"; position: absolute; left: 0; color: var(--c1); font-weight: 700; }
 
 /* ── ANOMALY TABLE ── */
 .anomaly-intro { font-size: 13.5px; color: var(--muted); width: 100%; max-width: 720px; margin-bottom: 14px; line-height: 1.55; }
@@ -243,20 +237,21 @@ body {
 <div id="p1" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">01 · Visão Geral da Aula</span>
   </nav>
   <div class="t-body">
     <div class="t-title">A arquitetura<br><em>do caos.</em></div>
 
     <div class="ov-block accent" style="margin-bottom:24px;">
-      <div class="ov-tag">Objetivos da Aula — Taxonomia de Bloom</div>
+      <div class="ov-tag">Objetivos da Aula</div>
       <div class="bloom-list">
-        <div class="bloom-item"><span class="bloom-level l1">Lembrar</span> Identificar os conceitos de entidade, atributo, relacionamento, cardinalidade e chave em um modelo de dados.</div>
-        <div class="bloom-item"><span class="bloom-level l2">Compreender</span> Explicar as diferenças entre os tipos de chave (PK, FK, natural, substituta) e o papel de cada forma normal.</div>
-        <div class="bloom-item"><span class="bloom-level l3">Aplicar</span> Construir um diagrama Entidade-Relacionamento a partir da descrição textual de um processo de negócio.</div>
-        <div class="bloom-item"><span class="bloom-level l4">Analisar</span> Identificar anomalias de inserção, alteração e exclusão em um modelo desnormalizado e apontar sua causa.</div>
-        <div class="bloom-item"><span class="bloom-level l5">Avaliar</span> Julgar se um esquema relacional atinge a 3ª Forma Normal, diagnosticando dependências parciais e transitivas.</div>
-        <div class="bloom-item"><span class="bloom-level l6">Criar</span> Projetar um modelo de dados completo — do diagrama ER conceitual ao esquema físico normalizado — para um processo de negócio real, garantindo integridade referencial e conformidade com a 3ª Forma Normal.</div>
+        <div class="bloom-item">Identificar os conceitos de entidade, atributo, relacionamento, cardinalidade e chave em um modelo de dados.</div>
+        <div class="bloom-item">Explicar as diferenças entre os tipos de chave (PK, FK, natural, substituta) e o papel de cada forma normal.</div>
+        <div class="bloom-item">Construir um diagrama Entidade-Relacionamento a partir da descrição textual de um processo de negócio.</div>
+        <div class="bloom-item">Identificar anomalias de inserção, alteração e exclusão em um modelo desnormalizado e apontar sua causa.</div>
+        <div class="bloom-item">Julgar se um esquema relacional atinge a 3ª Forma Normal, diagnosticando dependências parciais e transitivas.</div>
+        <div class="bloom-item">Projetar um modelo de dados completo — do diagrama ER conceitual ao esquema físico normalizado — para um processo de negócio real, garantindo integridade referencial e conformidade com a 3ª Forma Normal.</div>
       </div>
     </div>
 
@@ -289,6 +284,7 @@ body {
 <div id="p2" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">02 · Modelo Entidade-Relacionamento</span>
   </nav>
   <div class="t-body">
@@ -359,6 +355,7 @@ body {
 <div id="p3" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">03 · Relacionamentos e Cardinalidades</span>
   </nav>
   <div class="t-body">
@@ -433,6 +430,7 @@ body {
 <div id="p4" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">04 · Normalização: 1FN · 2FN · 3FN</span>
   </nav>
   <div class="t-body">
@@ -501,6 +499,7 @@ body {
 <div id="p4b" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">Anomalias de Dados</span>
   </nav>
   <div class="t-body">
@@ -572,6 +571,7 @@ body {
 <div id="p4c" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">Formas Normais — 1FN · 2FN · 3FN</span>
   </nav>
   <div class="t-body">
@@ -713,6 +713,7 @@ body {
 <div id="p5" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">05 · Tipos de Chaves</span>
   </nav>
   <div class="t-body">
@@ -853,6 +854,7 @@ body {
 <div id="p6" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">06 · Integridade Referencial</span>
   </nav>
   <div class="t-body">
@@ -950,6 +952,7 @@ body {
 <div id="p7" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">07 · Modelagem de Dados</span>
   </nav>
   <div class="t-body">

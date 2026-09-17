@@ -69,13 +69,8 @@ body {
 .bloom-card { width: 100%; max-width: 720px; background: var(--s1); border: 1px solid var(--border); border-left: 3px solid var(--c1); border-radius: 2px 10px 10px 2px; padding: 22px 24px; margin-bottom: 24px; }
 .bloom-eyebrow { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 16px; }
 .bloom-list { display: flex; flex-direction: column; gap: 11px; }
-.bloom-item { font-size: 13.5px; line-height: 1.55; color: var(--text); display: flex; align-items: baseline; gap: 12px; }
-.bloom-level { font-size: 8.5px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
-.bloom-level.l1 { background: var(--s1); color: var(--c1); border: 1px solid var(--border); }
-.bloom-level.l2 { background: var(--s2); color: var(--c1); border: 1px solid var(--border); }
-.bloom-level.l3 { background: #e0cccc; color: var(--c1); border: 1px solid #c8aeaa; }
-.bloom-level.l4 { background: #cdb5b5; color: var(--c1); border: 1px solid #b89898; }
-.bloom-level.l5 { background: var(--c1); color: #fdf8f6; border: 1px solid var(--c1); }
+.bloom-item { font-size: 13.5px; line-height: 1.55; color: var(--text); position: relative; padding-left: 18px; }
+.bloom-item::before { content: "•"; position: absolute; left: 0; color: var(--c1); font-weight: 700; }
 
 /* ── OVERVIEW ── */
 .ov-section-tag { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--muted); margin-bottom: 10px; width: 100%; max-width: 720px; }
@@ -253,7 +248,7 @@ body {
     <button class="mcard" onclick="show('p0')">
       <div class="mc-num">00</div>
       <div class="mc-h">Objetivos da Aula</div>
-      <p class="mc-p">Mapa de competências — o que você vai saber fazer ao final desta aula, segundo a Taxonomia de Bloom.</p>
+      <p class="mc-p">Mapa de competências — o que você vai saber fazer ao final desta aula.</p>
       <span class="mc-arrow">↗</span>
     </button>
     <button class="mcard" onclick="show('p1')">
@@ -333,32 +328,23 @@ body {
 <div id="p0" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">00 · Objetivos da Aula</span>
   </nav>
   <div class="t-body">
     <div class="t-title">O que você vai<br><em>saber fazer.</em></div>
     <div class="bloom-card">
-      <div class="bloom-eyebrow">Objetivos da Aula — Taxonomia de Bloom</div>
+      <div class="bloom-eyebrow">Objetivos da Aula</div>
       <div class="bloom-list">
-        <div class="bloom-item">
-          <span class="bloom-level l1">Lembrar</span>
-          Nomear os 5 Vs do Big Data e identificar os quatro tipos de banco NoSQL (Documento, Grafo, Chave-Valor, Coluna Larga).
+        <div class="bloom-item">Nomear os 5 Vs do Big Data e identificar os quatro tipos de banco NoSQL (Documento, Grafo, Chave-Valor, Coluna Larga).
         </div>
-        <div class="bloom-item">
-          <span class="bloom-level l2">Compreender</span>
-          Explicar por que o modelo relacional não escala para dados de alto volume e variedade, e qual limitação cada tipo de NoSQL resolve.
+        <div class="bloom-item">Explicar por que o modelo relacional não escala para dados de alto volume e variedade, e qual limitação cada tipo de NoSQL resolve.
         </div>
-        <div class="bloom-item">
-          <span class="bloom-level l3">Aplicar</span>
-          Representar dados de perfil de usuário em formato JSON e inserir documentos em uma coleção MongoDB no Atlas.
+        <div class="bloom-item">Representar dados de perfil de usuário em formato JSON e inserir documentos em uma coleção MongoDB no Atlas.
         </div>
-        <div class="bloom-item">
-          <span class="bloom-level l4">Analisar</span>
-          Comparar a modelagem SQL e NoSQL para um mesmo problema e identificar quando cada abordagem é mais adequada.
+        <div class="bloom-item">Comparar a modelagem SQL e NoSQL para um mesmo problema e identificar quando cada abordagem é mais adequada.
         </div>
-        <div class="bloom-item">
-          <span class="bloom-level l5">Criar</span>
-          Projetar o esquema NoSQL adequado para o cenário de eventos da SoundByte e justificar a escolha do tipo de banco para cada pergunta de negócio.
+        <div class="bloom-item">Projetar o esquema NoSQL adequado para o cenário de eventos da SoundByte e justificar a escolha do tipo de banco para cada pergunta de negócio.
         </div>
       </div>
     </div>
@@ -375,6 +361,7 @@ body {
 <div id="p1" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">01 · Visão Geral da Aula</span>
   </nav>
   <div class="t-body">
@@ -491,6 +478,7 @@ body {
 <div id="p2" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">02 · O Que é Big Data</span>
   </nav>
   <div class="t-body">
@@ -561,6 +549,7 @@ body {
 <div id="p3" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">03 · Estruturado vs Não Estruturado</span>
   </nav>
   <div class="t-body">
@@ -677,6 +666,7 @@ body {
 <div id="p4" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">04 · NoSQL: Além das Tabelas</span>
   </nav>
   <div class="t-body">
@@ -767,6 +757,7 @@ body {
 <div id="p5" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">05 · Tipos de BD NoSQL</span>
   </nav>
   <div class="t-body">
@@ -1001,6 +992,7 @@ Tori:
 <div id="p6" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">06 · SQL vs NoSQL na Prática</span>
   </nav>
   <div class="t-body">
@@ -1203,6 +1195,7 @@ Tori:
 <div id="p7" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">07 · Vantagens e Desafios</span>
   </nav>
   <div class="t-body">
@@ -1300,6 +1293,7 @@ Tori:
 <div id="p8" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">08 · Atividade Prática — MongoDB</span>
   </nav>
   <div class="t-body">
@@ -1497,6 +1491,7 @@ Tori:
 <div id="p9" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">09 · A Pergunta Estratégica</span>
   </nav>
   <div class="t-body">

@@ -69,13 +69,8 @@ body {
 .bloom-card { width: 100%; max-width: 720px; background: var(--s1); border: 1px solid var(--border); border-left: 3px solid var(--c1); border-radius: 2px 10px 10px 2px; padding: 22px 24px; margin-bottom: 24px; }
 .bloom-eyebrow { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 16px; }
 .bloom-list { display: flex; flex-direction: column; gap: 11px; }
-.bloom-item { font-size: 13.5px; line-height: 1.55; color: var(--text); display: flex; align-items: baseline; gap: 12px; }
-.bloom-level { font-size: 8.5px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
-.bloom-level.l1 { background: var(--s1); color: var(--c1); border: 1px solid var(--border); }
-.bloom-level.l2 { background: var(--s2); color: var(--c1); border: 1px solid var(--border); }
-.bloom-level.l3 { background: #e0cccc; color: var(--c1); border: 1px solid #c8aeaa; }
-.bloom-level.l4 { background: #cdb5b5; color: var(--c1); border: 1px solid #b89898; }
-.bloom-level.l5 { background: var(--c1); color: #fdf8f6; border: 1px solid var(--c1); }
+.bloom-item { font-size: 13.5px; line-height: 1.55; color: var(--text); position: relative; padding-left: 18px; }
+.bloom-item::before { content: "•"; position: absolute; left: 0; color: var(--c1); font-weight: 700; }
 
 /* ── OVERVIEW ── */
 .ov-section-tag { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--muted); margin-bottom: 10px; width: 100%; max-width: 720px; }
@@ -222,7 +217,7 @@ body {
     <button class="mcard" onclick="show('p0')">
       <div class="mc-num">00</div>
       <div class="mc-h">Objetivos da Aula</div>
-      <p class="mc-p">O que você vai saber fazer ao final desta aula — mapa de competências segundo a Taxonomia de Bloom.</p>
+      <p class="mc-p">O que você vai saber fazer ao final desta aula.</p>
       <span class="mc-arrow">↗</span>
     </button>
     <button class="mcard" onclick="show('p1')">
@@ -296,19 +291,20 @@ body {
 <div id="p0" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">00 · Objetivos da Aula</span>
   </nav>
   <div class="t-body">
     <div class="t-title">O que você vai<br><em>saber fazer.</em></div>
 
     <div class="bloom-card">
-      <div class="bloom-eyebrow">Objetivos da Aula — Taxonomia de Bloom</div>
+      <div class="bloom-eyebrow">Objetivos da Aula</div>
       <div class="bloom-list">
-        <div class="bloom-item"><span class="bloom-level l1">Lembrar</span> Reconhecer os cinco comandos SQL fundamentais — SELECT, FROM, WHERE, JOIN e GROUP BY — e seus propósitos básicos.</div>
-        <div class="bloom-item"><span class="bloom-level l2">Compreender</span> Explicar como cada cláusula SQL transforma os dados para responder uma pergunta de negócio específica.</div>
-        <div class="bloom-item"><span class="bloom-level l3">Aplicar</span> Escrever consultas com SELECT, WHERE, JOIN e GROUP BY para extrair informações de um banco relacional normalizado.</div>
-        <div class="bloom-item"><span class="bloom-level l4">Analisar</span> Interpretar o resultado de uma consulta e diagnosticar por que uma query retorna dados errados ou gera erros de sintaxe.</div>
-        <div class="bloom-item"><span class="bloom-level l5">Avaliar</span> Julgar se a resposta retornada por uma query — inclusive gerada por IA — responde corretamente a pergunta de negócio original.</div>
+        <div class="bloom-item">Reconhecer os cinco comandos SQL fundamentais — SELECT, FROM, WHERE, JOIN e GROUP BY — e seus propósitos básicos.</div>
+        <div class="bloom-item">Explicar como cada cláusula SQL transforma os dados para responder uma pergunta de negócio específica.</div>
+        <div class="bloom-item">Escrever consultas com SELECT, WHERE, JOIN e GROUP BY para extrair informações de um banco relacional normalizado.</div>
+        <div class="bloom-item">Interpretar o resultado de uma consulta e diagnosticar por que uma query retorna dados errados ou gera erros de sintaxe.</div>
+        <div class="bloom-item">Julgar se a resposta retornada por uma query — inclusive gerada por IA — responde corretamente a pergunta de negócio original.</div>
       </div>
     </div>
 
@@ -325,6 +321,7 @@ body {
 <div id="p1" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">01 · Visão Geral da Aula</span>
   </nav>
   <div class="t-body">
@@ -409,6 +406,7 @@ body {
 <div id="p2" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">02 · O Modelo SoundByte</span>
   </nav>
   <div class="t-body">
@@ -585,6 +583,7 @@ body {
 <div id="p3" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">03 · SELECT e FROM</span>
   </nav>
   <div class="t-body">
@@ -695,6 +694,7 @@ body {
 <div id="p_where" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">04 · WHERE</span>
   </nav>
   <div class="t-body">
@@ -778,6 +778,7 @@ body {
 <div id="p4" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">05 · JOIN</span>
   </nav>
   <div class="t-body">
@@ -1061,6 +1062,7 @@ body {
 <div id="p5" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">06 · GROUP BY e Agregações</span>
   </nav>
   <div class="t-body">
@@ -1176,6 +1178,7 @@ body {
 <div id="p6" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">07 · O que a IA pode e não pode fazer</span>
   </nav>
   <div class="t-body">
@@ -1271,6 +1274,7 @@ cadastrado. Ordene do maior para o menor.</span></code></div>
 <div id="p8" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">08 · Exercício — Banco de Dados Netflix</span>
   </nav>
   <div class="t-body">
@@ -1336,6 +1340,7 @@ antes de cada consulta.</span></code></div>
 <div id="p7" class="page" style="display:none!important">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">07 · Atividade Prática — Chinook</span>
   </nav>
   <div class="t-body">

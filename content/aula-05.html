@@ -69,13 +69,8 @@ body {
 .bloom-card { width: 100%; max-width: 720px; background: var(--s1); border: 1px solid var(--border); border-left: 3px solid var(--c1); border-radius: 2px 10px 10px 2px; padding: 22px 24px; margin-bottom: 24px; }
 .bloom-eyebrow { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 16px; }
 .bloom-list { display: flex; flex-direction: column; gap: 11px; }
-.bloom-item { font-size: 13.5px; line-height: 1.55; color: var(--text); display: flex; align-items: baseline; gap: 12px; }
-.bloom-level { font-size: 8.5px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
-.bloom-level.l1 { background: var(--s1); color: var(--c1); border: 1px solid var(--border); }
-.bloom-level.l2 { background: var(--s2); color: var(--c1); border: 1px solid var(--border); }
-.bloom-level.l3 { background: #e0cccc; color: var(--c1); border: 1px solid #c8aeaa; }
-.bloom-level.l4 { background: #cdb5b5; color: var(--c1); border: 1px solid #b89898; }
-.bloom-level.l5 { background: var(--c1); color: #fdf8f6; border: 1px solid var(--c1); }
+.bloom-item { font-size: 13.5px; line-height: 1.55; color: var(--text); position: relative; padding-left: 18px; }
+.bloom-item::before { content: "•"; position: absolute; left: 0; color: var(--c1); font-weight: 700; }
 
 /* ── OVERVIEW ── */
 .ov-section-tag { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--muted); margin-bottom: 10px; width: 100%; max-width: 720px; }
@@ -212,7 +207,7 @@ body {
     <button class="mcard" onclick="show('p0')">
       <div class="mc-num">00</div>
       <div class="mc-h">Objetivos da Aula</div>
-      <p class="mc-p">Mapa de competências — o que você vai saber fazer ao final desta aula, segundo a Taxonomia de Bloom.</p>
+      <p class="mc-p">Mapa de competências — o que você vai saber fazer ao final desta aula.</p>
       <span class="mc-arrow">↗</span>
     </button>
     <button class="mcard" onclick="show('p1')">
@@ -280,32 +275,23 @@ body {
 <div id="p0" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">00 · Objetivos da Aula</span>
   </nav>
   <div class="t-body">
     <div class="t-title">O que você vai<br><em>saber fazer.</em></div>
     <div class="bloom-card">
-      <div class="bloom-eyebrow">Objetivos da Aula — Taxonomia de Bloom</div>
+      <div class="bloom-eyebrow">Objetivos da Aula</div>
       <div class="bloom-list">
-        <div class="bloom-item">
-          <span class="bloom-level l1">Lembrar</span>
-          Identificar os conceitos de BI, KPI, dashboard, métricas de vaidade e análise descritiva/diagnóstica/preditiva/prescritiva.
+        <div class="bloom-item">Identificar os conceitos de BI, KPI, dashboard, métricas de vaidade e análise descritiva/diagnóstica/preditiva/prescritiva.
         </div>
-        <div class="bloom-item">
-          <span class="bloom-level l2">Compreender</span>
-          Explicar a diferença entre uma métrica de vaidade e uma métrica acionável, e por que essa distinção importa para decisões executivas.
+        <div class="bloom-item">Explicar a diferença entre uma métrica de vaidade e uma métrica acionável, e por que essa distinção importa para decisões executivas.
         </div>
-        <div class="bloom-item">
-          <span class="bloom-level l3">Aplicar</span>
-          Escolher o tipo de gráfico adequado para cada pergunta de negócio e construir um dashboard básico em uma ferramenta BI.
+        <div class="bloom-item">Escolher o tipo de gráfico adequado para cada pergunta de negócio e construir um dashboard básico em uma ferramenta BI.
         </div>
-        <div class="bloom-item">
-          <span class="bloom-level l4">Analisar</span>
-          Diagnosticar os problemas de um dashboard mal construído e propor melhorias baseadas nos princípios de visualização eficaz.
+        <div class="bloom-item">Diagnosticar os problemas de um dashboard mal construído e propor melhorias baseadas nos princípios de visualização eficaz.
         </div>
-        <div class="bloom-item">
-          <span class="bloom-level l5">Criar</span>
-          Projetar e construir um dashboard interativo com filtros e KPIs que responda uma pergunta de negócio específica para um público executivo.
+        <div class="bloom-item">Projetar e construir um dashboard interativo com filtros e KPIs que responda uma pergunta de negócio específica para um público executivo.
         </div>
       </div>
     </div>
@@ -322,6 +308,7 @@ body {
 <div id="p1" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">01 · Visão Geral da Aula</span>
   </nav>
   <div class="t-body">
@@ -405,6 +392,7 @@ body {
 <div id="p2" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">02 · O que faz um Dashboard Eficaz</span>
   </nav>
   <div class="t-body">
@@ -733,6 +721,7 @@ body {
 <div id="p3" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">03 · Métricas de Vaidade vs Acionáveis</span>
   </nav>
   <div class="t-body">
@@ -841,6 +830,7 @@ body {
 <div id="p4" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">04 · Categorias de Análise</span>
   </nav>
   <div class="t-body">
@@ -954,6 +944,7 @@ body {
 <div id="p5" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">05 · O Ecossistema de Dados</span>
   </nav>
   <div class="t-body">
@@ -1039,6 +1030,7 @@ body {
 <div id="p6" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">06 · Tableau e Ferramentas BI</span>
   </nav>
   <div class="t-body">
@@ -1138,6 +1130,7 @@ body {
 <div id="p7" class="page">
   <nav class="t-nav">
     <button class="back" onclick="show('menu')">← Menu</button>
+    <a class="back" href="../index.html">Disciplina</a>
     <span class="t-label">07 · IA e Visualização</span>
   </nav>
   <div class="t-body">
