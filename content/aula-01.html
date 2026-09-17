@@ -106,9 +106,11 @@ body {
 .t-title em { font-style: normal; color: var(--c1); }
 
 .diagram { width: 100%; max-width: 720px; margin-bottom: 44px; }
+.diagram img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); }
 
 .kps { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; width: 100%; max-width: 720px; }
 .kp { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 18px 18px 16px; }
+.kp-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 8px; margin-bottom: 12px; }
 .kp-tag { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 7px; }
 .kp-text { font-size: 13.5px; line-height: 1.55; color: var(--text); }
 
@@ -343,44 +345,19 @@ body {
   </nav>
   <div class="t-body">
     <div class="t-title">Três origens.<br><em>Todos os dados.</em></div>
-    <div class="diagram">
-      <svg viewBox="0 0 700 342" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
-        <line x1="350" y1="82" x2="152" y2="252" stroke="#dfc9c0" stroke-width="1.5" stroke-dasharray="4 4"/>
-        <line x1="350" y1="82" x2="548" y2="252" stroke="#dfc9c0" stroke-width="1.5" stroke-dasharray="4 4"/>
-        <line x1="152" y1="252" x2="548" y2="252" stroke="#dfc9c0" stroke-width="1.5" stroke-dasharray="4 4"/>
-        <!-- Pessoas (top) -->
-        <circle cx="350" cy="82" r="54" fill="#ffffff" stroke="#7a1a1a" stroke-width="1.5"/>
-        <circle cx="350" cy="67" r="11" fill="#7a1a1a" opacity=".85"/>
-        <path d="M325 98 Q325 83 350 83 Q375 83 375 98" fill="#7a1a1a" opacity=".85"/>
-        <text x="350" y="154" text-anchor="middle" fill="#1a0d0d" font-size="12" font-weight="700" font-family="system-ui" letter-spacing="1.5">PESSOAS</text>
-        <!-- Máquinas (bottom-left) -->
-        <circle cx="152" cy="252" r="54" fill="#ffffff" stroke="#b83030" stroke-width="1.5"/>
-        <circle cx="152" cy="252" r="15" fill="none" stroke="#b83030" stroke-width="2.5"/>
-        <circle cx="152" cy="252" r="5" fill="#b83030"/>
-        <rect x="148" y="232" width="8" height="8" rx="2" fill="#b83030"/>
-        <rect x="148" y="264" width="8" height="8" rx="2" fill="#b83030"/>
-        <rect x="130" y="248" width="8" height="8" rx="2" fill="#b83030"/>
-        <rect x="164" y="248" width="8" height="8" rx="2" fill="#b83030"/>
-        <text x="152" y="322" text-anchor="middle" fill="#1a0d0d" font-size="12" font-weight="700" font-family="system-ui" letter-spacing="1.5">MÁQUINAS</text>
-        <!-- Corporações (bottom-right) -->
-        <circle cx="548" cy="252" r="54" fill="#ffffff" stroke="#7a1a1a" stroke-width="1.5" stroke-opacity=".6"/>
-        <rect x="534" y="240" width="28" height="22" fill="none" stroke="#7a1a1a" stroke-width="2"/>
-        <rect x="540" y="248" width="6" height="10" fill="#7a1a1a" opacity=".7"/>
-        <rect x="550" y="248" width="6" height="10" fill="#7a1a1a" opacity=".7"/>
-        <rect x="532" y="236" width="36" height="4" rx="1" fill="#7a1a1a"/>
-        <text x="548" y="322" text-anchor="middle" fill="#1a0d0d" font-size="12" font-weight="700" font-family="system-ui" letter-spacing="1.5">CORPORAÇÕES</text>
-      </svg>
-    </div>
     <div class="kps">
       <div class="kp">
+        <img class="kp-img" src="../recursos/fig-1-1-pessoas.jpg" alt="Pessoas gerando dados por meio de redes sociais e dispositivos móveis." loading="lazy">
         <div class="kp-tag">Pessoas</div>
         <div class="kp-text">Redes sociais, transações, localização, comportamento digital.</div>
       </div>
       <div class="kp">
+        <img class="kp-img" src="../recursos/fig-1-2-maquinas.jpg" alt="Máquinas e sensores gerando dados em ambientes industriais." loading="lazy">
         <div class="kp-tag" style="color:#b83030">Máquinas</div>
         <div class="kp-text">Sensores IoT, drones, câmeras, equipamentos industriais.</div>
       </div>
       <div class="kp">
+        <img class="kp-img" src="../recursos/fig-1-3-corporate.jpg" alt="Corporações gerando dados por meio de sistemas transacionais." loading="lazy">
         <div class="kp-tag">Corporações</div>
         <div class="kp-text">ERP, CRM, sistemas transacionais, registros financeiros.</div>
       </div>
@@ -404,29 +381,38 @@ body {
   <div class="t-body">
     <div class="t-title">Do número bruto<br>à <em>decisão de negócio</em>.</div>
     <div class="diagram">
-      <svg viewBox="0 0 700 210" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+      <svg viewBox="0 0 900 210" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
         <!-- Box 1: DADO -->
         <rect x="16" y="55" width="160" height="90" rx="12" fill="#ffffff" stroke="#dfc9c0" stroke-width="1.5"/>
         <text x="96" y="85" text-anchor="middle" fill="#8a6060" font-size="9.5" font-family="system-ui" letter-spacing="2.5" font-weight="700">DADO</text>
         <text x="96" y="126" text-anchor="middle" fill="#7a1a1a" font-size="36" font-family="system-ui" font-weight="800">847</text>
         <!-- Arrow 1 -->
-        <line x1="178" y1="100" x2="226" y2="100" stroke="#dfc9c0" stroke-width="1.5"/>
-        <polygon points="226,93 240,100 226,107" fill="#c8aeaa"/>
-        <text x="208" y="86" text-anchor="middle" fill="#8a6060" font-size="10" font-family="system-ui">contexto</text>
+        <line x1="178" y1="100" x2="222" y2="100" stroke="#dfc9c0" stroke-width="1.5"/>
+        <polygon points="222,93 236,100 222,107" fill="#c8aeaa"/>
+        <text x="204" y="86" text-anchor="middle" fill="#8a6060" font-size="10" font-family="system-ui">contexto</text>
         <!-- Box 2: INFORMAÇÃO -->
-        <rect x="244" y="55" width="212" height="90" rx="12" fill="#ffffff" stroke="#dfc9c0" stroke-width="1.5"/>
-        <text x="350" y="85" text-anchor="middle" fill="#8a6060" font-size="9.5" font-family="system-ui" letter-spacing="2.5" font-weight="700">INFORMAÇÃO</text>
-        <text x="350" y="115" text-anchor="middle" fill="#b83030" font-size="14" font-family="system-ui" font-weight="600">vendas caíram 12%</text>
-        <text x="350" y="134" text-anchor="middle" fill="#b83030" font-size="14" font-family="system-ui" font-weight="600">em março</text>
+        <rect x="240" y="55" width="190" height="90" rx="12" fill="#ffffff" stroke="#dfc9c0" stroke-width="1.5"/>
+        <text x="335" y="85" text-anchor="middle" fill="#8a6060" font-size="9.5" font-family="system-ui" letter-spacing="2.5" font-weight="700">INFORMAÇÃO</text>
+        <text x="335" y="115" text-anchor="middle" fill="#b83030" font-size="14" font-family="system-ui" font-weight="600">vendas caíram 12%</text>
+        <text x="335" y="134" text-anchor="middle" fill="#b83030" font-size="14" font-family="system-ui" font-weight="600">em março</text>
         <!-- Arrow 2 -->
-        <line x1="458" y1="100" x2="506" y2="100" stroke="#dfc9c0" stroke-width="1.5"/>
-        <polygon points="506,93 520,100 506,107" fill="#c8aeaa"/>
-        <text x="488" y="86" text-anchor="middle" fill="#8a6060" font-size="10" font-family="system-ui">pergunta</text>
-        <!-- Box 3: DECISÃO -->
-        <rect x="524" y="55" width="162" height="90" rx="12" fill="#ffffff" stroke="#7a1a1a" stroke-width="1.5"/>
-        <text x="605" y="85" text-anchor="middle" fill="#7a1a1a" font-size="9.5" font-family="system-ui" letter-spacing="2.5" font-weight="700">DECISÃO</text>
-        <circle cx="605" cy="118" r="18" fill="none" stroke="#7a1a1a" stroke-width="2"/>
-        <polyline points="596,118 602,125 614,110" fill="none" stroke="#7a1a1a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="432" y1="100" x2="476" y2="100" stroke="#dfc9c0" stroke-width="1.5"/>
+        <polygon points="476,93 490,100 476,107" fill="#c8aeaa"/>
+        <text x="454" y="86" text-anchor="middle" fill="#8a6060" font-size="10" font-family="system-ui">padrão</text>
+        <!-- Box 3: CONHECIMENTO -->
+        <rect x="494" y="55" width="212" height="90" rx="12" fill="#ffffff" stroke="#dfc9c0" stroke-width="1.5"/>
+        <text x="600" y="85" text-anchor="middle" fill="#8a6060" font-size="9.5" font-family="system-ui" letter-spacing="2.5" font-weight="700">CONHECIMENTO</text>
+        <text x="600" y="115" text-anchor="middle" fill="#b83030" font-size="13" font-family="system-ui" font-weight="600">a queda se repete</text>
+        <text x="600" y="134" text-anchor="middle" fill="#b83030" font-size="13" font-family="system-ui" font-weight="600">todo mês de março</text>
+        <!-- Arrow 3 -->
+        <line x1="708" y1="100" x2="752" y2="100" stroke="#dfc9c0" stroke-width="1.5"/>
+        <polygon points="752,93 766,100 752,107" fill="#c8aeaa"/>
+        <text x="734" y="86" text-anchor="middle" fill="#8a6060" font-size="10" font-family="system-ui">pergunta</text>
+        <!-- Box 4: DECISÃO -->
+        <rect x="774" y="55" width="110" height="90" rx="12" fill="#ffffff" stroke="#7a1a1a" stroke-width="1.5"/>
+        <text x="829" y="85" text-anchor="middle" fill="#7a1a1a" font-size="9.5" font-family="system-ui" letter-spacing="2.5" font-weight="700">DECISÃO</text>
+        <circle cx="829" cy="118" r="18" fill="none" stroke="#7a1a1a" stroke-width="2"/>
+        <polyline points="820,118 826,125 838,110" fill="none" stroke="#7a1a1a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
     <div class="kps">
@@ -512,6 +498,13 @@ body {
         <div class="kp-tag" style="color:#b83030">Propósitos</div>
         <div class="kp-text">Operacional: executar o negócio. Analítico: entender e decidir.</div>
       </div>
+      <div class="kp">
+        <div class="kp-tag">Granularidade</div>
+        <div class="kp-text">O operacional guarda o evento individual — um pedido, um clique. O analítico agrega por dia, região ou produto. Escolher a granularidade errada é perder a pergunta antes de fazê-la.</div>
+      </div>
+    </div>
+    <div class="diagram">
+      <img src="../recursos/fig-1-4-transacional-analitico.png" alt="Comparação entre dado transacional (operacional) e dado analítico." loading="lazy">
     </div>
     <div class="pg-nav">
       <button class="pn-btn" onclick="show('p2')">← Dado × Informação</button>
