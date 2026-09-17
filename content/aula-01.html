@@ -113,6 +113,10 @@ body {
 .kp-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 8px; margin-bottom: 12px; }
 .kp-tag { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; color: var(--c1); margin-bottom: 7px; }
 .kp-text { font-size: 13.5px; line-height: 1.55; color: var(--text); }
+.kp-text ul { margin: 6px 0 0; padding-left: 18px; }
+.kp-text li { margin-bottom: 4px; }
+.kp-text li:last-child { margin-bottom: 0; }
+.kp-text li b { color: var(--text); }
 
 /* ── PREV / NEXT NAVIGATION ── */
 .pg-nav {
@@ -451,6 +455,9 @@ body {
   </nav>
   <div class="t-body">
     <div class="t-title">A mesma base.<br><em>Dois propósitos.</em></div>
+    <div class="diagram" style="margin-bottom: 56px;">
+      <img src="../recursos/fig-1-4-transacional-analitico.png" alt="Comparação entre dado transacional (operacional) e dado analítico." loading="lazy">
+    </div>
     <div class="diagram">
       <svg viewBox="0 0 700 290" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
         <!-- Left: OLTP -->
@@ -496,15 +503,23 @@ body {
       </div>
       <div class="kp">
         <div class="kp-tag" style="color:#b83030">Propósitos</div>
-        <div class="kp-text">Operacional: executar o negócio. Analítico: entender e decidir.</div>
+        <div class="kp-text">
+          <ul>
+            <li><b>Operacional:</b> executar o negócio.</li>
+            <li><b>Analítico:</b> entender e decidir.</li>
+          </ul>
+        </div>
       </div>
       <div class="kp">
         <div class="kp-tag">Granularidade</div>
-        <div class="kp-text">O operacional guarda o evento individual — um pedido, um clique. O analítico agrega por dia, região ou produto. Escolher a granularidade errada é perder a pergunta antes de fazê-la.</div>
+        <div class="kp-text">
+          <ul>
+            <li><b>Operacional:</b> guarda o evento individual — um pedido, um clique.</li>
+            <li><b>Analítico:</b> agrega por dia, região ou produto.</li>
+          </ul>
+          Escolher a granularidade errada é perder a pergunta antes de fazê-la.
+        </div>
       </div>
-    </div>
-    <div class="diagram">
-      <img src="../recursos/fig-1-4-transacional-analitico.png" alt="Comparação entre dado transacional (operacional) e dado analítico." loading="lazy">
     </div>
     <div class="pg-nav">
       <button class="pn-btn" onclick="show('p2')">← Dado × Informação</button>
